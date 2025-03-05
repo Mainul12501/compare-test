@@ -503,6 +503,13 @@ class Store extends Model
         return $this->hasOne(DisbursementWithdrawalMethod::class)->where('is_default',1);
     }
 
+    public function scopeWithoutModule($query, $moduleType)
+    {
+        return $query->whereHas('module', function ($q) use ($moduleType) {
+            $q->whereNot('module_type', $moduleType);
+        });
+    }
+
        /**
      * @param $value
      * @return bool
@@ -551,6 +558,14 @@ class Store extends Model
     public function scopeModule($query, $module_id): mixed
     {
         return $query->where('module_id', $module_id);
+    }
+
+
+    public function scopeWithModuleType($query, $moduleType)
+    {
+        return $query->whereHas('module', function ($q) use ($moduleType) {
+            $q->where('module_type', $moduleType);
+        });
     }
 
     /**

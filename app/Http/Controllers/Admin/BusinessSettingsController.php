@@ -2150,7 +2150,7 @@ class BusinessSettingsController extends Controller
         return back();
     }
 
-    public function fcm_index()
+    public function fcm_index(Request $request)
     {
         abort_if($request?->module_type == 'rental' && !addon_published_status('Rental'), 404);
         $fcm_credentials = Helpers::get_business_settings('fcm_credentials');

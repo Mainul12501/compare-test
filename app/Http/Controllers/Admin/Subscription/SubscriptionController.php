@@ -97,7 +97,8 @@ class SubscriptionController extends Controller
     {
         $language = getWebConfig('language');
         $defaultLang = str_replace('_', '-', app()->getLocale());
-        return view('admin-views.subscription.package.create', compact('language','defaultLang'));
+        $module= $request->module ?? 'all';
+        return view('admin-views.subscription.package.create', compact('language','defaultLang', 'module'));
     }
     public function store(Request $request)
     {

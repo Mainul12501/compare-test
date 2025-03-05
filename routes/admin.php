@@ -176,6 +176,7 @@ Route::group(['namespace' => 'Admin', 'as' => 'admin.'], function () {
             Route::get('store-filter/{id}', 'VendorController@store_filter')->name('store-filter');
             Route::get('get-account-data/{store}', 'VendorController@get_account_data')->name('store-filter');
             Route::get('get-stores', 'VendorController@get_stores')->name('get-stores');
+            Route::get('get-providers', 'VendorController@get_providers')->name('get-providers');
             Route::get('get-addons', 'VendorController@get_addons')->name('get_addons');
             Route::group(['middleware' => ['module:store']], function () {
                 Route::get('update-application/{id}/{status}', 'VendorController@update_application')->name('application');
