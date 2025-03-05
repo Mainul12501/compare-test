@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Validator;
 
 class WishlistController extends Controller
 {
-    // v2.8.1 checked
     public function add_to_wishlist(Request $request)
     {
         $validator = Validator::make($request->all(), [

@@ -137,6 +137,7 @@ if (isset($cart['paid'])) {
             <dd class="col-12">
                 <hr class="m-0">
             </dd>
+            <input type="hidden" id='total_order_amount' value="{{ round($total + $total_tax_amount, 2) }}">
             <dt class="col-6 font-regular">{{ translate('Total') }}: </dt>
             <dd class="col-6 text-right h4 b">
                 {{ \App\CentralLogics\Helpers::format_currency(round($total + $total_tax_amount, 2)) }} </dd>

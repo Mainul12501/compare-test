@@ -40,6 +40,7 @@ class Expense extends Model
     {
         return date('Y-m-d H:i:s',strtotime($value));
     }
+
     public function trip()
     {
         return $this->belongsTo(Trips::class, 'trip_id');

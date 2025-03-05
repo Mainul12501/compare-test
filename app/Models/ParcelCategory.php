@@ -16,7 +16,6 @@ class ParcelCategory extends Model
     protected $casts = [
         'parcel_per_km_shipping_charge'=>'float',
         'parcel_minimum_shipping_charge'=>'float',
-        'parcel_per_kg_charge'=>'float',    // v2.8.1
     ];
 
     protected $appends = ['image_full_url'];

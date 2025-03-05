@@ -127,7 +127,7 @@
                         <input type="hidden" name="g-recaptcha-response" id="g-recaptcha-response">
 
                         <input type="hidden" name="set_default_captcha" id="set_default_captcha_value" value="0" >
-                        <div class="row p-2 <!--d-none-->" id="reload-captcha"> {{--v2.8.1 -- comment out d-none class if want to keep company code--}}
+                        <div class="row p-2 d-none" id="reload-captcha">
                             <div class="col-6 pr-0">
                                 <input type="text" class="form-control form-control-lg border-0" name="custome_recaptcha"
                                         id="custome_recaptcha" required placeholder="{{translate('Enter recaptcha value')}}" autocomplete="off" value="{{env('APP_MODE')=='dev'? session('six_captcha'):''}}">
@@ -360,49 +360,34 @@ $(document).on('click','.reloadCaptcha', function(){
     });
 </script>
 @if(isset($recaptcha) && $recaptcha['status'] == 1)
-    <script type="text/javascript">
-        "use strict";
-        var onloadCallback = function () {
-            grecaptcha.render('recaptcha_element', {
-                'sitekey': '{{ \App\CentralLogics\Helpers::get_business_settings('recaptcha')['site_key'] }}'
-            });
-        };
-    </script>
-    <script src="https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit" async defer></script>
-
-{{--    <script src="https://www.google.com/recaptcha/api.js?render={{$recaptcha['site_key']}}"></script>--}}
+    <script src="https://www.google.com/recaptcha/api.js?render={{$recaptcha['site_key']}}"></script>
 @endif
 @if(isset($recaptcha) && $recaptcha['status'] == 1)
     <script>
         $(document).ready(function() {
             $('#signInBtn').click(function (e) {
-                $('#set_default_captcha_value').val('1');
                 if( $('#set_default_captcha_value').val() == 1){
                     $('#form-id').submit();
                     return true;
                 }
                 e.preventDefault();
-                if (grecaptcha)
-                {
-                    if (typeof grecaptcha === 'undefined') {
-                        toastr.error('Invalid recaptcha key provided. Please check the recaptcha configuration.   ---- here');
-                        $('#reload-captcha').removeClass('d-none');
-                        $('#set_default_captcha_value').val('1');
+                if (typeof grecaptcha === 'undefined') {
+                    toastr.error('Invalid recaptcha key provided. Please check the recaptcha configuration.');
+                    $('#reload-captcha').removeClass('d-none');
+                    $('#set_default_captcha_value').val('1');
 
-                        return;
-                    }
-                    grecaptcha.ready(function () {
-                        grecaptcha.execute('{{$recaptcha['site_key']}}', {action: 'submit'}).then(function (token) {
-                            $('#g-recaptcha-response').value = token;
-                            $('#form-id').submit();
-                        });
-                    });
+                    return;
                 }
-
+                grecaptcha.ready(function () {
+                    grecaptcha.execute('{{$recaptcha['site_key']}}', {action: 'submit'}).then(function (token) {
+                        $('#g-recaptcha-response').value = token;
+                        $('#form-id').submit();
+                    });
+                });
                 window.onerror = function (message) {
-                    var errorMessage = 'An unexpected error occurred. Please check the recaptcha configuration  -- error msg';
+                    var errorMessage = 'An unexpected error occurred. Please check the recaptcha configuration';
                     if (message.includes('Invalid site key')) {
-                        errorMessage = 'Invalid site key provided. Please check the recaptcha configuration.  -- error msg';
+                        errorMessage = 'Invalid site key provided. Please check the recaptcha configuration.';
                     } else if (message.includes('not loaded in api.js')) {
                         errorMessage = 'reCAPTCHA API could not be loaded. Please check the recaptcha API configuration.';
                     }

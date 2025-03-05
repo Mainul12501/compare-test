@@ -45,7 +45,7 @@ Route::get('order-invoice/{id}', 'HomeController@order_invoice')->name('order_in
 
 Route::get('login/{tab}', 'LoginController@login')->name('login');
 Route::post('external-login-from-drivemond', 'LoginController@externalLoginFromDrivemond');
-Route::post('login_submit', 'LoginController@submit')->name('login_post');
+Route::post('login_submit', 'LoginController@submit')->name('login_post')->middleware('actch');
 Route::get('logout', 'LoginController@logout')->name('logout');
 Route::get('/reload-captcha', 'LoginController@reloadCaptcha')->name('reload-captcha');
 Route::get('/reset-password', 'LoginController@reset_password_request')->name('reset-password');
@@ -108,6 +108,8 @@ if (!$is_published) {
                 ->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
             Route::post('callback', [RazorPayController::class, 'callback'])->name('callback')
                 ->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
+            Route::any('cancel', [RazorPayController::class, 'cancel'])->name('cancel')
+                ->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
         });
 
         //PAYPAL
@@ -116,7 +118,7 @@ if (!$is_published) {
             Route::any('success', [PaypalPaymentController::class, 'success'])->name('success')
                 ->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);;
             Route::any('cancel', [PaypalPaymentController::class, 'cancel'])->name('cancel')
-                ->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
+                ->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);;
         });
 
         //SENANG-PAY
@@ -189,7 +191,6 @@ if (!$is_published) {
 
 
 Route::get('/test', function () {
-    return bcrypt('123456');
     dd('Hello tester');
 });
 
@@ -197,35 +198,20 @@ Route::get('module-test', function () {
 });
 
 //Restaurant Registration
-Route::group(['prefix' => 'store', 'as' => 'restaurant.'], function () {
+Route::group(['prefix' => 'vendor', 'as' => 'restaurant.'], function () {
     Route::get('apply', 'VendorController@create')->name('create');
     Route::post('apply', 'VendorController@store')->name('store');
     Route::get('get-all-modules', 'VendorController@get_all_modules')->name('get-all-modules');
-    Route::get('download-store-agreement', 'VendorController@download_store_agereement')->name('download-store-agreement'); // v2.8.1
-    Route::get('download-courier-company-agreement', 'VendorController@download_courier_company_agereement')->name('download-courier-company-agreement');   // v2.8.1
+    Route::get('get-module-type', 'VendorController@get_modules_type')->name('get-module-type');
+
     Route::get('back', 'VendorController@back')->name('back');
     Route::post('business-plan', 'VendorController@business_plan')->name('business_plan');
     Route::post('payment', 'VendorController@payment')->name('payment');
     Route::get('final-step', 'VendorController@final_step')->name('final_step');
 });
-Route::group(['prefix' => 'company', 'as' => 'company.'], function () { // v2.8.1
-    Route::get('apply', 'VendorController@company_create')->name('create'); // v2.8.1
-    Route::post('apply', 'VendorController@company_store')->name('store');  // v2.8.1
-}); // v2.8.1
 
 //Deliveryman Registration
 Route::group(['prefix' => 'deliveryman', 'as' => 'deliveryman.'], function () {
     Route::get('apply', 'DeliveryManController@create')->name('create');
     Route::post('apply', 'DeliveryManController@store')->name('store');
-    Route::get('download-delivery-man-agreement', 'DeliveryManController@download_dm_agereement')->name('download-delivery-man-agreement'); // v2.8.1
-});
-Route::get('show-agreement/{key}', 'VendorController@showAgreement')->name('show-agreement');   // v2.8.1
-
-Route::get('/get-default-dwm-data/{disbursementWithdrawalMethod}', [\App\Http\Controllers\Admin\DeliveryMan\DeliveryManController::class, 'getDefaultDwmData'])->name('get-default-dwm-data'); // v2.8.1
-Route::post('/change-default-dwm-data', [\App\Http\Controllers\Admin\DeliveryMan\DeliveryManController::class, 'changeDefaultDwmData'])->name('change-default-dwm-data'); // v2.8.1
-//Route::get('change-dwm-status/{disbursementWithdrawalMethod}/{status}', [\App\Http\Controllers\Admin\DeliveryMan\DeliveryManController::class, 'changeDwmStatus'])->name('change-dwm-status'); // v2.8.1
-Route::get('create-passport-keys', function (){
-//    \Illuminate\Support\Facades\Artisan::call('passport:keys');
-    shell_exec('php ../artisan passport:install');
-    echo \Illuminate\Support\Facades\Artisan::output();
 });

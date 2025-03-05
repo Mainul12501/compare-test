@@ -66,12 +66,8 @@
                     <li class="navbar-vertical-aside-has-menu {{ Request::is('admin/parcel/orders/*')  ? 'active' : '' }}">
                         <a class="js-navbar-vertical-aside-menu-link nav-link nav-link-toggle" href="javascript:" title="{{ translate('messages.orders') }}">
                             <i class="tio-shopping-cart nav-icon"></i>
-                            @php($pendingOrdersOnMenu = \App\Models\Order::where(['order_status' => 'pending', 'order_type' => 'parcel'])->where('module_id', 5)->count() ?? 0)
-                            <span class="text-truncate {{ $pendingOrdersOnMenu > 0 ? ' position-relative overflow-visible' : 'navbar-vertical-aside-mini-mode-hidden-elements' }}">
+                            <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">
                                 {{ translate('messages.orders') }}
-                                @if(0 < $pendingOrdersOnMenu)
-                                    <span class="btn-status btn-status-danger border-0 size-8px"></span>
-                                @endif
                             </span>
                         </a>
                         <ul class="js-navbar-vertical-aside-submenu nav nav-sub" style="display:{{ Request::is('admin/parcel/orders/*') || Request::is('admin/order/offline/payment/list*')? 'block' : 'none' }}">
@@ -297,48 +293,6 @@
                     </li>
                     @endif
                     <!--End Product Section -->
-
-                    <!-- Comapny section start -->
-                    <!-- v2.8.1 start -->
-                    <li class="nav-item">
-                        <small class="nav-subtitle" title="{{ translate('messages.store_section') }}">{{ translate('messages.Courier_Company_management') }}</small>
-                        <small class="tio-more-horizontal nav-subtitle-replacer"></small>
-                    </li>
-
-                    @if (\App\CentralLogics\Helpers::module_permission_check('store'))
-                        <li class="navbar-vertical-aside-has-menu {{ Request::is('admin/store/pending-requests') ? 'active' : '' }}">
-                            <a class="js-navbar-vertical-aside-menu-link nav-link" href="{{ route('admin.company.pending-requests') }}" title="{{ translate('messages.pending_requests') }}">
-                                <span class="tio-calendar-note nav-icon"></span>
-                                <span class="text-truncate position-relative overflow-visible">
-                            {{ translate('messages.new_courier_companies') }}
-                                    @php($new_str = \App\Models\Store::whereHas('vendor', function($query){
-                                        return $query->where('status', null);
-                                    })->where('store_type','company')->get())
-                                    @if (count($new_str)>0)
-
-                                        <span class="btn-status btn-status-danger border-0 size-8px"></span>
-                                    @endif
-                        </span>
-                            </a>
-                        </li>
-                        <li class="navbar-vertical-aside-has-menu {{ Request::is('admin/company/add') ? 'active' : '' }}">
-                            <a class="js-navbar-vertical-aside-menu-link nav-link" href="{{ route('admin.company.add') }}" title="{{ translate('messages.add_scourier_company') }}">
-                                <span class="tio-add-circle nav-icon"></span>
-                                <span class="text-truncate">
-                            {{ translate('messages.add_courier_company') }}
-                        </span>
-                            </a>
-                        </li>
-                        <li class="navbar-vertical-aside-has-menu {{ Request::is('admin/company/list') ? 'active' : '' }}">
-                            <a class="js-navbar-vertical-aside-menu-link nav-link" href="{{ route('admin.company.list') }}" title="{{ translate('messages.stores_list') }}">
-                                <span class="tio-layout nav-icon"></span>
-                                <span class="text-truncate">{{ translate('messages.courier_company') }}
-                                    {{ translate('list') }}</span>
-                            </a>
-                        </li>
-                    @endif
-                    <!-- v2.8.1 end -->
-                    <!-- End conpany section -->
 
 
                 <li class="__sidebar-hs-unfold px-2" id="tourb-9">

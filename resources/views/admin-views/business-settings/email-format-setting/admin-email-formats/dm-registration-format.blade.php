@@ -109,7 +109,7 @@
                                             {{translate('Logo')}}
                                         </h5>
                                         <label class="custom-file">
-                                            <input type="file" name="logo" id="mail-logo" class="custom-file-input" accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*">
+                                            <input type="file" name="logo" id="mail-logo" class="custom-file-input" accept=".webp, .jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*">
                                             <span class="custom-file-label">{{ translate('messages.Choose File') }}</span>
                                         </label>
                                     </div>
@@ -251,7 +251,7 @@
                                             {{translate('Banner image')}}
                                         </h5>
                                         <label class="custom-file">
-                                            <input type="file" name="image" id="mail-banner" class="custom-file-input" accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*">
+                                            <input type="file" name="image" id="mail-banner" class="custom-file-input" accept=".webp, .jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*">
                                             <span class="custom-file-label">{{ translate('messages.Choose File') }}</span>
                                         </label>
                                     </div>

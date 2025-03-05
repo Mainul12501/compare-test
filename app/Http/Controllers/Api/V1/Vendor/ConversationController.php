@@ -18,7 +18,6 @@ use Illuminate\Support\Facades\Validator;
 
 class ConversationController extends Controller
 {
-    // v2.8.1 checked
     public function messages_store(Request $request)
     {
         if ($request->has('image')) {

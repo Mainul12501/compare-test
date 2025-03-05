@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 
 class SocialMediaController extends Controller
 {
-    // v2.8.1 checked
     /**
      * Display a listing of the resource.
      *

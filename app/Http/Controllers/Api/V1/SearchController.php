@@ -14,7 +14,6 @@ use Illuminate\Support\Facades\Validator;
 
 class SearchController extends Controller
 {
-    // v2.8.1 'checked -- need to change if these code not work properly
     public function get_searched_products(Request $request)
     {
         if (!$request->hasHeader('zoneId')) {

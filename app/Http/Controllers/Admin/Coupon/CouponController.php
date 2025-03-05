@@ -24,7 +24,6 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class CouponController extends BaseController
 {
-    // v2.8.1 checked
     public function __construct(
         protected CouponRepositoryInterface $couponRepo,
         protected CouponService $couponService,

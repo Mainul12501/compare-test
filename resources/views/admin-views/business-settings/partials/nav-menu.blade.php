@@ -12,7 +12,7 @@
                 <a class="nav-link {{ Request::is('admin/business-settings/business-setup/refund-settings') ?'active':'' }}" href="{{ route('admin.business-settings.business-setup',  ['tab' => 'refund-settings']) }}"  aria-disabled="true">{{translate('messages.refund_settings')}}</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link {{ Request::is('admin/business-settings/business-setup/store') ?'active':'' }}" href="{{ route('admin.business-settings.business-setup',  ['tab' => 'store']) }}"  aria-disabled="true">{{translate('messages.stores')}}</a>
+                <a class="nav-link {{ Request::is('admin/business-settings/business-setup/store') ?'active':'' }}" href="{{ route('admin.business-settings.business-setup',  ['tab' => 'store']) }}"  aria-disabled="true">{{translate('messages.Vendor')}}</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link {{ Request::is('admin/business-settings/business-setup/deliveryman') ?'active':'' }}" href="{{ route('admin.business-settings.business-setup',  ['tab' => 'deliveryman']) }}"  aria-disabled="true">{{translate('messages.deliveryman')}}</a>

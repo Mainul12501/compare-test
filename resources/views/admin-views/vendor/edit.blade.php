@@ -149,7 +149,7 @@
                                             <div class="icon-file">
                                                 <i class="tio-edit"></i>
                                         <input type="file" name="logo" id="customFileEg1" class="custom-file-input"
-                                        accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*" required>
+                                        accept=".webp, .jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*" required>
                                             </div>
                                         </div>
                                     </label>
@@ -170,7 +170,7 @@
                                             <div class="icon-file">
                                                 <i class="tio-edit"></i>
                                                 <input type="file" name="cover_photo" id="coverImageUpload"  class="custom-file-input"
-                                                    accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*">
+                                                    accept=".webp, .jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*">
                                             </div>
                                         </div>
                                     </label>
@@ -254,17 +254,25 @@
                                         </select>
                                     </div>
                                     <div class="form-group">
-                                        <label class="input-label" for="latitude">{{translate('messages.latitude')}}<span
+                                        <label class="input-label" for="latitude">{{translate('messages.latitude')}}
+                                            <span
                                                 class="form-label-secondary" data-toggle="tooltip" data-placement="right"
-        data-original-title="{{translate('messages.store_lat_lng_warning')}}"><img src="{{asset('/public/assets/admin/img/info-circle.svg')}}" alt="{{translate('messages.store_lat_lng_warning')}}"></span></label>
+                                                data-original-title="{{translate('messages.store_lat_lng_warning')}}">
+                                                <img src="{{asset('/public/assets/admin/img/info-circle.svg')}}" alt="{{translate('messages.store_lat_lng_warning')}}">
+                                            </span>
+                                        </label>
                                         <input type="text" id="latitude"
                                                 name="latitude" class="form-control"
                                                 placeholder="{{ translate('messages.Ex:') }} -94.22213" value="{{$store->latitude}}" required readonly>
                                     </div>
                                     <div class="form-group mb-5">
-                                        <label class="input-label" for="longitude">{{translate('messages.longitude')}}<span
+                                        <label class="input-label" for="longitude">{{translate('messages.longitude')}}
+                                            <span
                                                 class="form-label-secondary" data-toggle="tooltip" data-placement="right"
-        data-original-title="{{translate('messages.store_lat_lng_warning')}}"><img src="{{asset('/public/assets/admin/img/info-circle.svg')}}" alt="{{translate('messages.store_lat_lng_warning')}}"></span></label>
+                                                data-original-title="{{translate('messages.store_lat_lng_warning')}}">
+                                                <img src="{{asset('/public/assets/admin/img/info-circle.svg')}}" alt="{{translate('messages.store_lat_lng_warning')}}">
+                                            </span>
+                                        </label>
                                         <input type="text"
                                                 name="longitude" class="form-control"
                                                 placeholder="{{ translate('messages.Ex:') }} 103.344322" id="longitude" value="{{$store->longitude}}" required readonly>
@@ -315,101 +323,6 @@
                         </div>
                     </div>
                 </div>
-{{--                v2.8.1 start--}}
-                <div class="col-lg-12">
-                    <div class="card shadow--card-2">
-                        <div class="card-header">
-                            <h5 class="card-title">
-                                <span class="card-header-icon mr-1"><i class="tio-dashboard"></i></span>
-                                <span>{{translate('Additional Information')}}</span>
-                            </h5>
-                        </div>
-                        <div class="card-body d-flex justify-content-center align-items-center">
-
-                            <div class="row g-12 w-100 d-flex justify-content-start align-items-center">
-
-
-                                <div class="col-md-4 col-lg-4 col-sm-12">
-                                    <div class="form-group">
-                                        <label class="input-label"
-                                               for="tex_id">{{ translate('messages.Tax_Id') }}</label>
-                                        <input type="text" id="tax_id"
-                                               name="tax_id" class="form-control __form-control"
-                                               placeholder="{{ translate('messages.Tax_Id') }}"
-                                               value="{{ $store->tax_id }}" required>
-                                    </div>
-                                </div>
-
-                                <div class="col-md-4 col-lg-4 col-sm-12">
-                                    <div class="form-group">
-                                        <label class="input-label"
-                                               for="reg_no">{{ translate('messages.registration_number') }}</label>
-                                        <input type="text" id="reg_no"
-                                               name="register_no" class="form-control __form-control"
-                                               placeholder="{{ translate('messages.registration_number') }}"
-                                               value="{{ $store->register_no }}" required>
-                                    </div>
-                                </div>
-
-                                <div class="col-2 card p-5 mx-5">
-                                    <label class="__custom-upload-img">
-                                        <label class="form-label">
-                                            {{ translate('tax_document') }}
-                                        </label>
-
-                                        <div class="text-center">
-                                            <img class="img--110 onerror-image" id="tax_document_view"
-                                                 data-onerror-image="{{ asset('public/assets/admin/img/important-file.png') }}"
-                                                 src="{{\App\CentralLogics\Helpers::onerror_file_or_image_helper($store['tax_document'], asset('storage/app/public/store/').'/'.$store['tax_document'], asset('public/assets/admin/img/important-file.png'), 'store/') }}"
-                                                 alt="tax_document" />
-                                        </div>
-
-                                        <input type="file" name="tax_document" id="tax_document" class="custom-file-input"
-                                               accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff, .pdf, .doc, .docx|image/*, application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document" required>
-                                    </label>
-                                </div>
-                                <div class="col-2 card p-5 mx-5">
-                                    <label class="__custom-upload-img">
-                                        <label class="form-label">
-                                            {{ translate('registration_document') }}
-                                        </label>
-
-                                        <div class="text-center">
-                                            <img class="img--110 onerror-image" id="registration_document_view"
-                                                 data-onerror-image="{{ asset('public/assets/admin/img/important-file.png') }}"
-                                                 src="{{\App\CentralLogics\Helpers::onerror_file_or_image_helper($store['registration_document'], asset('storage/app/public/store/').'/'.$store['registration_document'], asset('public/assets/admin/img/important-file.png'), 'store/') }}"
-                                                 alt="registration_document" />
-                                        </div>
-
-                                        <input type="file" name="registration_document" id="registration_document" class="custom-file-input"
-                                               accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff, .pdf, .doc, .docx|image/*, application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document" required>
-                                    </label>
-                                </div>
-                                <div class="col-2 card p-5 mx-5">
-                                    <label class="__custom-upload-img">
-                                        <label class="form-label">
-                                            {{ translate('agreement_document') }}
-                                        </label>
-
-                                        <div class="text-center">
-                                            <img class="img--110 onerror-image" id="agreement_document_view"
-                                                 data-onerror-image="{{ asset('public/assets/admin/img/important-file.png') }}"
-                                                 src="{{\App\CentralLogics\Helpers::onerror_file_or_image_helper($store['agreement_document'], asset('storage/app/public/store/').'/'.$store['agreement_document'], asset('public/assets/admin/img/important-file.png'), 'store/') }}"
-                                                 alt="agreement_document" />
-                                        </div>
-
-                                        <input type="file" name="agreement_document" id="agreement_document" class="custom-file-input"
-                                               accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff, .pdf, .doc, .docx|image/*, application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document" required>
-                                    </label>
-                                </div>
-
-
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-{{--                v2.8.1 end--}}
                 <div class="col-lg-12">
                     <div class="card">
                         <div class="card-header">
@@ -742,7 +655,7 @@
 
     $('#module_id').select2({
             ajax: {
-                 url: '{{url('/')}}/store/get-all-modules',
+                 url: '{{url('/')}}/vendor/get-all-modules',
                 data: function (params) {
                     return {
                         q: params.term, // search term
@@ -776,50 +689,4 @@
 
     })
 </script>
-{{--    v2.8.1 start--}}
-    <script>
-        $("#tax_document").change(function() {
-            var fallbackImageUrl = $("#tax_document_view").data("onerror-image");
-            $("#tax_document_view").on("error", function() {
-                $(this).attr("src", fallbackImageUrl);
-            });
-            var file = this.files[0];
-            if (file) {
-                var reader = new FileReader();
-                reader.onload = function(e) {
-                    $("#tax_document_view").attr("src", e.target.result);
-                }
-                reader.readAsDataURL(file);
-            }
-        });
-        $("#registration_document").change(function() {
-            var fallbackImageUrl = $("#registration_document_view").data("onerror-image");
-            $("#registration_document_view").on("error", function() {
-                $(this).attr("src", fallbackImageUrl);
-            });
-            var file = this.files[0];
-            if (file) {
-                var reader = new FileReader();
-                reader.onload = function(e) {
-                    $("#registration_document_view").attr("src", e.target.result);
-                }
-                reader.readAsDataURL(file);
-            }
-        });
-        $("#agreement_document").change(function() {
-            var fallbackImageUrl = $("#agreement_document_view").data("onerror-image");
-            $("#agreement_document_view").on("error", function() {
-                $(this).attr("src", fallbackImageUrl);
-            });
-            var file = this.files[0];
-            if (file) {
-                var reader = new FileReader();
-                reader.onload = function(e) {
-                    $("#agreement_document_view").attr("src", e.target.result);
-                }
-                reader.readAsDataURL(file);
-            }
-        });
-    </script>
-{{--    v2.8.1 end--}}
 @endpush

@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class UserNotification extends Model
 {
     use HasFactory;
-    
+    protected $guarded = ['id'];
     public function getDataAttribute($value)
     {
         return json_decode($value, true);

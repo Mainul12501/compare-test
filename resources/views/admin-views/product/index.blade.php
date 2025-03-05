@@ -160,7 +160,7 @@
                                         <img class="img--176 border" id="viewer" src="{{ asset('public/assets/admin/img/upload-img.png') }}" alt="thumbnail" />
                                         <div class="icon-file-group">
                                             <div class="icon-file"><input type="file" name="image" id="customFileEg1" class="custom-file-input d-none"
-                                            accept=".jpg, .png, .webp, .jpeg, .gif, .bmp, .tif, .tiff|image/*">
+                                            accept=".webp, .jpg, .png, .webp, .jpeg, .gif, .bmp, .tif, .tiff|image/*">
                                                     <i class="tio-edit"></i>
                                             </div>
                                         </div>
@@ -457,19 +457,7 @@
                                             value="1" name="price" class="form-control"
                                             placeholder="{{ translate('messages.Ex:') }} 100" required>
                                     </div>
-{{--                                    v2.8.1 start--}}
-                                    <div class="form-group mb-0">
-                                        <label class="input-label"
-                                               for="exampleFormControlInput1">{{ translate('messages.weight') }} {{translate('(Kg)')}}</label>
-                                        <input type="number" min="0.001"
-                                               max="999999999999.99" name="weight" class="form-control" step="0.001"
-                                               placeholder="{{ translate('messages.Ex:') }} 5" required>
-
-                                        <input type="hidden" name= "module_type" value="{{ Config::get('module.current_module_type')}}">
-                                    </div>
-{{--                                    v2.8.1 end--}}
                                 </div>
-
                                 <div class="col-sm-{{ Config::get('module.current_module_type') == 'food' ? '4' :'3' }} col-6" id="stock_input">
                                     <div class="form-group mb-0">
                                         <label class="input-label"
@@ -512,32 +500,6 @@
                                             placeholder="{{ translate('messages.Ex:') }} 100">
                                     </div>
                                 </div>
-
-
-                                <div class="col-sm-6 col-lg-4">
-                                    <div class="form-group mb-0">
-                                        <label class="input-label" for="exampleFormControlInput1">{{translate('messages.VMW Height (cm)')}}</label>
-                                        <input type="number" min="0.001" max="999999999999.999" step="0.001" name="vmw_height" class="form-control"
-                                               placeholder="{{ translate('messages.Ex:') }} 10" required>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-lg-4">
-                                    <div class="form-group mb-0">
-                                        <label class="input-label" for="exampleFormControlInput1">{{translate('messages.VMW Width (cm)')}}</label>
-                                        <input type="number" min="0.001" max="999999999999.999" step="0.001" name="vmw_width" class="form-control"
-                                               placeholder="{{ translate('messages.Ex:') }} 10" required>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-lg-4">
-                                    <div class="form-group mb-0">
-                                        <label class="input-label" for="exampleFormControlInput1">{{translate('messages.VMW Length (cm)')}}</label>
-                                        <input type="number" min="0.001" max="999999999999.999" step="0.001" name="vmw_length" class="form-control"
-                                               placeholder="{{ translate('messages.Ex:') }} 10" required>
-                                    </div>
-                                </div>
-
-
-
                             </div>
                         </div>
                     </div>

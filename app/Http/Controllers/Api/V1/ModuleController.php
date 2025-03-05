@@ -10,38 +10,45 @@ use Illuminate\Http\Request;
 
 class ModuleController extends Controller
 {
-    // v2.8.1 checked
+
     public function index(Request $request)
     {
         if ($request->hasHeader('zoneId')) {
-            $zone_id=$request->header('zoneId');
-            $modules = Module::with('zones')->withCount('items')->whereHas('zones',function($query) use ($zone_id){
-                $query->whereIn('zone_id',json_decode($zone_id, true));
-            })->active()->get();
-        }else{
-            $modules = Module::withCount('items')->when($request->zone_id, function($query)use($request){
-                $query->whereHas('zones',function($query) use ($request){
-                    $query->where('zone_id',$request->zone_id);
+            $zone_id = json_decode($request->header('zoneId'), true);
+
+            $zone_id = is_array($zone_id) ? $zone_id : [$zone_id];
+
+            $modules = Module::with('zones')
+                ->withCount([
+                    'items',
+                    'stores' => function ($query) use ($zone_id) {
+                        $query->whereIn('zone_id', $zone_id);
+                    }
+                ])
+                ->whereHas('zones', function ($query) use ($zone_id) {
+                    $query->whereIn('zone_id', $zone_id);
+                })
+                ->active()
+                ->get();
+        } else {
+            $modules = Module::withCount([
+                'items',
+                'stores' => function ($query) use ($request) {
+                    $query->when($request->zone_id, function ($q) use ($request) {
+                        $q->where('zone_id', $request->zone_id);
+                    });
+                }
+            ])
+            ->when($request->zone_id, function ($query) use ($request) {
+                $query->whereHas('zones', function ($query) use ($request) {
+                    $query->where('zone_id', $request->zone_id);
                 })->notParcel();
-            })->active()->get();
+            })
+            ->active()
+            ->get();
         }
 
         $modules = array_map(function($item){
-            // if(count($item['translations'])>0)
-            // {
-            //     foreach($item['translations'] as $translation){
-            //         if($translation['key']=='module_name')
-            //         {
-            //             $item['module_name'] = $translation['value'];
-            //         }
-
-            //         if($translation['key']=='description')
-            //         {
-            //             $item['description'] = $translation['value'];
-            //         }
-            //     }
-
-            // }
             return $item;
         },$modules->toArray());
         return response()->json($modules);

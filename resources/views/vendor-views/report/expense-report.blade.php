@@ -136,9 +136,9 @@
                             <tr>
                                 <th >{{translate('sl')}}</th>
                                 @if($module_type == 'rental')
-                                    <th class="text-center" >{{translate('trip_id')}}</th>
+                                <th class="text-center" >{{translate('trip_id')}}</th>
                                 @else
-                                    <th class="text-center" >{{translate('messages.order_id')}}</th>
+                                <th class="text-center" >{{translate('messages.order_id')}}</th>
                                 @endif
                                 <th class="text-center" >{{translate('Date & Time')}}</th>
                                 <th class="text-center" >{{ translate('Expense Type') }}</th>
@@ -181,10 +181,10 @@
 
 
                                     <td class="text-center">
-                                    @if (isset($exp->order->customer))
-                                    {{ $exp->order->customer->f_name.' '.$exp->order->customer->l_name }}
-                                    @elseif($exp->order->is_guest)
-                                        @php($customer_details = json_decode($exp->order['delivery_address'],true))
+                                    @if (isset($exp?->order?->customer))
+                                    {{ $exp?->order?->fullName }}
+                                    @elseif($exp?->order?->is_guest)
+                                        @php($customer_details = json_decode($exp?->order['delivery_address'],true))
                                         {{$customer_details['contact_person_name']}}
                                     @else
                                     <label class="badge badge-danger">{{translate('messages.invalid_customer_data')}}</label>

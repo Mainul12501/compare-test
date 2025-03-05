@@ -145,7 +145,7 @@ active
 
                     </div>
                 </div>
-{{--            </div>--}}
+            </div>
             <div class="card mb-20">
                 <div class="card-header">
                     <div class="w-100 d-flex flex-wrap align-items-start gap-2">
@@ -166,21 +166,21 @@ active
                 </div>
                 <div class="card-body">
                     <div class="check--item-wrapper check--item-wrapper-2 mt-0">
-                        @if ($subscriptionackage->module_type !== 'rental')
+                       @if ($subscriptionackage->module_type !== 'rental')
 
-                        <div class="check-item">
-                            <label class="form-group form-check form--check">
-                                <input type="checkbox" class="form-check-input package-available-feature"  {{ $subscriptionackage->pos == 1 ? 'checked' : '' }} name="pos_system" value="1">
-                                <span class="form-check-label text-dark">{{ translate('messages.pos_system') }}</span>
-                            </label>
-                        </div>
-                        <div class="check-item">
-                            <label class="form-group form-check form--check">
-                                <input type="checkbox" class="form-check-input package-available-feature" {{ $subscriptionackage->self_delivery == 1 ? 'checked' : '' }}  name="self_delivery" value="1">
-                                <span class="form-check-label text-dark">{{ translate('messages.self_delivery') }}</span>
-                            </label>
-                        </div>
-                        @endif
+                       <div class="check-item">
+                           <label class="form-group form-check form--check">
+                               <input type="checkbox" class="form-check-input package-available-feature"  {{ $subscriptionackage->pos == 1 ? 'checked' : '' }} name="pos_system" value="1">
+                               <span class="form-check-label text-dark">{{ translate('messages.pos_system') }}</span>
+                           </label>
+                       </div>
+                       <div class="check-item">
+                           <label class="form-group form-check form--check">
+                               <input type="checkbox" class="form-check-input package-available-feature" {{ $subscriptionackage->self_delivery == 1 ? 'checked' : '' }}  name="self_delivery" value="1">
+                               <span class="form-check-label text-dark">{{ translate('messages.self_delivery') }}</span>
+                           </label>
+                       </div>
+                       @endif
                         <div class="check-item">
                             <label class="form-group form-check form--check">
                                 <input type="checkbox" class="form-check-input package-available-feature" {{ $subscriptionackage->mobile_app == 1 ? 'checked' : '' }}  name="mobile_app" value="1" >

@@ -140,14 +140,6 @@
                         </li>
                     @endif
 
-                    <li class="nav-item __nav-item">
-                        <a href="{{ route('admin.show-all-pending-requests')}}" id="tourb-8"
-                           class="__nav-link {{ Request::is('admin/show-all-pending-requests') ? 'active' : '' }}">
-                            <img src="{{asset('/public/assets/admin/img/new-img/dispatch.svg')}}" alt="public/img">
-                            <span>{{ translate('Pending')}}</span>
-                        </a>
-                    </li>
-
                     <li class="nav-item max-sm-m-0 ml-auto mr-lg-3">
                         <a class="btn btn-icon rounded-circle nav-msg-icon"
                            href="{{route('admin.message.list')}}">
@@ -257,25 +249,25 @@
                                 <div class="__nav-module-body">
                                     <div class="__nav-module-items">
                                         @foreach ($modules as $module)
-                                            @if(($module->module_type == 'rental' && addon_published_status('Rental') == 1) || $module->module_type != 'rental')
-                                                <a href="javascript:"
+                                        @if(($module->module_type == 'rental' && addon_published_status('Rental') == 1) || $module->module_type != 'rental')
+                                            <a href="javascript:"
 
-                                                   data-module-id="{{ $module->id }}"
-                                                   data-url="{{$module->module_type == 'rental' && addon_published_status('Rental') ? route('admin.rental.dashboard') : route('admin.dashboard')}}"
-                                                   data-filter="module_id"
+                                               data-module-id="{{ $module->id }}"
+                                               data-url="{{$module->module_type == 'rental' && addon_published_status('Rental') ? route('admin.rental.dashboard') : route('admin.dashboard')}}"
+                                               data-filter="module_id"
 
-                                                   class="__nav-module-item set-module {{Config::get('module.current_module_id') == $module->id?'active':''}}">
-                                                    <div class="img w--70px ">
-                                                        <img src="{{ $module?->icon_full_url }}"
+                                               class="__nav-module-item set-module {{Config::get('module.current_module_id') == $module->id?'active':''}}">
+                                                <div class="img w--70px ">
+                                                    <img src="{{ $module?->icon_full_url }}"
 
-                                                             data-onerror-image="{{asset('public/assets/admin/img/new-img/module/e-shop.svg')}}"
-                                                             alt="new-img" class="mw-100 onerror-image">
-                                                    </div>
-                                                    <div>
-                                                        {{ $module->module_name }}
-                                                    </div>
-                                                </a>
-                                            @endif
+                                                         data-onerror-image="{{asset('public/assets/admin/img/new-img/module/e-shop.svg')}}"
+                                                         alt="new-img" class="mw-100 onerror-image">
+                                                </div>
+                                                <div>
+                                                    {{ $module->module_name }}
+                                                </div>
+                                            </a>
+                                        @endif
                                         @endforeach
                                         @if (\App\CentralLogics\Helpers::module_permission_check('module'))
                                             <a href="{{ route('admin.business-settings.module.create') }}"

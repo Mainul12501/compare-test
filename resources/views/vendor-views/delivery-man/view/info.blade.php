@@ -96,31 +96,6 @@
                                  data-onerror-image="{{asset('public/assets/admin/img/160x160/img1.jpg')}}"
                                  src="{{ $dm['image_full_url'] }}"
                                  alt="Image Description">
-{{--                            v2.8.1 start--}}
-                            <div class="resturant--info-address  justify-content-center align-items-center">
-                                @if ($dm['agreement_document'])
-                                    <div class="card p-5 mx-5">
-                                        <label class="__custom-upload-img">
-                                            <label class="form-label">
-                                                {{ translate('agreement_document') }}
-                                            </label>
-                                            <a  class="text-center d-flex flex-column" href="{{ route('vendor.delivery-man.download-document', ['fileName' => $dm['agreement_document']]) }}">
-                                                <div class="text-center">
-                                                    <img class="img--110 onerror-image" id="license_view"
-                                                         data-onerror-image="{{ asset('public/assets/admin/img/important-file.png') }}"
-                                                         src="{{\App\CentralLogics\Helpers::onerror_file_or_image_helper($dm['agreement_document'], asset('storage/app/public/delivery-man/').'/'.$dm['agreement_document'], asset('public/assets/admin/img/important-file.png'), 'delivery-man/') }}"
-                                                         alt="Id card " />
-                                                </div>
-                                                <span class="pt-2">{{ translate('Download') }}</span>
-
-                                            </a>
-
-
-                                        </label>
-                                    </div>
-                                @endif
-                            </div>
-{{--                            v2.8.1 end--}}
                                  <div class="d-block">
                                     <div class="rating--review">
                                         <h1 class="title">{{count($dm->rating)>0?number_format($dm->rating[0]->average, 1, '.', ' '):0}}<span class="out-of">/5</span></h1>

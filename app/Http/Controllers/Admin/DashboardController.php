@@ -2,11 +2,6 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\Advertisement;
-use App\Models\DisbursementWithdrawalMethod;
-use App\Models\OfflinePayments;
-use App\Models\TempProduct;
-use App\Scopes\StoreScope;
 use Carbon\Carbon;
 use App\Models\Item;
 use App\Models\User;
@@ -28,7 +23,7 @@ use Illuminate\Support\Facades\Config;
 
 class DashboardController extends Controller
 {
-    // v2.8.1 checked
+
     public function __construct()
     {
         DB::statement("SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));");
@@ -935,78 +930,5 @@ class DashboardController extends Controller
         $dash_data['delivery_commission'] = $delivery_commission;
         $dash_data['label'] = $label;
         return $dash_data;
-    }
-
-    public function showAllPendingRequests(Request $request)
-    {
-        $module_type = Config::get('module.current_module_type');
-        if($module_type == 'settings'){
-            return redirect()->route('admin.business-settings.business-setup');
-        }
-        $modules = Module::where(['status' => 1])->get(['id', 'module_name', 'thumbnail']);
-        foreach ($modules as $module)
-        {
-            $module['pending_orders']   = Order::where(['module_id' => $module->id, 'order_status' => 'pending'])->count() ?? 0;
-            $module['refund_requests']   = Order::where(['module_id' => $module->id, 'order_status' => 'refunded'])->count() ?? 0;
-            $module['pending_items']   = TempProduct::withoutGlobalScope(StoreScope::class)
-                ->where('module_id', $module->id)
-                ->where('is_rejected', 0)
-                ->orderBy('is_rejected', 'asc')
-                ->orderBy('updated_at', 'desc')
-                ->count();
-            $module['pending_stores']   = Store::where(['module_id' => $module->id, 'status' => 0])->count() ?? 0;
-            $module['ads_requests']   = Advertisement::where(['module_id' => $module->id, 'status' => 'pending'])->count() ?? 0;
-        }
-
-        return view("admin-views.pending-all-requests", [
-            'modules'   => $modules,
-            'disbursment_requests_count'    => DisbursementWithdrawalMethod::where(['pending_status' => 1])->where('store_id', '!=', null)->count() ?? 0,
-            'dm_disbursment_requests_count'    => DisbursementWithdrawalMethod::where(['pending_status' => 1])->where('delivery_man_id', '!=', null)->count() ?? 0,
-            'pending_dm_count'    => DeliveryMan::where(['status' => 0])->count() ?? 0,
-            'pending_store_count'    => DeliveryMan::where(['status' => 0])->count() ?? 0,
-            'OfflinePayments'   => OfflinePayments::whereNotNull('store_id')->where('type', 'store')->where('status', 'pending')->count() ?? 0,
-        ]);
-    }
-
-    public function redirectToPendingPages(Request $request)
-    {
-
-        if (isset($request->type) && isset($request->module_id))
-        {
-            session()->put('current_module', $request->module_id ?? 1);
-            if ($request->type == 'store_dis_req')
-            {
-                return redirect(url('/admin/store/pending-method-requests'));
-            }
-            elseif ($request->type == 'order')
-            {
-                return redirect(url('/admin/order/list/pending'));
-            }
-            elseif ($request->type == 'item')
-            {
-                return redirect(url('/admin/item/new/item/list'));
-            }
-            elseif ($request->type == 'refund')
-            {
-                return redirect(url('/admin/refund/requested'));
-            }
-            elseif ($request->type == 'store')
-            {
-                return redirect(url('/admin/store/pending-requests'));
-            }
-            elseif ($request->type == 'ads')
-            {
-                return redirect(url('/admin/advertisement/requests'));
-            }
-            else
-            {
-                \Toastr::error('Something went wrong. Please try again');
-                return redirect()->back();
-            }
-
-        } else {
-            \Toastr::error('Something went wrong. Please try again');
-            return back();
-        }
     }
 }

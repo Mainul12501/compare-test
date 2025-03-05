@@ -116,7 +116,7 @@
                                 </div>
                                 <div class="custom-file">
                                     <input type="file" name="image" id="customFileEg1" class="custom-file-input"
-                                            accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*">
+                                            accept=".webp, .jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*">
                                     <label class="custom-file-label" for="customFileEg1">{{translate('messages.choose_file')}}</label>
                                 </div>
                             </div>
@@ -135,14 +135,6 @@
                                     value="{{ $parcel_category->parcel_minimum_shipping_charge }}">
                             </div>
                         </div>
-{{--                        v2.8.1 codes start--}}
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label class="input-label text-capitalize">{{translate('messages.per_kg_charge')}}</label>
-                                <input type="number" step=".01" min="0" placeholder="{{translate('messages.per_kg_charge')}}" class="form-control" name="parcel_per_kg_charge" value="{{ $parcel_category->parcel_per_kg_charge }}">
-                            </div>
-                        </div>
-{{--                        v2.8.1 codes end--}}
                         <div class="col-12">
                             <div class="btn--container justify-content-end">
                                 <button type="reset" id="reset_btn" class="btn btn--reset">{{translate('messages.reset')}}</button>

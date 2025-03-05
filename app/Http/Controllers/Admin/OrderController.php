@@ -39,12 +39,12 @@ use App\Models\OrderPayment;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Storage;
 use MatanYadaev\EloquentSpatial\Objects\Point;
-use App\Models\DeliveryCompany;
 
 class OrderController extends Controller
 {
     public function list($status, Request $request)
     {
+        // dd($status);
         $key = explode(' ', $request['search']);
         if (session()->has('zone_filter') == false) {
             session()->put('zone_filter', 0);
@@ -213,7 +213,7 @@ class OrderController extends Controller
 
     public function details(Request $request, $id)
     {
-        $order = Order::with(['details','offline_payments','refund',  'store' => function ($query) {
+        $order = Order::with(['details','offline_payments','refund', 'store' => function ($query) {
             return $query->withCount('orders');
         }, 'customer' => function ($query) {
             return $query->withCount('orders');
@@ -226,59 +226,20 @@ class OrderController extends Controller
         }])->where(['id' => $id])->first();
         if (isset($order)) {
             if (isset($order->store)) {
-                if ($order->order_type == 'parcel')
-                {
-                    $deliveryMen = DeliveryMan::with('vehicle')->where(function($query)use($order){
-                        if ($order->module_type != 'parcel')
-                            $query->where('vehicle_id',$order->dm_vehicle_id)->orWhereNull('vehicle_id');
-                    })
-                        ->whereHas('vehicle', function ($query) use($order) {
-                            $query->where('maximum_weight', '>=', $order->weight)->where('minimum_weight', '<=', $order->weight)->where('maximum_coverage_area', '>=', $order->distance)->where('starting_coverage_area', '<=', $order->distance);
-                        })
-                        ->available()->active()/*->where('type','zone_wise')*/->get(); // v2.8.1 -- customized
-                } else {
-                     $deliveryMen = DeliveryMan::with('vehicle')->where('zone_id', $order->store->zone_id)
-
+                $deliveryMen = DeliveryMan::where('zone_id', $order->store->zone_id)
                 ->where(function($query)use($order){
-//                            $query->whereNull('vehicle_id');
                             $query->where('vehicle_id',$order->dm_vehicle_id)->orWhereNull('vehicle_id');
-                    })
-                         ->whereHas('vehicle', function ($query) use($order) {
-                             $query->where('maximum_weight', '>=', $order->weight)->where('minimum_weight', '<=', $order->weight)->where('maximum_coverage_area', '>=', $order->distance)->where('starting_coverage_area', '<=', $order->distance);
-                         })
-                         ->available()->with('vehicle')->active()/*->where('type','zone_wise')*/->get(); // v2.8.1 -- customized
-                }
+                    })->available()->active()->get();
             } else {
-                 $deliveryMen = isset($order->zone_id) ? DeliveryMan::where('zone_id', $order->zone_id)->zonewise()->available()->active()->get() : [];
+                // $deliveryMen = isset($order->zone_id) ? DeliveryMan::where('zone_id', $order->zone_id)->zonewise()->available()->active()->get() : [];
 
                 if($order->store !== null){
-
-                    if ($order->order_type == 'parcel')
-                    {
-                        $deliveryMen = isset($order->zone_id) ? DeliveryMan::with('vehicle')->/*where('zone_id', $order->store->zone_id)->*/where(function($query)use($order){
+                    $deliveryMen = isset($order->zone_id) ? DeliveryMan::where('zone_id', $order->store->zone_id)->where(function($query)use($order){
                             $query->where('vehicle_id',$order->dm_vehicle_id)->orWhereNull('vehicle_id');
                     })
-                            ->whereHas('vehicle', function ($query) use($order) {
-                                $query->where('maximum_weight', '>=', $order->weight)->where('minimum_weight', '<=', $order->weight)->where('maximum_coverage_area', '>=', $order->distance)->where('starting_coverage_area', '<=', $order->distance);
-                            })
-                    ->available()->active()/*->where('type','zone_wise')*/->get():[];   // v2.8.1 -- comment out the code
-                    } else {
-                        $deliveryMen = isset($order->zone_id) ? DeliveryMan::with('vehicle')->where('zone_id', $order->store->zone_id)->where(function($query)use($order){
-                            $query->where('vehicle_id',$order->dm_vehicle_id)->orWhereNull('vehicle_id');
-                    })
-//                            ->whereHas('vehicle', function ($query) use($order) {
-//                                $query->where('maximum_weight', '>=', $order->weight)->where('minimum_weight', '<=', $order->weight)->where('maximum_coverage_area', '>=', $order->distance)->where('starting_coverage_area', '<=', $order->distance);
-//                            })
-                    ->available()->active()->where('type','zone_wise')->get():[];   // v2.8.1 -- comment out the code
-                    }
-
+                    ->available()->active()->get():[];
                 } else{
-
-                    $deliveryMen = DeliveryMan::with('vehicle')->where('zone_id', '=', NULL)->where('vehicle_id',$order->dm_vehicle_id)
-//                        ->whereHas('vehicle', function ($query) use($order) {
-//                            $query->where('maximum_weight', '>=', $order->weight)->where('minimum_weight', '<=', $order->weight)->where('maximum_coverage_area', '>=', $order->distance)->where('starting_coverage_area', '<=', $order->distance);
-//                        })
-                        ->active()/*->where('type','zone_wise')*/->get();   // v2.8.1 -- comment out the code
+                    $deliveryMen = DeliveryMan::where('zone_id', '=', NULL)->where('vehicle_id',$order->dm_vehicle_id)->active()->get();
                 }
             }
             $category = $request->query('category_id', 0);
@@ -502,26 +463,20 @@ class OrderController extends Controller
             $refund_method = $request->refund_method  ?? 'manual';
             $wallet_status = BusinessSetting::where('key', 'wallet_status')->first()->value;
             $refund_to_wallet = BusinessSetting::where('key', 'wallet_add_refund')->first()->value;
-            $refund_amount_final = 0;   // v2.8.1
             if ($order->payment_status == "paid" && $wallet_status == 1 && $refund_to_wallet == 1) {
-                $refund_amount = round($order->order_amount - ($request->method == 'without-dm' ? $order->delivery_charge : 0) - $order->dm_tips, config('round_up_to_digit'));     //v 2.8.1
+                $refund_amount = round($order->order_amount - $order->delivery_charge - $order->dm_tips, config('round_up_to_digit'));
                 CustomerLogic::create_wallet_transaction($order->user_id, $refund_amount, 'order_refund', $order->id);
                 Toastr::info(translate('Refunded amount added to customer wallet'));
                 $refund_method = 'wallet';
-                $refund_amount_final = $refund_amount;  // v2.8.1
             } else {
-                Toastr::warning(translate('Customer Wallet Refund is not active.Please Manage the Refund Amount Manually'));
+                Toastr::warning(translate('Customer Wallet Refund is not active.Plase Manage the Refund Amount Manually'));
                 $refund_method = $request->refund_method  ?? 'manual';
             }
-            if (!$refund_amount_final > 0) {    // v2.8.1
-                $refund_amount_final = Refund::where('order_id', $request->id)->first()->refund_amount; // v2.8.1
-            }   // v2.8.1
             Refund::where('order_id', $order->id)->update([
                 'order_status' => 'refunded',
                 'admin_note' => $request->admin_note ?? null,
                 'refund_status' => 'approved',
                 'refund_method' => $refund_method,
-                'refund_amount' => $refund_amount_final ?? 0.   // v2.8.1
             ]);
             $order?->store ?   Helpers::increment_order_count($order?->store) : '';
 
@@ -562,7 +517,7 @@ class OrderController extends Controller
                 Toastr::error(translate('messages.Failed_to_send_mail'));
             }
         } else if ($request->order_status == 'canceled') {
-            if (in_array($order->order_status, ['delivered', 'canceled', 'refund_requested', 'refunded', 'failed', 'picked_up'])|| $order->picked_up) {     // v2.8.1
+            if (in_array($order->order_status, ['delivered', 'canceled', 'refund_requested', 'refunded', 'failed'])) {
                 Toastr::warning(translate('messages.you_can_not_cancel_a_completed_order'));
                 return back();
             }
@@ -1851,39 +1806,5 @@ class OrderController extends Controller
             ->paginate(config('default_pagination'));
 
         return view('admin-views.order.offline_verification_list', compact('orders', 'status'));
-    }
-    // v2.8.1 full function
-    public function third_party_company(Request $request){
-
-        $request->validate([
-            "order_id"=>"required",
-            "company_name"=>"required",
-            "tracking_url"=>"required|url",
-            "serial_number"=>"required",
-
-        ]);
-
-        $delivery_company = DeliveryCompany::updateOrCreate(
-            ['order_id' => $request->order_id],
-            [
-                'company_name' => $request->company_name,
-                'tracking_url' => $request->tracking_url,
-                'serial_number' => $request->serial_number
-            ]
-        );
-        $order=Order::find($request->order_id);
-        $order->third_party=1;
-        $order->company_id=$delivery_company->id;
-        $order->save();
-
-        if ($delivery_company->wasRecentlyCreated) {
-            Toastr::success(translate('Assign_to_third_party_company'));
-        }
-        else
-        {
-            Toastr::success(translate('Update_to_third_party_company'));
-        }
-
-        return back();
     }
 }

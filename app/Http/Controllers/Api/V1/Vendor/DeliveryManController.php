@@ -10,11 +10,9 @@ use App\CentralLogics\Helpers;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
-use Illuminate\Support\Facades\Response;
 
 class DeliveryManController extends Controller
 {
-    // v2.8.1 checked
     public function __construct(Request $request)
     {
         $this->middleware(function ($request, $next) {
@@ -277,7 +275,7 @@ class DeliveryManController extends Controller
 
         return response()->json(['message' => translate('messages.deliveryman_updated_successfully')], 200);
 
-        return redirect('store-panel/delivery-man/list');
+
     }
 
     public function delete(Request $request)

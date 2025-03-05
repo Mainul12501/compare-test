@@ -746,21 +746,7 @@ trait NotificationDataSetUpTrait
         ];
 
 
-            foreach($data as $item){
-
-                if(NotificationSetting::where('key', $item['key'])->where('type', $item['type'])->doesntExist()){
-                    $notificationsetting = NotificationSetting::firstOrNew(
-                        ['key' => $item['key'], 'type' => $item['type']]
-                    );
-                    $notificationsetting->title = $item['title'];
-                    $notificationsetting->sub_title = $item['sub_title'];
-                    $notificationsetting->mail_status = $item['mail_status'];
-                    $notificationsetting->sms_status = $item['sms_status'];
-                    $notificationsetting->push_notification_status = $item['push_notification_status'];
-                    $notificationsetting->save();
-
-                }
-            }
+            self::checkAndUpdateAdminNotificationData($data);
             self::deleteAdminNotificationSetupData();
             return true;
     }

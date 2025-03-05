@@ -144,7 +144,7 @@
                         <label class="input-label"
                                for="exampleFormControlInput1">{{ translate('messages.upload_image') }}</label>
                         <div class="custom-file">
-                            <input type="file" name="images[]" id="customFileUpload" class="custom-file-input" accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*" multiple>
+                            <input type="file" name="images[]" id="customFileUpload" class="custom-file-input" accept=".webp, .jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*" multiple>
                             <label class="custom-file-label" for="customFileUpload"></label>
                         </div>
                     </div>

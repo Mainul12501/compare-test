@@ -28,8 +28,7 @@ class DeliveryManService
         } else {
             $identityImage = json_encode([]);
         }
-        $agreement_document_extension = $request->file('agreement_document')->extension();  // v2.8.1
-        $agreement_document = $this->upload('delivery-man/', $agreement_document_extension, $request->file('agreement_document'));  // v2.8.1
+
         return [
             'f_name' => $request->f_name,
             'l_name' => $request->l_name,
@@ -43,7 +42,6 @@ class DeliveryManService
             'image' => $imageName,
             'active' => 0,
             'earning' => $request->earning,
-            'agreement_document' => $agreement_document,    // v2.8.1
             'password' => bcrypt($request->password),
         ];
     }
@@ -58,9 +56,9 @@ class DeliveryManService
 
         if ($request->has('identity_image')){
             foreach (json_decode($deliveryMan['identity_image'], true) as $img) {
-
+                
                 Helpers::check_and_delete('delivery-man/' , $img);
-
+                
             }
             $imgKeeper = [];
             foreach ($request->identity_image as $img) {
@@ -71,12 +69,7 @@ class DeliveryManService
         } else {
             $identityImage = $deliveryMan['identity_image'];
         }
-        if($request->file('agreement_document')){   // v2.8.1
-            $agreement_document_extension = $request->file('agreement_document')->extension();  // v2.8.1
-            $agreement_document = $this->updateAndUpload('delivery-man/', $deliveryMan->agreement_document, $agreement_document_extension, $request->file('agreement_document'));   // v2.8.1
-        }else{  // v2.8.1
-            $agreement_document = $deliveryMan['agreement_document'];   // v2.8.1
-        }   // v2.8.1
+
         return [
             "f_name" => $request->f_name,
             "l_name" => $request->l_name,
@@ -89,7 +82,6 @@ class DeliveryManService
             "identity_image" => $identityImage,
             "image" => $imageName,
             "earning" => $request->earning,
-            'agreement_document' => $agreement_document,    // v2.8.1
             "password" => strlen($request->password)>1?bcrypt($request->password):$deliveryMan['password'],
             "application_status" => in_array($deliveryMan['application_status'], ['pending','denied']) ? 'approved' : $deliveryMan['application_status'],
             "status" => in_array($deliveryMan['application_status'], ['pending','denied']) ? 1 : $deliveryMan['status'],

@@ -17,7 +17,6 @@ use Illuminate\Support\Facades\Validator;
 
 class ProvideDMEarningController extends Controller
 {
-    // v2.8.1 checked
     /**
      * Display a listing of the resource.
      *
@@ -161,7 +160,7 @@ class ProvideDMEarningController extends Controller
             'search'=>$request->search??null,
 
         ];
-
+        
         if ($request->type == 'excel') {
             return Excel::download(new DeliverymanPaymentExport($data), 'ProvideDMEarning.xlsx');
         } else if ($request->type == 'csv') {

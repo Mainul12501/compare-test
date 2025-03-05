@@ -396,7 +396,7 @@
                                                     <div class="icon-file">
                                                         <input type="file" name="logo" id="customFileEg1"
                                                             class="custom-file-input"
-                                                            accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*">
+                                                            accept=".webp, .jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*">
                                                             <i class="tio-edit"></i>
                                                     </div>
                                                 </div>
@@ -417,7 +417,7 @@
                                                     <div class="icon-file">
                                                         <input type="file" name="icon" id="favIconUpload"
                                                             class="custom-file-input"
-                                                            accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*">
+                                                            accept=".webp, .jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*">
                                                             <i class="tio-edit"></i>
                                                     </div>
                                                     {{-- <button class="btn action-btn btn-outline-danger">

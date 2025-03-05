@@ -14,8 +14,6 @@ active
 
 
 
-
-
         <div class="content container-fluid">
             <div class="page-header">
                 <div class="row align-items-center py-2">
@@ -31,16 +29,16 @@ active
             </div>
 
             @if (addon_published_status('Rental'))
-                <!-- Nav Menus -->
-                <ul class="nav nav-tabs border-0 nav--tabs nav--pills mb-4">
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->module != 1 ? 'active' : '' }}   " href="{{ route('admin.business-settings.subscriptionackage.index')  }}">{{ translate('All_Module') }}</a>
-                    </li>
+            <!-- Nav Menus -->
+            <ul class="nav nav-tabs border-0 nav--tabs nav--pills mb-4">
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->module != 1 ? 'active' : '' }}   " href="{{ route('admin.business-settings.subscriptionackage.index')  }}">{{ translate('All_Module') }}</a>
+                </li>
 
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->module == 1 ?'active' : '' }} " href="{{ route('admin.business-settings.subscriptionackage.index',['module'=> true])  }}">{{ translate('Rental_Module') }}</a>
-                    </li>
-                </ul>
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->module == 1 ?'active' : '' }} " href="{{ route('admin.business-settings.subscriptionackage.index',['module'=> true])  }}">{{ translate('Rental_Module') }}</a>
+                </li>
+            </ul>
             @endif
 
                 @if ($packages->total() > 0 || request()->has('search'))
@@ -117,6 +115,7 @@ active
                             <form class="search-form">
                                 <!-- Search -->
                                 <div class="input--group input-group input-group-merge input-group-flush">
+                                    <input type="hidden" value="{{ request()->module }}"  name="module"  >
                                     <input class="form-control" value="{{ request()?->search }}" type="search" placeholder="{{ translate('Search by name') }}" name="search">
                                     <button type="submit" class="btn btn--secondary"><i class="tio-search"></i></button>
                                 </div>
@@ -236,10 +235,6 @@ active
                         <div class="max-w-542 mx-auto py-sm-5 py-4">
                             <img class="mb-4" src="{{asset('/public/assets/admin/img/empty-subscription.svg')}}" alt="img">
                             <h4 class="mb-3">{{translate('Create Subscription Plan')}}</h4>
-{{--                            <p class="mb-4">--}}
-{{--                                {{translate('Add new subscription packages to the list. So that Stores get more options to join the business for the growth and success.')}}<br>--}}
-{{--                            </p>--}}
-{{--                            <a href="{{ route('admin.business-settings.subscriptionackage.create') }}" class="btn btn--primary border-0"><i class="tio-add"></i> {{translate('Add Subcription Package')}}</a>--}}
                             @if ( request()->module == 1)
                                 <p class="mb-4">
                                     {{translate('Add new subscription packages to the list. So that Providers get more options to join the business for the growth and success.')}}<br>
@@ -277,15 +272,8 @@ active
                         </div>
                         <div class="text-center" id="toggle-message">
                             <h3>{{ translate('Are_You_Sure_You_want_To_Off_The_Status?') }}</h3>
-{{--                            <p>{{ translate('You_are_about_to_deactivate_a_subscription_package._You_have_the_option_to_either_switch_all_stores_plans_or_allow_stores_to_make_changes._Please_choose_an_option_below_to_proceed.') }}</p>--}}
-{{--                        </div>--}}
-{{--                    </div>--}}
-{{--                    <div class="btn--container justify-content-center">--}}
-{{--                        <a href="#" data-toggle="tooltip" data-placement="bottom" title="{{ translate('Stores_will_be_subscribed_untill_their_package_expires') }}"  id="status_change_now" class="btn btn-outline-primary min-w-120" >--}}
-{{--                            {{translate("Allow Store to Change")}}--}}
-{{--                        </a>--}}
                             @if ( request()->module == 1)
-                                <p>{{ translate('You_are_about_to_deactivate_a_subscription_package._You_have_the_option_to_either_switch_all_Providers_plans_or_allow_Providers_to_make_changes._Please_choose_an_option_below_to_proceed.') }}</p>
+                            <p>{{ translate('You_are_about_to_deactivate_a_subscription_package._You_have_the_option_to_either_switch_all_Providers_plans_or_allow_Providers_to_make_changes._Please_choose_an_option_below_to_proceed.') }}</p>
                         </div>
                     </div>
                     <div class="btn--container justify-content-center">
@@ -294,17 +282,22 @@ active
                         </a>
 
 
-                        @else
+                            @else
 
                             <p>{{ translate('You_are_about_to_deactivate_a_subscription_package._You_have_the_option_to_either_switch_all_stores_plans_or_allow_stores_to_make_changes._Please_choose_an_option_below_to_proceed.') }}</p>
+                        </div>
                     </div>
-                </div>
-                <div class="btn--container justify-content-center">
-                    <a href="#" data-toggle="tooltip" data-placement="bottom" title="{{ translate('Stores_will_be_subscribed_untill_their_package_expires') }}"  id="status_change_now" class="btn btn-outline-primary min-w-120" >
-                        {{translate("Allow Store to Change")}}
-                    </a>
+                    <div class="btn--container justify-content-center">
+                        <a href="#" data-toggle="tooltip" data-placement="bottom" title="{{ translate('Stores_will_be_subscribed_untill_their_package_expires') }}"  id="status_change_now" class="btn btn-outline-primary min-w-120" >
+                            {{translate("Allow Store to Change")}}
+                        </a>
 
-                    @endif
+                            @endif
+
+
+
+
+
                         <button type="button"  class="btn btn--primary min-w-120  shift_package"  data-dismiss="modal" >{{translate('Switch_Plan')}}</button>
                     </div>
                 </div>
@@ -330,7 +323,13 @@ active
                         </div>
                         <div class="text-center" id="toggle-message">
                             <h3>{{ translate('Are_You_Sure_You_want_To_ON_The_Status?') }}</h3>
+                            @if ( request()->module == 1)
+                            <p>{{ translate('This_package_will_be_available_for_the_providers.') }}</p>
+
+                            @else
+
                             <p>{{ translate('This_package_will_be_available_for_the_stores.') }}</p>
+                            @endif
                         </div>
                     </div>
                     <div class="btn--container justify-content-center">

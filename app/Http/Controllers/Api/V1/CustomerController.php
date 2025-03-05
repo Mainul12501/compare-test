@@ -29,11 +29,9 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
 use Modules\Gateways\Traits\SmsGateway;
 use MatanYadaev\EloquentSpatial\Objects\Point;
-use Illuminate\Support\Facades\Storage;
 
 class CustomerController extends Controller
 {
-    // v2.8.1 checked
     public function address_list(Request $request)
     {
         $limit = $request['limit'] ?? 10;
@@ -327,7 +325,7 @@ class CustomerController extends Controller
 
     public function review_reminder(Request $request)
     {
-        $order = Order::wherehas('OrderReference', function ($query) {
+        $order = Order::has('details')->wherehas('OrderReference', function ($query) {
             $query->where('is_reviewed', 0)->where('is_review_canceled', 0);
         })
             ->where('user_id', $request->user()->id)->where('order_status', 'delivered')->where('is_guest', 0)->latest()->select('id')->with('details:id,order_id,item_details')->first();

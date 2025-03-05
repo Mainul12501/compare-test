@@ -10,12 +10,7 @@
     if (count($order->details) > 0) {
         $campaign_order = isset($order?->details[0]?->item_campaign_id ) ? true : false;
     }
-    $reasons=\App\Models\OrderCancelReason::where('status', 1)->where('user_type' ,'vendor' )->get();
-    $parcel_order = $order->order_type == 'parcel' ? true : false;  // v2.8.1
-
-//    $max_processing_time = explode('-', $order['store']['delivery_time'])[0];
-    $max_processing_time = $order->store?explode('-', $order->store['delivery_time'])[0]:0;
-
+    $max_processing_time = explode('-', $order['store']['delivery_time'])[0];
     ?>
     <div class="content container-fluid">
         <!-- Page Header -->
@@ -25,7 +20,7 @@
                     <h1 class="page-header-title">
                         <span class="page-header-icon">
                             <img src="{{ asset('/public/assets/admin/img/shopping-basket.png') }}" class="w--20"
-                                 alt="">
+                                alt="">
                         </span>
                         <span>
                             {{ translate('order_details') }} <span
@@ -36,13 +31,13 @@
 
                 <div class="col-sm-auto">
                     <a class="btn btn-icon btn-sm btn-soft-secondary rounded-circle mr-1"
-                       href="{{ route('vendor.order.details', [$order['id'] - 1]) }}" data-toggle="tooltip"
-                       data-placement="top" title="Previous order">
+                        href="{{ route('vendor.order.details', [$order['id'] - 1]) }}" data-toggle="tooltip"
+                        data-placement="top" title="Previous order">
                         <i class="tio-chevron-left"></i>
                     </a>
                     <a class="btn btn-icon btn-sm btn-soft-secondary rounded-circle"
-                       href="{{ route('vendor.order.details', [$order['id'] + 1]) }}" data-toggle="tooltip"
-                       data-placement="top" title="Next order">
+                        href="{{ route('vendor.order.details', [$order['id'] + 1]) }}" data-toggle="tooltip"
+                        data-placement="top" title="Next order">
                         <i class="tio-chevron-right"></i>
                     </a>
                 </div>
@@ -108,36 +103,20 @@
                                 @endif
                             </div>
                             <div class="d-sm-none">
-                                <!--v2.8.1-->
-                                @if(\App\CentralLogics\Helpers::get_store_data()->store_type == 'company')
-                                    <a class="btn btn--primary print--btn font-regular"
-                                       href={{ route('vendor.parcel.generate-invoice', [$order['id']]) }}>
-                                        <i class="tio-print mr-sm-1"></i> <span>{{ translate('messages.print_invoice') }}</span>
-                                    </a>
-                                @else
-                                    <a class="btn btn--primary print--btn font-regular"
-                                       href={{ route('vendor.order.generate-invoice', [$order['id']]) }}>
-                                        <i class="tio-print mr-sm-1"></i> <span>{{ translate('messages.print_invoice') }}</span>
-                                    </a>
-                                @endif
-                                {{--v2.8.1--}}
+                                <a class="btn btn--primary print--btn font-regular"
+                                    href={{ route('vendor.order.generate-invoice', [$order['id']]) }}>
+                                    <i class="tio-print mr-sm-1"></i> <span>{{ translate('messages.print_invoice') }}</span>
+                                </a>
                             </div>
                         </div>
 
 
                         <div class="order-invoice-right mt-3 mt-sm-0">
                             <div class="btn--container ml-auto align-items-center justify-content-end">
-                                @if(\App\CentralLogics\Helpers::get_store_data()->store_type == 'company')
-                                    <a class="btn btn--primary print--btn font-regular d-none d-sm-block"
-                                       href={{ route('vendor.parcel.generate-invoice', [$order['id']]) }}>
-                                        <i class="tio-print mr-sm-1"></i> <span>{{ translate('messages.print_invoice') }}</span>
-                                    </a>
-                                @else
-                                    <a class="btn btn--primary print--btn font-regular d-none d-sm-block"
-                                       href={{ route('vendor.order.generate-invoice', [$order['id']]) }}>
-                                        <i class="tio-print mr-sm-1"></i> <span>{{ translate('messages.print_invoice') }}</span>
-                                    </a>
-                                @endif
+                                <a class="btn btn--primary print--btn font-regular d-none d-sm-block"
+                                    href={{ route('vendor.order.generate-invoice', [$order['id']]) }}>
+                                    <i class="tio-print mr-sm-1"></i> <span>{{ translate('messages.print_invoice') }}</span>
+                                </a>
                             </div>
                             <div class="text-right mt-3 order-invoice-right-contents text-capitalize">
                                 <h6>
@@ -236,7 +215,7 @@
                                             @php($item = is_array($item)?$item:['img'=>$item,'storage'=>'public'])
                                                 <div>
                                                     <button class="btn w-100 px-0" data-toggle="modal"
-                                                        data-target="#imagemodal{{ $key }}"
+                                                        data-target="#prescriptionimagemodal{{ $key }}"
                                                         title="{{ translate('messages.order_attachment') }}">
                                                         <div class="gallary-card ml-auto">
                                                             <img  src="{{\App\CentralLogics\Helpers::get_full_url('order',$item['img'],$item['storage']) }}"
@@ -245,7 +224,7 @@
                                                         </div>
                                                     </button>
                                                 </div>
-                                                <div class="modal fade" id="imagemodal{{ $key }}" tabindex="-1"
+                                                <div class="modal fade" id="prescriptionimagemodal{{ $key }}" tabindex="-1"
                                                     role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                                                     <div class="modal-dialog">
                                                         <div class="modal-content">
@@ -308,7 +287,7 @@
                                     <tr>
                                         <th class="border-0">{{ translate('messages.#') }}</th>
                                         <th class="border-0">{{ translate('messages.item_details') }}</th>
-                                        @if ($order->store && $order->store->module->module_type == 'food')
+                                        @if ($order->store->module->module_type == 'food')
                                             <th class="border-0">{{ translate('messages.addons') }}</th>
                                         @endif
                                         <th class="text-right  border-0">{{ translate('messages.price') }}</th>
@@ -397,7 +376,7 @@
                                                         </div>
                                                     </div>
                                                 </td>
-                                                @if ($order->store && $order->store->module->module_type == 'food')
+                                                @if ($order->store->module->module_type == 'food')
                                                     <td>
                                                         <div>
                                                             @foreach (json_decode($detail['add_ons'], true) as $key2 => $addon)
@@ -475,7 +454,7 @@
                                                         </div>
                                                     </div>
                                                 </td>
-                                                @if ($order->store && $order->store->module->module_type == 'food')
+                                                @if ($order->store->module->module_type == 'food')
                                                     <td>
                                                         @foreach (json_decode($detail['add_ons'], true) as $key2 => $addon)
                                                             @if ($key2 == 0)
@@ -532,7 +511,7 @@
                                     <dt class="col-6">{{ translate('messages.items_price') }}:</dt>
                                     <dd class="col-6">{{ \App\CentralLogics\Helpers::format_currency($product_price) }}
                                     </dd>
-                                    @if ($order->store && $order->store->module->module_type == 'food')
+                                    @if ($order->store->module->module_type == 'food')
                                         <dt class="col-6">{{ translate('messages.addon_cost') }}:</dt>
 
                                         <dd class="col-6">
@@ -658,7 +637,9 @@
 
             <div class="col-lg-4">
                 <!-- Card -->
-                @if($order->order_status != 'refund_requested' && $order->order_status != 'refunded' && $order->order_status != 'delivered')
+                @if ($order->order_status != 'refund_requested' &&
+                    $order->order_status != 'refunded' &&
+                    $order->order_status != 'delivered')
                     <div class="card mb-2">
                         <!-- Header -->
                         <div class="card-header justify-content-center text-center px-0 mx-4">
@@ -670,102 +651,24 @@
 
                         <!-- Body -->
 
-                        {{--                        v2.8.1 start--}}
-                        @if($order->confirmed && !$order->parcel_company && \App\CentralLogics\Helpers::get_store_data()->store_type == 'company' || (!$order->confirmed && \App\CentralLogics\Helpers::get_store_data()->store_type == 'company'))
-                            @if ($order->store && $order->store->module->module_type == 'food')
-                                <a class="btn btn--primary w-100 order-status-change-alert"
-
-                                   data-url="{{ route('vendor.order.status', ['id' => $order['id'], 'order_status' => 'confirmed']) }}"
-                                   data-message="{{ translate('Change status to cooking ?') }}"
-                                   data-verification="false"
-                                   data-processing-time="{{ $max_processing_time }}"
-                                   href="javascript:">{{ translate('messages.confirm_order') }}</a>
-                            @else
-                                <a class="btn btn--primary w-100 route-alert"
-                                   data-url="{{ route('vendor.order.status', ['id' => $order['id'], 'order_status' => 'confirmed']) }}"
-                                   data-message="{{ translate('messages.confirm_order') }}"
-                                   href="javascript:">{{ translate('messages.confirm_order') }}</a>
-                            @endif
-                        @endif
-                        @if ($order->order_type == 'parcel' && \App\CentralLogics\Helpers::get_store_data()->store_type == 'company' && $order->confirmed)
-                            <div class="card-body">
-                                <div class="hs-unfold w-100">
-                                    <div class="dropdown">
-                                        <button
-                                            class="form-control h--45px dropdown-toggle d-flex justify-content-between align-items-center w-100"
-                                            type="button" id="dropdownMenuButton" data-toggle="dropdown"
-                                            aria-haspopup="true" aria-expanded="false">
-                                                <?php
-                                                $message= match($order['order_status']){
-                                                    'pending' => translate('messages.pending'),
-                                                    'confirmed' => translate('messages.confirmed'),
-                                                    'accepted' => translate('messages.accepted'),
-                                                    'processing' => translate('messages.processing'),
-                                                    'handover' => translate('messages.handover'),
-                                                    'picked_up' => translate('messages.out_for_delivery'),
-                                                    'delivered' => translate('messages.delivered'),
-                                                    'canceled' => translate('messages.canceled'),
-                                                    default => translate('messages.status') ,
-                                                };
-                                                ?>
-                                            {{ $message }}
-                                        </button>
-                                        @php($order_delivery_verification = (bool) \App\Models\BusinessSetting::where(['key' => 'order_delivery_verification'])->first()->value)
-                                        <div class="dropdown-menu text-capitalize" aria-labelledby="dropdownMenuButton">
-                                            <a class="dropdown-item {{ $order['order_status'] == 'pending' ? 'active' : '' }} route-alert"
-                                               data-url="{{ route('vendor.parcel.status', ['id' => $order['id'], 'order_status' => 'pending']) }}" data-message="{{ translate('Change status to pending ?') }}"
-                                               href="javascript:">{{ translate('messages.pending') }}</a>
-                                            <a class="dropdown-item {{ $order['order_status'] == 'confirmed' ? 'active' : '' }} route-alert"
-                                               data-url="{{ route('vendor.parcel.status', ['id' => $order['id'], 'order_status' => 'confirmed']) }}" data-message="{{ translate('Change status to confirmed ?') }}"
-                                               href="javascript:">{{ translate('messages.confirmed') }}</a>
-                                            @if ($order->order_type != 'parcel')
-                                                @if ($order->store && $order->store->module->module_type == 'food')
-                                                    <a class="dropdown-item {{ $order['order_status'] == 'processing' ? 'active' : '' }} order_status_change_alert" data-url="{{ route('vendor.parcel.status', ['id' => $order['id'], 'order_status' => 'processing']) }}" data-message="{{ translate('Change status to cooking ?') }}" data-processing={{ $max_processing_time }}
-                                                    href="javascript:">{{ translate('messages.processing') }}</a>
-                                                @else
-                                                    <a class="dropdown-item {{ $order['order_status'] == 'processing' ? 'active' : '' }} route-alert"
-                                                       data-url="{{ route('vendor.parcel.status', ['id' => $order['id'], 'order_status' => 'processing']) }}" data-message="{{ translate('Change status to processing ?') }}"
-                                                       href="javascript:">{{ translate('messages.processing') }}</a>
-                                                @endif
-                                                <a class="dropdown-item {{ $order['order_status'] == 'handover' ? 'active' : '' }} route-alert"
-                                                   data-url="{{ route('vendor.parcel.status', ['id' => $order['id'], 'order_status' => 'handover']) }}" data-message="{{ translate('Change status to handover ?') }}"
-                                                   href="javascript:">{{ translate('messages.handover') }}</a>
-                                            @endif
-                                            <a class="dropdown-item {{ $order['order_status'] == 'picked_up' ? 'active' : '' }} route-alert"
-                                               data-url="{{ route('vendor.parcel.status', ['id' => $order['id'], 'order_status' => 'picked_up']) }}" data-message="{{ translate('Change status to out for delivery ?') }}"
-                                               href="javascript:">{{ translate('messages.out_for_delivery') }}</a>
-                                            <a class="dropdown-item {{ $order['order_status'] == 'delivered' ? 'active' : '' }} route-alert"
-                                               data-url="{{ route('vendor.parcel.status', ['id' => $order['id'], 'order_status' => 'delivered']) }}" data-message="{{ translate('Change status to delivered (payment status will be paid if not)?') }}"
-                                               href="javascript:">{{ translate('messages.delivered') }}</a>
-                                            <a class="dropdown-item {{ $order['order_status'] == 'canceled' ? 'active' : '' }} route-alert"
-                                               data-url="{{ route('vendor.parcel.status', ['id' => $order['id'], 'order_status' => 'canceled']) }}" data-message="{{ translate('Change status to canceled?') }}"
-                                               href="javascript:">{{ translate('messages.canceled') }}</a>
-                                            {{-- <a class="dropdown-item {{ $order['order_status'] == 'canceled' ? 'active' : '' }} canceled-status">{{ translate('messages.canceled') }}</a> --}}
-                                        </div>
-
+                        <div class="card-body">
+                            <!-- Order Status Flow Starts -->
+                            @php($order_delivery_verification = (bool) \App\Models\BusinessSetting::where(['key' => 'order_delivery_verification'])->first()->value)
+                            <div class="mb-4">
+                                <div class="row g-1">
+                                    <div class="{{ config('canceled_by_store') ? 'col-6' : 'col-12' }}">
+                                        <a class="btn btn--primary w-100 fz--13 px-2 {{ $order['order_status'] == 'pending' ? '' : 'd-none' }} route-alert"
+                                           data-url="{{ route('vendor.order.status', ['id' => $order['id'], 'order_status' => 'confirmed']) }}"
+                                           data-message="{{ translate('messages.confirm_this_order_?') }}"
+                                            href="javascript:">{{ translate('messages.confirm_this_order') }}</a>
                                     </div>
+                                    @if (config('canceled_by_store'))
+                                        <div class="col-6">
+                                            <a class="btn btn--danger w-100 fz--13 px-2 cancelled-status {{ $order['order_status'] == 'pending' ? '' : 'd-none' }}"
+                                               >{{ translate('Cancel Order') }}</a>
+                                        </div>
+                                    @endif
                                 </div>
-                            </div>
-                        @endif
-                        @if($order->order_type !== 'parcel' && \App\CentralLogics\Helpers::get_store_data()->store_type == 'company' && $order->parcel_company)
-                            <div class="card-body">
-                                <!-- Order Status Flow Starts -->
-                                @php($order_delivery_verification = (bool) \App\Models\BusinessSetting::where(['key' => 'order_delivery_verification'])->first()->value)
-                                <div class="mb-4">
-                                    <div class="row g-1">
-                                        <div class="{{ config('canceled_by_store') ? 'col-6' : 'col-12' }}">
-                                            <a class="btn btn--primary w-100 fz--13 px-2 {{ $order['order_status'] == 'pending' ? '' : 'd-none' }} route-alert"
-                                               data-url="{{ route('vendor.order.status', ['id' => $order['id'], 'order_status' => 'confirmed']) }}"
-                                               data-message="{{ translate('messages.confirm_this_order_?') }}"
-                                               href="javascript:">{{ translate('messages.confirm_this_order') }}</a>
-                                        </div>
-                                        @if (config('canceled_by_store'))
-                                            <div class="col-6">
-                                                <a class="btn btn--danger w-100 fz--13 px-2 cancelled-status {{ $order['order_status'] == 'pending' ? '' : 'd-none' }}"
-                                                >{{ translate('Cancel Order') }}</a>
-                                            </div>
-                                        @endif
-                                    </div>
                                     @if ($order->store && $order->store->module->module_type == 'food')
                                         <a class="btn btn--primary w-100 order-status-change-alert {{ $order['order_status'] == 'confirmed' || $order['order_status'] == 'accepted' ? '' : 'd-none' }}"
 
@@ -775,98 +678,47 @@
                                            data-processing-time="{{ $max_processing_time }}"
                                            href="javascript:">{{ translate('messages.proceed_for_processing') }}</a>
                                     @else
-                                        <a class="btn btn--primary w-100 route-alert  {{ $order['order_status'] == 'confirmed' || $order['order_status'] == 'accepted' ? '' : 'd-none' }}"
-                                           data-url="{{ route('vendor.order.status', ['id' => $order['id'], 'order_status' => 'processing']) }}"
-                                           data-message="{{ translate('messages.proceed_for_processing') }}"
-                                           href="javascript:">{{ translate('messages.proceed_for_processing') }}</a>
+                                    <a class="btn btn--primary w-100 route-alert  {{ $order['order_status'] == 'confirmed' || $order['order_status'] == 'accepted' ? '' : 'd-none' }}"
+                                       data-url="{{ route('vendor.order.status', ['id' => $order['id'], 'order_status' => 'processing']) }}"
+                                       data-message="{{ translate('messages.proceed_for_processing') }}"
+                                    href="javascript:">{{ translate('messages.proceed_for_processing') }}</a>
                                     @endif
-                                    <a class="btn btn--primary w-100 route-alert {{ $order['order_status'] == 'processing' ? '' : 'd-none' }}"
-                                       data-url="{{ route('vendor.order.status', ['id' => $order['id'], 'order_status' => 'handover']) }}"
-                                       data-message="{{ translate('messages.make_ready_for_handover') }}"
-                                       href="javascript:">{{ translate('messages.make_ready_for_handover') }}</a>
-                                    @if($order['order_status'] == 'handover')
-                                        <a class="btn  w-100
-                                    {{ ($order['order_type'] == 'take_away' || $order->store->self_delivery_system == 1)  ?  'btn--primary order-status-change-alert'  :  (\App\CentralLogics\Helpers::get_store_data()->store_type == 'company' ? 'btn--primary order-status-change-alert' : 'btn--secondary  self-delivery-warning') }} "
-                                           data-url="{{ route('vendor.order.status', ['id' => $order['id'], 'order_status' => 'delivered']) }}"
-                                           data-message="{{ translate('messages.Change status to delivered (payment status will be paid if not)?') }}"
-                                           data-verification="{{ $order_delivery_verification ? 'true' : 'false' }}"
-                                           href="javascript:">{{ translate('messages.make_delivered') }}</a>
-                                    @endif
-
-                                </div>
-                            </div>
-                        @elseif($order->order_type !== 'parcel' && \App\CentralLogics\Helpers::get_store_data()->store_type == 'store')
-                            {{--                        v2.8.1 end--}}
-
-                            <div class="card-body">
-                                <!-- Order Status Flow Starts -->
-                                @php($order_delivery_verification = (bool) \App\Models\BusinessSetting::where(['key' => 'order_delivery_verification'])->first()->value)
-                                <div class="mb-4">
-                                    <div class="row g-1">
-                                        <div class="{{ config('canceled_by_store') ? 'col-6' : 'col-12' }}">
-                                            <a class="btn btn--primary w-100 fz--13 px-2 {{ $order['order_status'] == 'pending' ? '' : 'd-none' }} route-alert"
-                                               data-url="{{ route('vendor.order.status', ['id' => $order['id'], 'order_status' => 'confirmed']) }}"
-                                               data-message="{{ translate('messages.confirm_this_order_?') }}"
-                                               href="javascript:">{{ translate('messages.confirm_this_order') }}</a>
-                                        </div>
-                                        @if (config('canceled_by_store'))
-                                            <div class="col-6">
-                                                <a class="btn btn--danger w-100 fz--13 px-2 cancelled-status {{ $order['order_status'] == 'pending' ? '' : 'd-none' }}"
-                                                >{{ translate('Cancel Order') }}</a>
-                                            </div>
-                                        @endif
-                                    </div>
-                                    @if ($order->store && $order->store->module->module_type == 'food')
-                                        <a class="btn btn--primary w-100 order-status-change-alert {{ $order['order_status'] == 'confirmed' || $order['order_status'] == 'accepted' ? '' : 'd-none' }}"
-
-                                           data-url="{{ route('vendor.order.status', ['id' => $order['id'], 'order_status' => 'processing']) }}"
-                                           data-message="{{ translate('Change status to cooking ?') }}"
-                                           data-verification="false"
-                                           data-processing-time="{{ $max_processing_time }}"
-                                           href="javascript:">{{ translate('messages.proceed_for_processing') }}</a>
-                                    @else
-                                        <a class="btn btn--primary w-100 route-alert  {{ $order['order_status'] == 'confirmed' || $order['order_status'] == 'accepted' ? '' : 'd-none' }}"
-                                           data-url="{{ route('vendor.order.status', ['id' => $order['id'], 'order_status' => 'processing']) }}"
-                                           data-message="{{ translate('messages.proceed_for_processing') }}"
-                                           href="javascript:">{{ translate('messages.proceed_for_processing') }}</a>
-                                    @endif
-                                    <a class="btn btn--primary w-100 route-alert {{ $order['order_status'] == 'processing' ? '' : 'd-none' }}"
-                                       data-url="{{ route('vendor.order.status', ['id' => $order['id'], 'order_status' => 'handover']) }}"
-                                       data-message="{{ translate('messages.make_ready_for_handover') }}"
-                                       href="javascript:">{{ translate('messages.make_ready_for_handover') }}</a>
-                                    @if($order['order_status'] == 'handover')
-                                        <a class="btn  w-100
+                                <a class="btn btn--primary w-100 route-alert {{ $order['order_status'] == 'processing' ? '' : 'd-none' }}"
+                                   data-url="{{ route('vendor.order.status', ['id' => $order['id'], 'order_status' => 'handover']) }}"
+                                   data-message="{{ translate('messages.make_ready_for_handover') }}"
+                                    href="javascript:">{{ translate('messages.make_ready_for_handover') }}</a>
+                                 @if($order['order_status'] == 'handover')
+                                    <a class="btn  w-100
                                     {{ ($order['order_type'] == 'take_away' || $order->store->sub_self_delivery == 1)  ?  'btn--primary order-status-change-alert'  :  'btn--secondary  self-delivery-warning' }} "
-                                           data-url="{{ route('vendor.order.status', ['id' => $order['id'], 'order_status' => 'delivered']) }}"
-                                           data-message="{{ translate('messages.Change status to delivered (payment status will be paid if not)?') }}"
-                                           data-verification="{{ $order_delivery_verification ? 'true' : 'false' }}"
-                                           href="javascript:">{{ translate('messages.make_delivered') }}</a>
-                                    @endif
+                                       data-url="{{ route('vendor.order.status', ['id' => $order['id'], 'order_status' => 'delivered']) }}"
+                                       data-message="{{ translate('messages.Change status to delivered (payment status will be paid if not)?') }}"
+                                       data-verification="{{ $order_delivery_verification ? 'true' : 'false' }}"
+                                        href="javascript:">{{ translate('messages.make_delivered') }}</a>
+                                 @endif
 
-                                </div>
                             </div>
+                        </div>
 
-                            <!-- End Body -->
-                            @endif
+                        <!-- End Body -->
                     </div>
                 @endif
                 <!-- End Card -->
                 @if ($order->order_status == 'canceled')
-                    <ul class="delivery--information-single mt-3">
-                        <li>
-                            <span class=" badge badge-soft-danger "> {{ translate('messages.Cancel_Reason') }} :</span>
-                            <span class="info">  {{ $order->cancellation_reason }} </span>
-                        </li>
+                <ul class="delivery--information-single mt-3">
+                    <li>
+                        <span class=" badge badge-soft-danger "> {{ translate('messages.Cancel_Reason') }} :</span>
+                        <span class="info">  {{ $order->cancellation_reason }} </span>
+                    </li>
 
-                        <li>
-                            <span class="name">{{ translate('Cancel_Note') }} </span>
-                            <span class="info">  {{ $order->cancellation_note ?? translate('messages.N/A')}} </span>
-                        </li>
-                        <li>
-                            <span class="name">{{ translate('Canceled_By') }} </span>
-                            <span class="info">  {{ translate($order->canceled_by) }} </span>
-                        </li>
-                        @if ($order->payment_status == 'paid' || $order->payment_status == 'partially_paid' )
+                    <li>
+                        <span class="name">{{ translate('Cancel_Note') }} </span>
+                        <span class="info">  {{ $order->cancellation_note ?? translate('messages.N/A')}} </span>
+                    </li>
+                    <li>
+                        <span class="name">{{ translate('Canceled_By') }} </span>
+                        <span class="info">  {{ translate($order->canceled_by) }} </span>
+                    </li>
+                    @if ($order->payment_status == 'paid' || $order->payment_status == 'partially_paid' )
                             @if ( $order?->payments)
                                 @php( $pay_infos =$order->payments()->where('payment_status','paid')->get())
                                 @foreach ($pay_infos as $pay_info)
@@ -876,115 +728,30 @@
                                     </li>
                                 @endforeach
                             @else
-                                <li>
-                                    <span class="name">{{ translate('Amount_paid_by') }} {{ translate($order->payment_method) }} </span>
-                                    <span class="info ">  {{ \App\CentralLogics\Helpers::format_currency($order->order_amount)  }} </span>
-                                </li>
+                            <li>
+                                <span class="name">{{ translate('Amount_paid_by') }} {{ translate($order->payment_method) }} </span>
+                                <span class="info ">  {{ \App\CentralLogics\Helpers::format_currency($order->order_amount)  }} </span>
+                            </li>
                             @endif
-                        @endif
+                    @endif
 
-                        @if ($order->payment_status == 'paid' || $order->payment_status == 'partially_paid')
-                            @if ( $order?->payments)
-                                @php( $amount =$order->payments()->where('payment_status','paid')->sum('amount'))
+                    @if ($order->payment_status == 'paid' || $order->payment_status == 'partially_paid')
+                        @if ( $order?->payments)
+                            @php( $amount =$order->payments()->where('payment_status','paid')->sum('amount'))
                                 <li>
                                     <span class="name">{{ translate('Amount_Returned_To_Wallet') }} </span>
                                     <span class="info">  {{ \App\CentralLogics\Helpers::format_currency($amount)  }} </span>
                                 </li>
-                            @else
-                                <li>
-                                    <span class="name">{{ translate('Amount_Returned_To_Wallet') }} </span>
-                                    <span class="info">  {{ \App\CentralLogics\Helpers::format_currency($order->order_amount)  }} </span>
-                                </li>
-                            @endif
+                        @else
+                        <li>
+                            <span class="name">{{ translate('Amount_Returned_To_Wallet') }} </span>
+                            <span class="info">  {{ \App\CentralLogics\Helpers::format_currency($order->order_amount)  }} </span>
+                        </li>
                         @endif
-                    </ul>
-                    <hr class="w-100">
-                @endif
-                {{--                v2.8.1 start--}}
-                @if (!in_array($order->order_status, [ 'refunded','delivered', 'canceled']) &&  ( !$order->delivery_man && $order['order_type'] != 'take_away' && (($order->parcel_company && $order?->parcel_company?->self_parcel_delivery) && !$order->delivery_company)))
-                    <div class="card p-1">
-                        <div class="w-100 text-center mt-3">
-                            <button type="button" class="btn btn--primary w-100" data-toggle="modal"
-                                    data-target="#myModal" data-lat='21.03' data-lng='105.85'>
-                                {{ translate('messages.assign_delivery_man_manually') }}
-                            </button>
-                        </div>
-                    </div>
-                @elseif(!in_array($order->order_status, [ 'refunded','delivered', 'canceled']) && (!$order->delivery_man && $order['order_type'] != 'take_away' && (\App\CentralLogics\Helpers::get_store_data()->self_delivery_system == 1)))
-                    <div class="card p-1">
-                        <div class="w-100 text-center mt-3">
-                            <button type="button" class="btn btn--primary w-100" data-toggle="modal"
-                                    data-target="#myModal" data-lat='21.03' data-lng='105.85'>
-                                {{ translate('messages.assign_delivery_man_manually') }}
-                            </button>
-                        </div>
-                    </div>
-                @endif
-                @if (!in_array($order->order_status, [ 'refunded','delivered', 'canceled']) &&  ( !$order->delivery_man && $order['order_type'] != 'take_away' && (($order->parcel_company && $order?->parcel_company?->self_parcel_delivery))))
-                    <div class="card p-1 mt-2">
-                        <div class="w-100 text-center mt-3">
-                            <button type="button" class="btn btn--warning w-100" data-toggle="modal"
-                                    data-target="#thirdPartyModal">
-                                {{ translate('messages.Third_party_company') }}
-                            </button>
-                        </div>
-
-                        <!-- Modal -->
-                        <div class="modal fade" id="thirdPartyModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="exampleModalLabel">{{translate('messages.Third_party_company')}}</h5>
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
-                                    </div>
-                                    <form action="{{route('vendor.parcel.third-party-company')}}">
-                                        @csrf
-                                        <div class="modal-body">
-                                            <div class="card-body">
-                                                <div class="row g-3 my-0">
-                                                    <div class="col-md-12">
-                                                        <div class="form-group mb-0">
-                                                            <label class="input-label" for="order_id">{{translate('messages.order_id')}}</label>
-                                                            <input readonly type="number" name="order_id" id="order_id" class="form-control" placeholder="{{translate('messages.order_id')}}" value={{$order->id}}>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-12">
-                                                        <div class="form-group mb-0">
-                                                            <label class="input-label" for="company_name">{{translate('messages.company_name')}}</label>
-                                                            <input type="text" name="company_name" id="company_name" class="form-control" placeholder="{{translate('messages.company_name')}} {{ $order->delivery_company?->tracking_url }} " value="{{ $order->delivery_company?->company_name }}">
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-12">
-                                                        <div class="form-group mb-0">
-                                                            <label class="input-label" for="tracking_url">{{translate('messages.tracking_URL')}}</label>
-                                                            <input type="text" name="tracking_url" id="tracking_url" class="form-control" placeholder="https://www.example.com" value="{{$order->delivery_company?->tracking_url}}">
-
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-12">
-                                                        <div class="form-group mb-0">
-                                                            <label class="input-label" for="serial_number">{{translate('messages.serial_number')}}</label>
-                                                            <input type="text" name="serial_number" id="serial_number" class="form-control" placeholder="{{translate('messages.serial_number')}}" value="{{ $order->delivery_company?->serial_number }}">
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                            <button type="submit" class="btn btn--primary">Submit</button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                @endif
-                {{--                v2.8.1 end--}}
+                    @endif
+                </ul>
+                <hr class="w-100">
+            @endif
                 @if ($order['order_type'] != 'take_away')
                     <!-- Card -->
                     <div class="card mb-2">
@@ -1005,7 +772,7 @@
                                         <img class="avatar-img onerror-image"
                                              data-onerror-image="{{ asset('public/assets/admin/img/160x160/img1.jpg') }}"
                                              src="{{ $order->delivery_man->image_full_url }}"
-                                             alt="Image Description">
+                                            alt="Image Description">
                                     </div>
                                     <div class="media-body">
                                         <span
@@ -1038,7 +805,7 @@
                                     @if (isset($address))
                                         <span class="d-block">
                                             <a target="_blank"
-                                               href="http://maps.google.com/maps?z=12&t=m&q=loc:{{ $address['latitude'] }}+{{ $address['longitude'] }}">
+                                                href="http://maps.google.com/maps?z=12&t=m&q=loc:{{ $address['latitude'] }}+{{ $address['longitude'] }}">
                                                 <i class="tio-map"></i> {{ $address['location'] }}<br>
                                             </a>
                                         </span>
@@ -1053,27 +820,6 @@
                                     {{ translate('messages.deliveryman_not_found') }}
                                 </span>
                             @endif
-                            <!-- v2.8.1 start -->
-                            <hr>
-                            @if ($order->delivery_company)
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <h5 class="card-title">
-                                <span class="card-header-icon">
-                                    <i class="tio-shop"></i>
-                                </span>
-                                        <span>{{ translate($parcel_order ? 'messages.sender' : 'messages.Third_party_company_info') }}</span>
-                                    </h5>
-                                </div>
-
-                                <div class="pt-3">
-                                    <div class="pt-2" >{{translate("messages.company_name:")}} <span class="text-dark">{{$order->delivery_company?->company_name}}</span>  </div>
-                                    <div class="pt-2" >{{translate("messages.tracking_URL:")}}
-                                        <a href="{{$order->delivery_company?->tracking_url}}" class=""><span class="badge badge-soft-success mt-3 mb-3">{{ translate('messages.click') }}</span></a>
-                                    </div>
-                                    <div class="pt-2">{{translate("messages.serial_number:")}}  <span class="text-dark">{{$order->delivery_company?->serial_number}}</span> </div>
-                                </div>
-                            @endif
-                            <!-- v2.8.1 end -->
                         </div>
                         <!-- End Body -->
                     </div>
@@ -1084,34 +830,32 @@
                 <div class="card mb-2 mt-2">
                     <div class="card-header border-0 text-center pb-0">
                         <h4 class="m-0">{{ translate('messages.delivery_proof') }} </h4>
-                        @if(isset($order->store))
-                            @if ($order['store']['sub_self_delivery'])
-                                <button class="btn btn-outline-primary btn-sm" data-toggle="modal"
-                                        data-target=".order-proof-modal">
-                                    {{ translate('messages.add') }}
-                                </button>
-                            @endif
-                        @endif
+                        @if ($order['store']['sub_self_delivery'])
 
+                        <button class="btn btn-outline-primary btn-sm" data-toggle="modal"
+                                            data-target=".order-proof-modal">
+                                            {{ translate('messages.add') }}
+                                        </button>
+                        @endif
                     </div>
                     @php($data = isset($order->order_proof) ? json_decode($order->order_proof, true) : 0)
                     <div class="card-body pt-2">
                         @if ($data)
-                            <label class="input-label"
-                                   for="order_proof">{{ translate('messages.image') }} : </label>
-                            <div class="row g-3">
+                        <label class="input-label"
+                            for="order_proof">{{ translate('messages.image') }} : </label>
+                        <div class="row g-3">
                                 @foreach ($data as $key => $img)
-                                    @php($img = is_array($img)?$img:['img'=>$img,'storage'=>'public'])
+                                @php($img = is_array($img)?$img:['img'=>$img,'storage'=>'public'])
                                     <div class="col-3">
                                         <img class="img__aspect-1 rounded border w-100 onerror-image" data-toggle="modal"
-                                             data-target="#imagemodal{{ $key }}"
+                                            data-target="#imagemodal{{ $key }}"
                                              data-onerror-image="{{ asset('public/assets/admin/img/160x160/img2.jpg') }}"
                                              src="{{\App\CentralLogics\Helpers::get_full_url('order',$img['img'],$img['storage']) }}"
                                              alt="image">
                                     </div>
                                     <div class="modal fade" id="imagemodal{{ $key }}" tabindex="-1"
-                                         role="dialog" aria-labelledby="order_proof_{{ $key }}"
-                                         aria-hidden="true">
+                                        role="dialog" aria-labelledby="order_proof_{{ $key }}"
+                                        aria-hidden="true">
                                         <div class="modal-dialog">
                                             <div class="modal-content">
                                                 <div class="modal-header">
@@ -1119,19 +863,19 @@
                                                         id="order_proof_{{ $key }}">
                                                         {{ translate('order_proof_image') }}</h4>
                                                     <button type="button" class="close"
-                                                            data-dismiss="modal"><span
+                                                        data-dismiss="modal"><span
                                                             aria-hidden="true">&times;</span><span
                                                             class="sr-only">{{ translate('messages.cancel') }}</span></button>
                                                 </div>
                                                 <div class="modal-body">
                                                     <img src="{{\App\CentralLogics\Helpers::get_full_url('order',$img['img'],$img['storage']) }}"
-                                                         class="initial--22 w-100" alt="img">
+                                                        class="initial--22 w-100" alt="img">
                                                 </div>
                                                 @php($storage = $img['storage']??'public')
                                                 @php($file = $storage == 's3'?base64_encode('order/' . $img['img']):base64_encode('public/order/' . $img['img']))
                                                 <div class="modal-footer">
                                                     <a class="btn btn-primary"
-                                                       href="{{ route('admin.file-manager.download', [$file,$storage]) }}"><i
+                                                        href="{{ route('admin.file-manager.download', [$file,$storage]) }}"><i
                                                             class="tio-download"></i>
                                                         {{ translate('messages.download') }}
                                                     </a>
@@ -1141,7 +885,7 @@
                                     </div>
                                 @endforeach
                             </div>
-                        @endif
+                            @endif
                     </div>
                 </div>
 
@@ -1165,7 +909,7 @@
                                     <img class="avatar-img onerror-image "
                                          data-onerror-image="{{ asset('public/assets/admin/img/160x160/img1.jpg') }}"
                                          src="{{ $order->customer->image_full_url }}"
-                                         alt="Image Description">
+                                        alt="Image Description">
                                 </div>
                                 <div class="media-body">
                                     <span
@@ -1208,7 +952,7 @@
                                         <div class="d-flex">
                                             <span class="name">{{ translate('messages.contact') }}:</span>
                                             <a class="info deco-none"
-                                               href="tel:{{ $address['contact_person_number'] }}">
+                                                href="tel:{{ $address['contact_person_number'] }}">
                                                 {{ $address['contact_person_number'] }}</a>
                                         </div>
                                         <div class="d-flex">
@@ -1230,7 +974,7 @@
                                         @if ($order['order_type'] != 'take_away' && isset($address['address']))
                                             @if (isset($address['latitude']) && isset($address['longitude']))
                                                 <a target="_blank"
-                                                   href="http://maps.google.com/maps?z=12&t=m&q=loc:{{ $address['latitude'] }}+{{ $address['longitude'] }}">
+                                                    href="http://maps.google.com/maps?z=12&t=m&q=loc:{{ $address['latitude'] }}+{{ $address['longitude'] }}">
                                                     <i class="tio-map"></i>{{ $address['address'] }}<br>
                                                 </a>
                                             @else
@@ -1248,12 +992,12 @@
                                 {{ translate('Guest_user') }}
                             </span>
                             @if ($order->delivery_address)
-                                @php($address = json_decode($order->delivery_address, true))
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <h5>{{ translate('messages.delivery_info') }}</h5>
-                                </div>
-                                @if (isset($address))
-                                    <span class="delivery--information-single d-block">
+                            @php($address = json_decode($order->delivery_address, true))
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5>{{ translate('messages.delivery_info') }}</h5>
+                            </div>
+                            @if (isset($address))
+                                <span class="delivery--information-single d-block">
                                     <div class="d-flex">
                                         <span class="name">{{ translate('messages.name') }}:</span>
                                         <span class="info">{{ $address['contact_person_name'] }}</span>
@@ -1261,7 +1005,7 @@
                                     <div class="d-flex">
                                         <span class="name">{{ translate('messages.contact') }}:</span>
                                         <a class="info deco-none"
-                                           href="tel:{{ $address['contact_person_number'] }}">
+                                            href="tel:{{ $address['contact_person_number'] }}">
                                             {{ $address['contact_person_number'] }}</a>
                                     </div>
                                     <div class="d-flex">
@@ -1283,19 +1027,19 @@
                                     </div>
 
                                     @if ($order['order_type'] != 'take_away' && isset($address['address']))
-                                            <hr>
-                                            @if (isset($address['latitude']) && isset($address['longitude']))
-                                                <a target="_blank"
-                                                   href="http://maps.google.com/maps?z=12&t=m&q=loc:{{ $address['latitude'] }}+{{ $address['longitude'] }}">
+                                    <hr>
+                                        @if (isset($address['latitude']) && isset($address['longitude']))
+                                            <a target="_blank"
+                                                href="http://maps.google.com/maps?z=12&t=m&q=loc:{{ $address['latitude'] }}+{{ $address['longitude'] }}">
                                                 <i class="tio-map"></i>{{ $address['address'] }}<br>
                                             </a>
-                                            @else
-                                                <i class="tio-map"></i>{{ $address['address'] }}<br>
-                                            @endif
+                                        @else
+                                            <i class="tio-map"></i>{{ $address['address'] }}<br>
                                         @endif
+                                    @endif
                                 </span>
-                                @endif
                             @endif
+                        @endif
 
                         </div>
                     @else
@@ -1308,54 +1052,6 @@
                     <!-- End Body -->
                 </div>
                 <!-- End Card -->
-                {{--                v2.8.1 start--}}
-                @if ($order->store && \App\CentralLogics\Helpers::get_store_data()->store_type == 'company' && $order->order_type!="parcel" )
-                    <!-- Restaurant Card -->
-                    <div class="card mt-2">
-                        <!-- Body -->
-                        <div class="card-body">
-                            <h5 class="card-title mb-3">
-                            <span class="card-header-icon">
-                                <i class="tio-user"></i>
-                            </span>
-
-                                <span>{{ translate('messages.store_information') }}</span>
-
-                            </h5>
-                            <div class="media align-items-center deco-none resturant--information-single"
-                                 href="{{ route('admin.store.view', [$order->store['id'],'module_id' => $order->module_id]) }}"
-                            >
-                                <div class="avatar avatar-circle">
-                                    <img class="avatar-img w-75px onerror-image"
-                                         data-onerror-image="{{ asset('public/assets/admin/img/100x100/1.png') }}"
-                                         src="{{\App\CentralLogics\Helpers::get_image_helper($order?->store,'logo' , asset('storage/app/public/store/') .'/'. $order?->store?->logo , asset('public/assets/admin/img/100x100/1.png'), 'store/') }}"
-                                         alt="Image Description">
-                                </div>
-                                <div class="media-body">
-                                <span class="fz--14px text--title font-semibold text-hover-primary d-block">
-                                    {{ $order->store['name'] }}
-                                </span>
-                                    <span>{{ $order->store->orders_count }} {{ translate('messages.orders') }}</span>
-                                    <span class="text--title font-semibold d-flex align-items-center">
-                                    <i class="tio-call-talking-quiet mr-2"></i>{{ $order->store['phone'] }}
-                                </span>
-                                    <span class="text--title d-flex align-items-center">
-                                    <i class="tio-email mr-2"></i>{{ $order->store['email'] }}
-                                </span>
-                                </div>
-                            </div>
-                            <hr>
-                            <span class="d-block">
-                            <a target="_blank" class="d-flex align-items-center __gap-5px" href="http://maps.google.com/maps?z=12&t=m&q=loc:{{ $order->store['latitude'] }}+{{ $order->store['longitude'] }}">
-                                <i class="tio-poi"></i> <span>{{ $order->store['address'] }}</span><br>
-                            </a>
-                        </span>
-                        </div>
-                        <!-- End Body -->
-                    </div>
-                    <!-- End Card -->
-                @endif
-                {{--                v2.8.1 end--}}
             </div>
         </div>
         <!-- End Row -->
@@ -1413,81 +1109,6 @@
         </div>
     </div>
     <!-- End Modal -->
-
-{{--    v2.8.1 start--}}
-    <!--Dm assign Modal -->
-    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title" id="myModalLabel">{{ translate('messages.assign_deliveryman') }}</h4>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
-                            aria-hidden="true">&times;</span></button>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-5 my-2">
-                            <ul class="list-group overflow-auto initial--23">
-                                @if(count($deliveryMen) > 0)
-                                    @foreach ($deliveryMen as $dm)
-                                        <li class="list-group-item">
-                                            <span class="dm_list" role='button' data-id="{{ $dm['id'] }}">
-                                                <img class="avatar avatar-sm avatar-circle mr-1 onerror-image"
-                                                     data-onerror-image="{{ asset('public/assets/admin/img/160x160/img1.jpg') }}"
-                                                     src="{{\App\CentralLogics\Helpers::onerror_image_helper($dm['image'], asset('storage/app/public/delivery-man/') .'/'. $dm['image'], asset('public/assets/admin/img/160x160/img1.jpg'), 'delivery-man/') }}"
-                                                     alt="{{ $dm['name'] }}">
-                                                {{ $dm['name'] }}
-                                            </span>
-
-                                            <a class="btn btn-primary btn-xs float-right add-delivery-man" data-order-type="{{ $order->order_type }}" data-id="{{ $dm['id'] }}">{{ translate('messages.assign') }}</a>
-                                        </li>
-                                    @endforeach
-
-                                @else
-                                    <li class="list-group-item">
-                                        <span class="dm_list" role='button' >
-                                                No Deliverymen Found
-                                            </span>
-                                    </li>
-                                @endif
-
-                            </ul>
-                        </div>
-                        <div class="col-md-7 modal_body_map">
-                            <div class="location-map" id="dmassign-map">
-                                <div class="initial--24" id="map_canvas"></div>
-                                <div class="initial--24 d-none" id="map"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!--Show locations on map Modal -->
-    <div class="modal fade" id="locationModal" tabindex="-1" role="dialog" aria-labelledby="locationModalLabel">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title" id="locationModalLabel">{{ translate('messages.location_data') }}</h4>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
-                            aria-hidden="true">&times;</span></button>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-12 modal_body_map">
-                            <div class="location-map" id="location-map">
-                                <div class="initial--25" id="location_map_canvas"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- End Modal -->
-{{--    v2.8.1 end--}}
 
     <div class="modal fade" id="edit-order-amount" tabindex="-1">
         <div class="modal-dialog">
@@ -1701,441 +1322,5 @@
                 }
             });
         });
-    </script>
-
-
-{{--    v2.8.1 starty--}}
-    <script>
-
-        $('.add-delivery-man').on('click',function (){
-            id = $(this).data('id');
-            var order_type_p = $(this).data('order-type');
-            addDeliveryManMainulCustom(order_type_p, id);
-            {{--$.ajax({--}}
-            {{--    type: "GET",--}}
-            {{--    url: '{{ url('/') }}/store-panel/parcel/add-delivery-man/{{ $order['id'] }}/' + id,--}}
-            {{--    success: function(data) {--}}
-            {{--        location.reload();--}}
-            {{--        console.log(data)--}}
-            {{--        toastr.success('Successfully added', {--}}
-            {{--            CloseButton: true,--}}
-            {{--            ProgressBar: true--}}
-            {{--        });--}}
-            {{--    },--}}
-            {{--    error: function(response) {--}}
-            {{--        console.log(response);--}}
-            {{--        toastr.error(response.responseJSON.message, {--}}
-            {{--            CloseButton: true,--}}
-            {{--            ProgressBar: true--}}
-            {{--        });--}}
-            {{--    }--}}
-            {{--});--}}
-        })
-
-        function addDeliveryManMainulCustom(order_type, id) {
-            if (order_type == 'parcel')
-            {
-                var url = '{{ url('/') }}/store-panel/parcel/add-delivery-man/{{ $order['id'] }}/' + id;
-            } else {
-                var url = '{{ url('/') }}/store-panel/order/add-delivery-man/{{ $order['id'] }}/' + id;
-            }
-            $.ajax({
-                type: "GET",
-                url: url,
-                success: function(data) {
-                    location.reload();
-                    console.log(data)
-                    toastr.success('Successfully added', {
-                        CloseButton: true,
-                        ProgressBar: true
-                    });
-                },
-                error: function(response) {
-                    console.log(response);
-                    toastr.error(response.responseJSON.message, {
-                        CloseButton: true,
-                        ProgressBar: true
-                    });
-                }
-            });
-        }
-    </script>
-
-
-    <script
-        src="https://maps.googleapis.com/maps/api/js?key={{ \App\Models\BusinessSetting::where('key', 'map_api_key')->first()->value }}&libraries=places&v=3.45.8">
-    </script>
-    <script>
-        var deliveryMan = <?php echo json_encode($deliveryMen); ?>;
-        var map = null;
-        @if ($order->order_type == 'parcel')
-        var myLatlng = new google.maps.LatLng({{ $address['latitude'] }}, {{ $address['longitude'] }});
-        @else
-        @php($default_location = App\CentralLogics\Helpers::get_business_settings('default_location'))
-        var myLatlng = new google.maps.LatLng(
-            {{ isset($order->store) ? $order->store->latitude : (isset($default_location) ? $default_location['lat'] : 0) }},
-            {{ isset($order->store) ? $order->store->longitude : (isset($default_location['lng']) ? $default_location['lng'] : 0) }}
-        );
-        @endif
-        var dmbounds = new google.maps.LatLngBounds(null);
-        var locationbounds = new google.maps.LatLngBounds(null);
-        var dmMarkers = [];
-        dmbounds.extend(myLatlng);
-        locationbounds.extend(myLatlng);
-        var myOptions = {
-            center: myLatlng,
-            zoom: 13,
-            mapTypeId: google.maps.MapTypeId.ROADMAP,
-
-            panControl: true,
-            mapTypeControl: false,
-            panControlOptions: {
-                position: google.maps.ControlPosition.RIGHT_CENTER
-            },
-            zoomControl: true,
-            zoomControlOptions: {
-                style: google.maps.ZoomControlStyle.LARGE,
-                position: google.maps.ControlPosition.RIGHT_CENTER
-            },
-            scaleControl: false,
-            streetViewControl: false,
-            streetViewControlOptions: {
-                position: google.maps.ControlPosition.RIGHT_CENTER
-            }
-        };
-
-        function initializeGMap() {
-
-            map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
-
-            var infowindow = new google.maps.InfoWindow();
-            @if ($order->store)
-            var Restaurantmarker = new google.maps.Marker({
-                @if ($parcel_order)
-                position: new google.maps.LatLng({{ $address['latitude'] }},
-                    {{ $address['longitude'] }}),
-                title: "{{ Str::limit($order?->customer?->f_name . ' ' . $order?->customer?->l_name, 15, '...') }}",
-                // icon: "{{ asset('public/assets/admin/img/restaurant_map.png') }}"
-                @else
-                position: new google.maps.LatLng({{ $order->store->latitude }},
-                    {{ $order->store->longitude }}),
-                title: "{{ Str::limit($order->store->name, 15, '...') }}",
-                icon: "{{ asset('public/assets/admin/img/restaurant_map.png') }}",
-                @endif
-                map: map,
-
-            });
-
-            google.maps.event.addListener(Restaurantmarker, 'click', (function(Restaurantmarker) {
-                return function() {
-                    @if ($parcel_order)
-                    infowindow.setContent(
-                        "<div style='float:left'><img style='max-height:40px;wide:auto;' src='{{ asset('storage/app/public/profile/' . $order?->customer?->image) }}'></div><div style='float:right; padding: 10px;'><b>{{ $order->customer?->f_name }}{{ $order->customer?->l_name }}</b><br />{{ $address['address'] }}</div>"
-                    );
-                    @else
-                    infowindow.setContent(
-                        "<div style='float:left'><img style='max-height:40px;wide:auto;' src='{{ asset('storage/app/public/restaurant/' . $order->store?->logo) }}'></div><div class='text-break' style='float:right; padding: 10px;'><b>{{ Str::limit($order->store->name, 15, '...') }}</b><br /> {{ $order->store->address }}</div>"
-                    );
-                    @endif
-                    infowindow.open(map, Restaurantmarker);
-                }
-            })(Restaurantmarker));
-            @endif
-
-            map.fitBounds(dmbounds);
-            for (var i = 0; i < deliveryMan.length; i++) {
-                if (deliveryMan[i].lat) {
-                    // var contentString = "<div style='float:left'><img style='max-height:40px;wide:auto;' src='{{ asset('storage/app/public/delivery-man') }}/"+deliveryMan[i].image+"'></div><div style='float:right; padding: 10px;'><b>"+deliveryMan[i].name+"</b><br/> "+deliveryMan[i].location+"</div>";
-                    var point = new google.maps.LatLng(deliveryMan[i].lat, deliveryMan[i].lng);
-                    dmbounds.extend(point);
-                    map.fitBounds(dmbounds);
-                    var marker = new google.maps.Marker({
-                        position: point,
-                        map: map,
-                        title: deliveryMan[i].location,
-                        icon: "{{ asset('public/assets/admin/img/delivery_boy_map.png') }}"
-                    });
-                    dmMarkers[deliveryMan[i].id] = marker;
-                    google.maps.event.addListener(marker, 'click', (function(marker, i) {
-                        return function() {
-                            infowindow.setContent(
-                                "<div style='float:left'><img style='max-height:40px;wide:auto;' src='{{ asset('storage/app/public/delivery-man') }}/" +
-                                deliveryMan[i].image +
-                                "'></div><div style='float:right; padding: 10px;'><b>" + deliveryMan[i]
-                                    .name + "</b><br/> " + deliveryMan[i].location + "</div>");
-                            infowindow.open(map, marker);
-                        }
-                    })(marker, i));
-                }
-
-            };
-        }
-
-        function initMap() {
-            let map = new google.maps.Map(document.getElementById("map"), {
-                zoom: 13,
-                center: {
-                    lat: {{ isset($order->store) ? $order->store->latitude : '23.757989' }},
-                    lng: {{ isset($order->store) ? $order->store->longitude : '90.360587' }}
-                }
-            });
-
-            let zonePolygon = null;
-
-            //get current location block
-            let infoWindow = new google.maps.InfoWindow();
-            // Try HTML5 geolocation.
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        myLatlng = {
-                            lat: position.coords.latitude,
-                            lng: position.coords.longitude,
-                        };
-                        infoWindow.setPosition(myLatlng);
-                        infoWindow.setContent("Location found.");
-                        infoWindow.open(map);
-                        map.setCenter(myLatlng);
-                    },
-                    () => {
-                        handleLocationError(true, infoWindow, map.getCenter());
-                    }
-                );
-            } else {
-                // Browser doesn't support Geolocation
-                handleLocationError(false, infoWindow, map.getCenter());
-            }
-            //-----end block------
-            const input = document.getElementById("pac-input");
-            const searchBox = new google.maps.places.SearchBox(input);
-            map.controls[google.maps.ControlPosition.TOP_CENTER].push(input);
-            let markers = [];
-            const bounds = new google.maps.LatLngBounds();
-            searchBox.addListener("places_changed", () => {
-                const places = searchBox.getPlaces();
-
-                if (places.length == 0) {
-                    return;
-                }
-                // Clear out the old markers.
-                markers.forEach((marker) => {
-                    marker.setMap(null);
-                });
-                markers = [];
-                // For each place, get the icon, name and location.
-                places.forEach((place) => {
-                    if (!place.geometry || !place.geometry.location) {
-                        console.log("Returned place contains no geometry");
-                        return;
-                    }
-                    console.log(place.geometry.location);
-                    if (!google.maps.geometry.poly.containsLocation(
-                        place.geometry.location,
-                        zonePolygon
-                    )) {
-                        toastr.error('{{ translate('messages.out_of_coverage') }}', {
-                            CloseButton: true,
-                            ProgressBar: true
-                        });
-                        return false;
-                    }
-
-                    document.getElementById('latitude').value = place.geometry.location.lat();
-                    document.getElementById('longitude').value = place.geometry.location.lng();
-
-                    const icon = {
-                        url: place.icon,
-                        size: new google.maps.Size(71, 71),
-                        origin: new google.maps.Point(0, 0),
-                        anchor: new google.maps.Point(17, 34),
-                        scaledSize: new google.maps.Size(25, 25),
-                    };
-                    // Create a marker for each place.
-                    markers.push(
-                        new google.maps.Marker({
-                            map,
-                            icon,
-                            title: place.name,
-                            position: place.geometry.location,
-                        })
-                    );
-
-                    if (place.geometry.viewport) {
-                        // Only geocodes have viewport.
-                        bounds.union(place.geometry.viewport);
-                    } else {
-                        bounds.extend(place.geometry.location);
-                    }
-                });
-                map.fitBounds(bounds);
-            });
-            @if ($order->store)
-            $.get({
-                url: '{{ url('/') }}/admin/zone/get-coordinates/{{ $order->store->zone_id }}',
-                dataType: 'json',
-                success: function(data) {
-                    zonePolygon = new google.maps.Polygon({
-                        paths: data.coordinates,
-                        strokeColor: "#FF0000",
-                        strokeOpacity: 0.8,
-                        strokeWeight: 2,
-                        fillColor: 'white',
-                        fillOpacity: 0,
-                    });
-                    zonePolygon.setMap(map);
-                    zonePolygon.getPaths().forEach(function(path) {
-                        path.forEach(function(latlng) {
-                            bounds.extend(latlng);
-                            map.fitBounds(bounds);
-                        });
-                    });
-                    map.setCenter(data.center);
-                    google.maps.event.addListener(zonePolygon, 'click', function(mapsMouseEvent) {
-                        infoWindow.close();
-                        // Create a new InfoWindow.
-                        infoWindow = new google.maps.InfoWindow({
-                            position: mapsMouseEvent.latLng,
-                            content: JSON.stringify(mapsMouseEvent.latLng.toJSON(), null,
-                                2),
-                        });
-                        var coordinates = JSON.stringify(mapsMouseEvent.latLng.toJSON(), null, 2);
-                        var coordinates = JSON.parse(coordinates);
-
-                        document.getElementById('latitude').value = coordinates['lat'];
-                        document.getElementById('longitude').value = coordinates['lng'];
-                        infoWindow.open(map);
-                    });
-                },
-            });
-            @endif
-
-        }
-
-        $(document).ready(function() {
-
-            // Re-init map before show modal
-            $('#myModal').on('shown.bs.modal', function(event) {
-                initMap();
-                var button = $(event.relatedTarget);
-                $("#dmassign-map").css("width", "100%");
-                $("#map_canvas").css("width", "100%");
-            });
-
-            // Trigger map resize event after modal shown
-            $('#myModal').on('shown.bs.modal', function() {
-                initializeGMap();
-                google.maps.event.trigger(map, "resize");
-                map.setCenter(myLatlng);
-            });
-
-            // Address change modal modal shown
-            $('#shipping-address-modal').on('shown.bs.modal', function() {
-                initMap();
-                // google.maps.event.trigger(map, "resize");
-                // map.setCenter(myLatlng);
-            });
-
-
-            function initializegLocationMap() {
-                map = new google.maps.Map(document.getElementById("location_map_canvas"), myOptions);
-
-                var infowindow = new google.maps.InfoWindow();
-
-                @if ($order->customer && isset($address))
-                var marker = new google.maps.Marker({
-                    position: new google.maps.LatLng({{ $address['latitude'] }},
-                        {{ $address['longitude'] }}),
-                    map: map,
-                    title: "{{ $order->customer->f_name }} {{ $order->customer->l_name }}",
-                    icon: "{{ asset('public/assets/admin/img/customer_location.png') }}"
-                });
-
-                google.maps.event.addListener(marker, 'click', (function(marker) {
-                    return function() {
-                        infowindow.setContent(
-                            "<div style='float:left'><img style='max-height:40px;wide:auto;' src='{{ asset('storage/app/public/profile/' . $order->customer->image) }}'></div><div style='float:right; padding: 10px;'><b>{{ $order->customer->f_name }} {{ $order->customer->l_name }}</b><br />{{ $address['address'] }}</div>"
-                        );
-                        infowindow.open(map, marker);
-                    }
-                })(marker));
-                locationbounds.extend(marker.getPosition());
-                @endif
-                @if ($order->delivery_man && $order->dm_last_location)
-                var dmmarker = new google.maps.Marker({
-                    position: new google.maps.LatLng({{ $order->dm_last_location['latitude'] }},
-                        {{ $order->dm_last_location['longitude'] }}),
-                    map: map,
-                    title: "{{ $order->delivery_man->f_name }} {{ $order->delivery_man->l_name }}",
-                    icon: "{{ asset('public/assets/admin/img/delivery_boy_map.png') }}"
-                });
-
-                google.maps.event.addListener(dmmarker, 'click', (function(dmmarker) {
-                    return function() {
-                        infowindow.setContent(
-                            "<div style='float:left'><img style='max-height:40px;wide:auto;' src='{{ asset('storage/app/public/delivery-man/' . $order->delivery_man->image) }}'></div> <div style='float:right; padding: 10px;'><b>{{ $order->delivery_man->f_name }} {{ $order->delivery_man->l_name }}</b><br /> {{ $order->dm_last_location['location'] }}</div>"
-                        );
-                        infowindow.open(map, dmmarker);
-                    }
-                })(dmmarker));
-                locationbounds.extend(dmmarker.getPosition());
-                @endif
-
-                @if ($order->store)
-                var Retaurantmarker = new google.maps.Marker({
-                    position: new google.maps.LatLng({{ $order->store->latitude }},
-                        {{ $order->store->longitude }}),
-                    map: map,
-                    title: "{{ Str::limit($order->store->name, 15, '...') }}",
-                    icon: "{{ asset('public/assets/admin/img/restaurant_map.png') }}"
-                });
-
-                google.maps.event.addListener(Retaurantmarker, 'click', (function(Retaurantmarker) {
-                    return function() {
-                        infowindow.setContent(
-                            "<div style='float:left'><img style='max-height:40px;wide:auto;' src='{{ asset('storage/app/public/restaurant/' . $order->store->logo) }}'></div> <div style='float:right; padding: 10px;'><b>{{ Str::limit($order->store->name, 15, '...') }}</b><br /> {{ $order->store->address }}</div>"
-                        );
-                        infowindow.open(map, Retaurantmarker);
-                    }
-                })(Retaurantmarker));
-                locationbounds.extend(Retaurantmarker.getPosition());
-                @endif
-                @if ($parcel_order && isset($receiver_details))
-                var Receivermarker = new google.maps.Marker({
-                    position: new google.maps.LatLng({{ $receiver_details['latitude'] }},
-                        {{ $receiver_details['longitude'] }}),
-                    map: map,
-                    title: "{{ Str::limit($receiver_details['contact_person_name'], 15, '...') }}",
-                    // icon: "{{ asset('public/assets/admin/img/restaurant_map.png') }}"
-                });
-
-                google.maps.event.addListener(Receivermarker, 'click', (function(Receivermarker) {
-                    return function() {
-                        infowindow.open(map, Receivermarker);
-                    }
-                })(Receivermarker));
-                locationbounds.extend(Receivermarker.getPosition());
-                @endif
-
-                google.maps.event.addListenerOnce(map, 'idle', function() {
-                    map.fitBounds(locationbounds);
-                });
-            }
-
-            // Re-init map before show modal
-            $('#locationModal').on('shown.bs.modal', function(event) {
-                initializegLocationMap();
-            });
-
-
-            $('.dm_list').on('click', function() {
-                var id = $(this).data('id');
-                map.panTo(dmMarkers[id].getPosition());
-                map.setZoom(13);
-                dmMarkers[id].setAnimation(google.maps.Animation.BOUNCE);
-                window.setTimeout(() => {
-                    dmMarkers[id].setAnimation(null);
-                }, 3);
-            });
-        })
     </script>
 @endpush

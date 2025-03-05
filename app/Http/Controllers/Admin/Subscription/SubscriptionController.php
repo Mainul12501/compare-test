@@ -13,27 +13,24 @@ use App\Mail\SubscriptionCancel;
 use App\Models\StoreSubscription;
 use Illuminate\Support\Facades\DB;
 use App\Models\SubscriptionPackage;
-use App\Exports\CustomerOrderExport;
 use App\Http\Controllers\Controller;
 use App\Mail\SubscriptionPlanUpdate;
 use Brian2694\Toastr\Facades\Toastr;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\View;
 use Maatwebsite\Excel\Facades\Excel;
-use Illuminate\Support\Facades\Schema;
 use App\Models\SubscriptionTransaction;
-use Illuminate\Support\Facades\Validator;
 use App\Exports\SubscritionPackageListExport;
 use App\Exports\SubscriptionTransactionsExport;
 use App\Exports\SubscriptionSubscriberListExport;
 use App\Models\SubscriptionBillingAndRefundHistory;
-use App\Contracts\Repositories\TranslationRepositoryInterface;
-use Illuminate\Support\Facades\View;
-
 use Modules\Rental\Emails\ProviderSubscriptionCancel;
 use Modules\Rental\Emails\ProviderSubscriptionPlanUpdate;
+use App\Contracts\Repositories\TranslationRepositoryInterface;
+
 class SubscriptionController extends Controller
 {
-    // v2.8.1 checked
+
     public function __construct(
         protected TranslationRepositoryInterface $translationRepo
     )
@@ -43,62 +40,53 @@ class SubscriptionController extends Controller
     {
         $key = explode(' ', $request['search']);
         $filter = $request['statistics'];
+
         $packages=  SubscriptionPackage::withcount('currentSubscribers')
-//            new v3 code starts -- comment if prob occurs
             ->when($request?->module == 1, function($query){
                 $query->where('module_type', 'rental');
             })
             ->when($request?->module != 1, function($query){
                 $query->where('module_type', 'all');
             })
-//            new v3 code ends -- comment if prob occurs
+            ->when(isset($key), function($q) use($key){
+                $q->where(function ($q) use ($key) {
+                    foreach ($key as $value) {
+                        $q->orWhere('package_name', 'like', "%{$value}%");
+                    }
+                });
+            })
+            ->latest()->paginate(config('default_pagination'));
 
-        ->when(isset($key), function($q) use($key){
-            $q->where(function ($q) use ($key) {
-                foreach ($key as $value) {
-                    $q->orWhere('package_name', 'like', "%{$value}%");
-                        // ->orWhere('price', 'like', "%{$value}%")
-                        // ->orWhere('validity', 'like', "%{$value}%");
-                }
-            });
-        })
-        ->latest()->paginate(config('default_pagination'));
+        $package_sell_count= SubscriptionPackage::
+        when($request?->module != 1, function($query){
+            $query->where('module_type', 'all');
+        } )
+            ->when($request?->module == 1, function($query){
+                $query->where('module_type', 'rental');
+            } )-> withSum([
+                'transactions' => function ($query) use ($filter) {
+                    $query->where('is_trial',0)
+                        ->when(isset($filter) && $filter == 'this_year', function ($query) {
+                            return $query->whereYear('created_at', now()->format('Y'));
+                        })
 
+                        ->when(isset($filter) && $filter == 'this_month', function ($query) {
+                            return $query->whereMonth('created_at', now()->format('m'))->whereYear('created_at', now()->format('Y'));
+                        })
 
-     $package_sell_count= SubscriptionPackage::
-//         new v3 code starts -- comment if prob occurs
-     when($request?->module != 1, function($query){
-         $query->where('module_type', 'all');
-     } )
-         ->when($request?->module == 1, function($query){
-             $query->where('module_type', 'rental');
-         } )
-//         new v3 code ends -- comment if prob occurs
-        ->withSum([
-            'transactions' => function ($query) use ($filter) {
-                $query->where('is_trial',0)
-                    ->when(isset($filter) && $filter == 'this_year', function ($query) {
-                        return $query->whereYear('created_at', now()->format('Y'));
-                    })
-
-                    ->when(isset($filter) && $filter == 'this_month', function ($query) {
-                        return $query->whereMonth('created_at', now()->format('m'))->whereYear('created_at', now()->format('Y'));
-                    })
-
-                    ->when(isset($filter) && $filter == 'this_week', function ($query) {
-                        return $query->whereBetween('created_at', [now()->startOfWeek()->format('Y-m-d H:i:s'), now()->endOfWeek()->format('Y-m-d H:i:s')]);
-                    });
-            },
-        ], 'paid_amount')->get();
+                        ->when(isset($filter) && $filter == 'this_week', function ($query) {
+                            return $query->whereBetween('created_at', [now()->startOfWeek()->format('Y-m-d H:i:s'), now()->endOfWeek()->format('Y-m-d H:i:s')]);
+                        });
+                },
+            ], 'paid_amount')->get();
 
         return view('admin-views.subscription.package.index',compact('packages','package_sell_count'));
     }
-    public function create()
+    public function create(Request $request)
     {
         $language = getWebConfig('language');
-        $defaultLang = str_replace('_', '-', app()->getLocale());
         $module= $request->module ?? 'all';
-        return view('admin-views.subscription.package.create', compact('language','defaultLang', 'module'));
+        return view('admin-views.subscription.package.create', compact('language','module'));
     }
     public function store(Request $request)
     {
@@ -136,6 +124,7 @@ class SubscriptionController extends Controller
         $package->chat = $request->chat ?? 0;
         $package->review = $request->review ?? 0;
         $package->colour = $request?->colour;
+        $package->module_type = $request?->module ?? 'all';
         $package->save();
 
         $this->translationRepo->addByModel(request: $request, model: $package, modelPath: 'App\Models\SubscriptionPackage', attribute: 'package_name');
@@ -154,7 +143,6 @@ class SubscriptionController extends Controller
 
     public function show(SubscriptionPackage $subscriptionackage)
     {
-//        $packages= SubscriptionPackage::where('status',1)->get();
         $packages= SubscriptionPackage::where('status',1)->where('module_type', $subscriptionackage->module_type == 'rental' && addon_published_status('Rental') ? 'rental' : 'all' )->get();
         $over_view_data= $this->packageOverview($subscriptionackage);
         return view('admin-views.subscription.package.package-details', compact('subscriptionackage','over_view_data','packages'));
@@ -213,6 +201,7 @@ class SubscriptionController extends Controller
             $subscribers= StoreSubscription::with('store.vendor')->has('store')->where(['package_id' =>  $subscriptionackage->id,'status'=> 1])->get();
             foreach ($subscribers as $subscriber){
 
+
                 if($subscriber?->store?->module->module_type == 'rental' && addon_published_status('Rental')){
 
 
@@ -234,9 +223,9 @@ class SubscriptionController extends Controller
                         ]);
                     }
 
-                    if(config('mail.status') && Helpers::get_mail_status('rental_subscription_plan_upadte_mail_status_provider') == '1' &&  Helpers::getRentalNotificationStatusData('provider','provider_subscription_plan_update','mail_status' ,$subscriber?->store?->id)){
-                        Mail::to($subscriber?->store?->email)->send(new ProviderSubscriptionPlanUpdate($subscriber?->store?->name));
-                    }
+                        if(config('mail.status') && Helpers::get_mail_status('rental_subscription_plan_upadte_mail_status_provider') == '1' &&  Helpers::getRentalNotificationStatusData('provider','provider_subscription_plan_update','mail_status' ,$subscriber?->store?->id)){
+                            Mail::to($subscriber?->store?->email)->send(new ProviderSubscriptionPlanUpdate($subscriber?->store?->name));
+                        }
 
                 } else{
 
@@ -258,38 +247,11 @@ class SubscriptionController extends Controller
                         ]);
                     }
 
-                    if(config('mail.status') && Helpers::get_mail_status('subscription_plan_upadte_mail_status_store') == '1' &&  Helpers::getNotificationStatusData('store','store_subscription_plan_update','mail_status' ,$subscriber?->store?->id)){
-                        Mail::to($subscriber?->store?->email)->send(new SubscriptionPlanUpdate($subscriber?->store?->name));
+                        if(config('mail.status') && Helpers::get_mail_status('subscription_plan_upadte_mail_status_store') == '1' &&  Helpers::getNotificationStatusData('store','store_subscription_plan_update','mail_status' ,$subscriber?->store?->id)){
+                            Mail::to($subscriber?->store?->email)->send(new SubscriptionPlanUpdate($subscriber?->store?->name));
+                        }
                     }
                 }
-            }
-
-
-
-//                old v2.12.0 code starts
-//                if( Helpers::getNotificationStatusData('store','store_subscription_plan_update','push_notification_status',$subscriber?->store?->id)  &&  $subscriber?->store?->vendor?->firebase_token){
-//                    $data = [
-//                        'title' => translate('subscription_plan_updated'),
-//                        'description' => translate('Your_subscription_plan_has_been_updated'),
-//                        'order_id' => '',
-//                        'image' => '',
-//                        'type' => 'subscription',
-//                        'order_status' => '',
-//                    ];
-//                    Helpers::send_push_notif_to_device($subscriber?->store?->vendor?->firebase_token, $data);
-//                    DB::table('user_notifications')->insert([
-//                        'data' => json_encode($data),
-//                        'vendor_id' => $subscriber?->store?->vendor_id,
-//                        'created_at' => now(),
-//                        'updated_at' => now()
-//                    ]);
-//                }
-//
-//                if(config('mail.status') && Helpers::get_mail_status('subscription_plan_upadte_mail_status_store') == '1' &&  Helpers::getNotificationStatusData('store','store_subscription_plan_update','mail_status' ,$subscriber?->store?->id)){
-//                    Mail::to($subscriber?->store?->email)->send(new SubscriptionPlanUpdate($subscriber?->store?->name));
-//                }
-//                old v2.12.0 code ends
-
 
         } catch (\Exception $ex) {
             info($ex->getMessage());
@@ -563,13 +525,13 @@ class SubscriptionController extends Controller
     }
     public function subscriberDetail($id){
         $store= Store::where('id',$id)->with([
-            'store_sub_update_application.package','vendor','store_sub_update_application.last_transcations'
+            'store_sub_update_application.package','vendor','store_sub_update_application.last_transcations','module:id,module_type'
         ])->withcount('items')
         ->first();
         if($store->module_type == 'rental') {
             $store->loadCount('vehicles as items_count' );
         }
-//        $packages = SubscriptionPackage::where('status',1)->latest()->get();
+
         $packages = SubscriptionPackage::where('status',1)->where('module_type', $store?->module?->module_type == 'rental' && addon_published_status('Rental') ? 'rental' : 'all' )->latest()->get();
         $admin_commission=BusinessSetting::where('key', 'admin_commission')->first()?->value ;
         $business_name=BusinessSetting::where('key', 'business_name')->first()?->value ;
@@ -591,7 +553,7 @@ class SubscriptionController extends Controller
         try {
             $store=Store::where('id',$id)->first();
 
-            if($store?->module?->module_type == 'rental' && addon_published_status('Rental')){
+        if($store?->module?->module_type == 'rental' && addon_published_status('Rental')){
                 if( Helpers::getRentalNotificationStatusData('provider','provider_subscription_cancel','push_notification_status',$store->id)  &&  $store?->vendor?->firebase_token){
                     $data = [
                         'title' => translate('subscription_canceled'),
@@ -634,29 +596,6 @@ class SubscriptionController extends Controller
                     Mail::to($store->email)->send(new SubscriptionCancel($store->name));
                 }
             }
-
-//            old v2.12.0 code starts
-//            if( Helpers::getNotificationStatusData('store','store_subscription_cancel','push_notification_status',$store->id)  &&  $store?->vendor?->firebase_token){
-//                $data = [
-//                    'title' => translate('subscription_canceled'),
-//                    'description' => translate('Your_subscription_has_been_canceled'),
-//                    'order_id' => '',
-//                    'image' => '',
-//                    'type' => 'subscription',
-//                    'order_status' => '',
-//                ];
-//                Helpers::send_push_notif_to_device($store?->vendor?->firebase_token, $data);
-//                DB::table('user_notifications')->insert([
-//                    'data' => json_encode($data),
-//                    'vendor_id' => $store?->vendor_id,
-//                    'created_at' => now(),
-//                    'updated_at' => now()
-//                ]);
-//            }
-//            if (config('mail.status') && Helpers::get_mail_status('subscription_cancel_mail_status_store') == '1' &&  Helpers::getNotificationStatusData('store','store_subscription_cancel','mail_status' ,$store?->id)) {
-//                Mail::to($store->email)->send(new SubscriptionCancel($store->name));
-//            }
-//            old v2.12.0 code ends
         } catch (\Exception $ex) {
             info($ex->getMessage());
         }
@@ -683,6 +622,7 @@ class SubscriptionController extends Controller
     }
     public function packageView($id,$store_id){
         $store_subscription= StoreSubscription::where('store_id', $store_id)->with(['package'])->latest()->first();
+//        dd($store_subscription);
         $package = SubscriptionPackage::where('status',1)->where('id',$id)->first();
         $store= Store::Where('id',$store_id)->first();
         $pending_bill= SubscriptionBillingAndRefundHistory::where(['store_id'=>$store->id,
@@ -841,20 +781,16 @@ class SubscriptionController extends Controller
         $key = explode(' ', $request['search']);
 
         $packages=  SubscriptionPackage::withcount('currentSubscribers')
-//            new v3 code starts -- comment if prob occurs
-            ->when($request?->module == 1, function($query){
-                $query->where('module_type', 'rental');
-            })
-            ->when($request?->module != 1, function($query){
-                $query->where('module_type', 'all');
-            })
-            //            new v3 code ends -- comment if prob occurs
+        ->when($request?->module == 1, function($query){
+            $query->where('module_type', 'rental');
+        })
+        ->when($request?->module != 1, function($query){
+            $query->where('module_type', 'all');
+        })
         ->when(isset($key), function($q) use($key){
             $q->where(function ($q) use ($key) {
                 foreach ($key as $value) {
                     $q->orWhere('package_name', 'like', "%{$value}%");
-                        // ->orWhere('price', 'like', "%{$value}%")
-                        // ->orWhere('validity', 'like', "%{$value}%");
                 }
             });
         })

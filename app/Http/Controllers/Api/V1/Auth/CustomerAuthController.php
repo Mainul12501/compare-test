@@ -13,7 +13,6 @@ use Illuminate\Http\Request;
 use App\CentralLogics\Helpers;
 use Illuminate\Support\Carbon;
 use App\Mail\EmailVerification;
-use App\Mail\LoginVerification;
 use App\Models\BusinessSetting;
 use App\CentralLogics\SMS_module;
 use App\Models\WalletTransaction;
@@ -26,8 +25,6 @@ use Illuminate\Support\Facades\Mail;
 use Modules\Gateways\Traits\SmsGateway;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
-use App\CentralLogics\CustomerLogic;
-
 use Modules\Rental\Entities\RentalCart;
 use Modules\Rental\Entities\RentalCartUserData;
 
@@ -281,70 +278,6 @@ class CustomerAuthController extends Controller
             'message' => translate('messages.not_found')
         ], 404);
 
-    }
-
-    // v2.8.1 full function
-    public function check_email(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|unique:users'
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => Helpers::error_processor($validator)], 403);
-        }
-
-
-        if (BusinessSetting::where(['key' => 'email_verification'])->first()->value) {
-            $token = rand(1000, 9999);
-            DB::table('email_verifications')->insert([
-                'email' => $request['email'],
-                'token' => $token,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-            $mail_status = Helpers::get_mail_status('registration_otp_mail_status_user');
-            if (config('mail.status') && $mail_status == '1') {
-                $user = User::where('email', $request['email'])->first();
-                Mail::to($request['email'])->send(new EmailVerification($token,$user->f_name));
-            }
-            return response()->json([
-                'message' => 'Email is ready to register',
-                'token' => 'active'
-            ], 200);
-        } else {
-            return response()->json([
-                'message' => 'Email is ready to register',
-                'token' => 'inactive'
-            ], 200);
-        }
-    }
-    // v2.8.1 full function
-    public function verify_email(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'email' => 'required'
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => Helpers::error_processor($validator)], 403);
-        }
-
-        $verify = EmailVerifications::where(['email' => $request['email'], 'token' => $request['token']])->first();
-
-        if (isset($verify)) {
-            $verify->delete();
-            return response()->json([
-                'message' => translate('messages.token_varified'),
-            ], 200);
-        }
-
-        $errors = [];
-        array_push($errors, ['code' => 'token', 'message' => translate('messages.token_not_found')]);
-        return response()->json(
-            ['errors' => $errors],
-            404
-        );
     }
 
     public function firebase_auth_verify(Request $request)
@@ -1140,7 +1073,7 @@ class CustomerAuthController extends Controller
     }
 
     private function check_guest_cart($user, $guest_id){
-        if($guest_id  && isset($user->id)){
+        if($guest_id && isset($user->id)){
 
             $userStoreIds = Cart::where('user_id', $guest_id)
                 ->join('items', 'carts.item_id', '=', 'items.id')
@@ -1158,14 +1091,14 @@ class CustomerAuthController extends Controller
             if(addon_published_status('Rental')){
 
                 RentalCart::where(['user_id' => $user->id, 'is_guest' => 0])
-                    ->when(RentalCart::where(['user_id' => $guest_id, 'is_guest' => 1])->exists(),function ($query) {
+                ->when(RentalCart::where(['user_id' => $guest_id, 'is_guest' => 1])->exists(),function ($query) {
                         $query->delete();
                     });
 
                 RentalCartUserData::where(['user_id' => $user->id, 'is_guest' => 0])
                     ->when( RentalCartUserData::where(['user_id' => $guest_id, 'is_guest' => 1])->exists(),function ($query) {
-                        $query->delete();
-                    });
+                            $query->delete();
+                        });
 
                 RentalCart::where('user_id', $guest_id)->update(['user_id' => $user->id, 'is_guest' => 0]);
                 RentalCartUserData::where('user_id', $guest_id)->update(['user_id' => $user->id, 'is_guest' => 0]);

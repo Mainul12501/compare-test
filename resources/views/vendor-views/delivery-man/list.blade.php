@@ -47,10 +47,6 @@
                         <th class="border-0 text-capitalize">{{translate('messages.name')}}</th>
                         <th class="border-0 text-capitalize">{{translate('messages.availability_status')}}</th>
                         <th class="border-0 text-capitalize">{{translate('messages.phone')}}</th>
-{{--                        v2.8.1--}}
-                        @if (\App\CentralLogics\Helpers::get_store_data()->store_type = 'company')
-                            <th class="border-0 text-capitalize">{{translate('messages.cash_in_hand')}}</th>
-                        @endif
                         <th class="border-0 text-capitalize text-center">{{translate('messages.active_orders')}}</th>
                         <th class="border-0 text-capitalize text-center">{{translate('messages.action')}}</th>
                     </tr>
@@ -96,23 +92,11 @@
                             <td>
                                 <a class="deco-none" href="tel:{{$dm['phone']}}">{{$dm['phone']}}</a>
                             </td>
-{{--                            v2.8.1--}}
-                            @if (\App\CentralLogics\Helpers::get_store_data()->store_type = 'company')
-                                <td >
-                                    {{ $dm->collected_cash}}
-                                </td>
-                            @endif
                             <td class="text-center">
                                 {{ $dm->orders ? count($dm->orders):0 }}
                             </td>
                             <td>
                                 <div class="btn--container justify-content-center">
-                                    @if($dm->dm_withdraw_to_store_status == 1)
-                                        <a class="btn action-btn btn--primary btn-outline-success" href="{{route('vendor.delivery-man.sent-withdraw-req-to-dm',['delivery_men' => $dm['id'], 'type' => 'accept'])}}" title="Accept Withdraw Request of Deliveryman"><i class="tio-done font-weight-bold"></i></a>
-                                    @endif
-                                    @if($dm->collected_cash > 0)
-                                        <a class="btn action-btn btn--primary btn-outline-warning" href="{{route('vendor.delivery-man.sent-withdraw-req-to-dm',['delivery_men' => $dm['id'], 'type' => 'sent'])}}" title="Sent Withdraw Request to Deliveryman"><i class="tio-money"></i></a>
-                                    @endif
                                     <a class="btn action-btn btn--primary btn-outline-primary" href="{{route('vendor.delivery-man.edit',[$dm['id']])}}" title="{{translate('messages.edit')}}"><i class="tio-edit"></i>
                                     </a>
                                     <a class="btn action-btn btn--danger btn-outline-danger form-alert"

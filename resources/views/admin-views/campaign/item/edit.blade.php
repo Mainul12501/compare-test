@@ -135,7 +135,7 @@
                             </div>
                             <div class="custom-file">
                                 <input type="file" name="image" id="customFileEg1" class="custom-file-input"
-                                        accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*">
+                                        accept=".webp, .jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*">
                                 <label class="custom-file-label" for="customFileEg1">{{translate('messages.choose_file')}}</label>
                             </div>
                         </div>
@@ -301,7 +301,7 @@
                                 <div class="col-md-3 col-sm-6">
                                     <div class="form-group mb-0">
                                         <label class="input-label" for="exampleFormControlInput1">{{translate('messages.price')}}</label>
-                                        <input type="number" min="1" max="100000" step="0.01" value="{{$campaign->price}}" name="price" class="form-control"
+                                        <input type="number" min="1" max="999999999" step="0.01" value="{{$campaign->price}}" name="price" class="form-control"
                                                 placeholder="{{ translate('messages.Ex:') }} 100" required>
                                     </div>
                                 </div>
@@ -312,7 +312,7 @@
                                             data-original-title="{{ translate('Currently you need to manage discount with store.') }}">
                                             <i class="tio-info-outined"></i>
                                         </span></label>
-                                        <input type="number" min="0" max="100000" value="{{$campaign->discount}}" name="discount" class="form-control"
+                                        <input type="number" min="0" max="999999999" value="{{$campaign->discount}}" name="discount" class="form-control"
                                                 placeholder="{{ translate('messages.Ex:') }} 100" >
                                     </div>
                                 </div>

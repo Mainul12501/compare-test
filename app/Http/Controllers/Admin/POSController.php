@@ -27,7 +27,6 @@ use Illuminate\Support\Facades\Config;
 
 class POSController extends Controller
 {
-    // v2.8.1 checked
     public function index(Request $request)
     {
         $time = Carbon::now()->toTimeString();

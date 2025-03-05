@@ -10,7 +10,6 @@ use App\CentralLogics\Helpers;
 
 class NotificationController extends Controller
 {
-    // v2.8.11 checked
     public function get_notifications(Request $request){
 
         if (!$request->hasHeader('zoneId')) {

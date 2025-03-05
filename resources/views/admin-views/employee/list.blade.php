@@ -115,6 +115,10 @@
                                                 method="post" id="employee-{{$employee['id']}}">
                                             @csrf @method('delete')
                                         </form>
+                                        @else
+                                        <div class="btn--container justify-content-center">
+                                        <span class="badge-pill badge-soft-primary"> {{ translate('messages.N/A') }} </span>
+                                    </div>
                                         @endif
                                     </td>
                                 </tr>

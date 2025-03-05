@@ -66,26 +66,14 @@
                             <div class="form-group mb-0">
                                 <label class="toggle-switch toggle-switch-sm d-flex justify-content-between border border-secondary rounded px-4 form-control" for="schedule_order">
                                 <span class="pr-2">{{translate('messages.scheduled_order')}}<span class="input-label-secondary" data-toggle="tooltip" data-placement="right" data-original-title="{{translate('When_enabled,_store_owner_can_take_scheduled_orders_from_customers.')}}"><img src="{{asset('/public/assets/admin/img/info-circle.svg')}}" alt="{{translate('messages.scheduled_order_hint')}}"></span></span>
-{{--                                    <input type="checkbox" class="toggle-switch-input redirect-url" data-url="{{route('admin.store.toggle-settings',[$store->id,$store->schedule_order?0:1, 'schedule_order'])}}"  id="schedule_order" {{$store->schedule_order?'checked':''}}>--}}
+                                    <input type="checkbox" class="toggle-switch-input redirect-url" data-url="{{route('admin.store.toggle-settings',[$store->id,$store->schedule_order?0:1, 'schedule_order'])}}"  id="schedule_order" {{$store->schedule_order?'checked':''}}>
                                     <span class="toggle-switch-label">
                                         <span class="toggle-switch-indicator"></span>
                                     </span>
                                 </label>
                             </div>
                         </div>
-
-                        <?php
-                            $isStoreBusinessModelIsCommission = false;
-                            if ($store->store_business_model == 'commission') {
-                                $isStoreBusinessModelIsCommission = true;
-                            }
-                            $isSubscriptionHasSelfDelivery = false;
-                            if ($store && ($store->store_business_model == 'subscription') && $store->store_sub && $store->store_sub->self_delivery) {
-                                $isSubscriptionHasSelfDelivery = true;
-                            }
-                        ?>
-{{--                        @if ($store->store_business_model == 'commission')--}}
-                        @if ($isStoreBusinessModelIsCommission || $isSubscriptionHasSelfDelivery)
+                        @if ($store->store_business_model == 'commission')
 
                         <div class="col-sm-6 col-lg-4">
                             <div class="form-group mb-0">
@@ -212,7 +200,7 @@
 
                                 <div class="form-group col-sm-6 col-lg-4">
                                     <label class="input-label text-capitalize">{{translate('messages.minimum_order_amount')}}<span class="input-label-secondary" data-toggle="tooltip" data-placement="right" data-original-title="{{translate('Specify_the_minimum_order_amount_required_for_customers_when_ordering_from_this_store.')}}"><img src="{{asset('/public/assets/admin/img/info-circle.svg')}}" alt="{{translate('messages.self_delivery_hint')}}"></span></label>
-                                    <input type="number" name="minimum_order" step="0.01" min="0" max="100000" class="form-control" placeholder="100" value="{{$store->minimum_order>0?$store->minimum_order:''}}">
+                                    <input type="number" name="minimum_order" step="0.01" min="0" max="999999999" class="form-control" placeholder="100" value="{{$store->minimum_order>0?$store->minimum_order:''}}">
                                 </div>
                                 @if (config('module.'.$store->module->module_type)['order_place_to_schedule_interval'])
                                 <div class="form-group col-sm-6 col-lg-4">
@@ -240,20 +228,7 @@
                                         <input type="number" id="tax" min="0" max="100" step="0.01" name="tax" class="form-control" required value="{{$store->tax??'0'}}" {{isset($store->tax)?'':'readonly'}}>
                                     </div>
                                 </div>
-{{--                                    v2.8.1 start--}}
-                                    <div class="form-group col-sm-6 col-lg-4">
-                                        <div class="form-group">
-                                            <label class="d-flex mb-1 justify-content-between switch toggle-switch-sm text-dark text-capitalize" for="comission_status">
-                                                <span>{{translate('messages.admin_commission')}}(%) <span class="input-label-secondary" data-toggle="tooltip" data-placement="right" data-original-title="{{translate('When_enabled,_admin_will_only_receive_the_certain_commission_percentage_he_set_for_this_store._Otherwise,_the_system_default_commission_will_be_applied.')}}"><img src="{{asset('/public/assets/admin/img/info-circle.svg')}}" alt="{{translate('When_enabled,_admin_will_only_receive_the_certain_commission_percentage_he_set_for_this_store._Otherwise,_the_system_default_commission_will_be_applied.')}}"></span></span>
-                                                <input type="checkbox" class="toggle-switch-input" name="comission_status" id="comission_status" value="1" {{isset($store->comission)?'checked':''}}>
-                                                <span class="toggle-switch-label">
-                                                <span class="toggle-switch-indicator"></span>
-                                            </span>
-                                            </label>
-                                            <input type="number" id="comission" min="0" max="10000" step="0.01" name="comission" class="form-control" required value="{{$store->comission??'0'}}" {{isset($store->comission)?'':'readonly'}}>
-                                        </div>
-                                    </div>
-{{--                                    v2.8.1 end--}}
+
 
                                 <div class="col-12">
                                     <div class="justify-content-end btn--container">

@@ -15,18 +15,7 @@ use Modules\Rental\Entities\Trips;
 
 class SystemController extends Controller
 {
-    public function store_data_v2_12()
-    {
-        $new_order_count = Order::StoreOrder()->where(['checked' => 0])->count();
-        $new_order = Order::StoreOrder()->where(['checked' => 0])->latest()->first();
-        $new_parcel_order_count = Order::ParcelOrder()->where(['checked' => 0])->count();
-        $new_parcel_order = Order::ParcelOrder()->where(['checked' => 0])->latest()->first();
-        return response()->json([
-            'success' => 1,
 
-            'data' => ['new_order' => $new_order_count > 0 ? $new_order_count : $new_parcel_order_count, 'type' => $new_order_count > 0 ? 'store_order' : 'parcel', 'module_id' => $new_order_count > 0 ? $new_order?->module_id : $new_parcel_order?->module_id]
-        ]);
-    }
     public function store_data()
     {
         if(Order::StoreOrder()->where(['checked' => 0])->count() > 0 ){
@@ -48,9 +37,9 @@ class SystemController extends Controller
         return response()->json([
             'success' => 1,
             'data' => ['new_order' => $new_order ?? 0,
-                'type' => $type ?? 'store_order',
-                'module_id' => $module_id ?? 0
-            ]
+                        'type' => $type ?? 'store_order',
+                        'module_id' => $module_id ?? 0
+                ]
         ]);
     }
 

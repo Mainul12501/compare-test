@@ -4,9 +4,7 @@ namespace App\Http\Controllers\Vendor;
 
 use App\CentralLogics\Helpers;
 use App\Http\Controllers\Controller;
-use App\Models\DisbursementWithdrawalMethod;
 use App\Models\Vendor;
-use App\Models\WithdrawalMethod;
 use Brian2694\Toastr\Facades\Toastr;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rules\Password;
@@ -15,10 +13,7 @@ class ProfileController extends Controller
 {
     public function view()
     {
-        return view('vendor-views.profile.index',[
-        'withdrawal_methods' => WithdrawalMethod::ofStatus(1)->get(),   // v2.8.1
-            'disbursementWithdrawalMethod' => DisbursementWithdrawalMethod::where('store_id', Helpers::get_store_id())->first(), // v2.8.1
-        ]);
+        return view('vendor-views.profile.index');
     }
 
     public function bank_view()
@@ -50,6 +45,8 @@ class ProfileController extends Controller
         $seller->l_name = $request->l_name;
         $seller->phone = $request->phone;
         $seller->email = $request->email;
+
+        $seller->store()->update(['email' =>$request->email]);
         if ($request->image) {
             $seller->image = Helpers::update('vendor/', $seller->image, 'png', $request->file('image'));
         }

@@ -60,8 +60,7 @@ class Notification extends Model
             "description"=> $this->description,
             "order_id"=> "",
             "image"=> $this->image,
-            "type"=> "push_notification",
-//            "type"=> "order_status", // v2.8.1 -- comment out the code if prob shows up
+            "type"=> "push_notification"
         ];
     }
 

@@ -19,8 +19,6 @@ use App\Traits\Payment;
 use App\Library\Receiver;
 use App\Library\Payment as PaymentInfo;
 use Illuminate\Support\Str;
-use App\Models\WalletToBank;
-use Illuminate\Support\Facades\DB;
 
 class WalletController extends Controller
 {
@@ -316,32 +314,5 @@ class WalletController extends Controller
         return response()->json($data);
 
 
-    }
-
-    // v2.8.1 full function
-    public function reqToTransfer(Request $request)
-    {
-        try {
-            $loggedUser = $request->user();
-            if ($loggedUser->wallet_balance < $request->request_balance)
-            {
-                return response()->json(['errors' => ['message' => 'Too much Amount.']], 403);
-            }
-            $walletToBank = new WalletToBank();
-            $walletToBank->user_id  = $loggedUser->id;
-            $walletToBank->request_balance  = $request->request_balance;
-            $walletToBank->bank_name  = $request->bank_name;
-            $walletToBank->bank_account_number  = $request->bank_account_number;
-            $walletToBank->bank_routing_number  = $request->bank_routing_number;
-            $walletToBank->notes  = $request->notes;
-            DB::beginTransaction();
-            $walletToBank->save();
-            DB::commit();
-            return response()->json(['success' => ['message' => 'Request sent successfully.']]);
-        } catch (\Exception $exception)
-        {
-            return response()->json($exception->getMessage());
-        }
-        return response()->json();
     }
 }

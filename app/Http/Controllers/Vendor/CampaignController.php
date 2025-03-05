@@ -15,7 +15,6 @@ use Illuminate\Support\Facades\Mail;
 
 class CampaignController extends Controller
 {
-    // v2.8.1 checked
     function list(Request $request)
     {
         $key = explode(' ', $request['search']);

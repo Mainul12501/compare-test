@@ -176,7 +176,7 @@ active
                                     <div class="upload-file">
                                         <input type="file" class="cover_attachment js-upload-input"
                                             data-target="profile-prev-image" name="profile_image"
-                                            accept=".png,.jpg,.jpeg,.gif, |image/*">
+                                            accept=".webp, .png,.jpg,.jpeg,.gif, |image/*">
                                         <div class="upload-file__img">
                                             <img src="{{asset('public/assets/admin/img/media/upload-file.png')}}" alt="" >
                                         </div>
@@ -196,7 +196,7 @@ active
                                     <div class="upload-file">
                                         <input type="file" class="cover_attachment js-upload-input"
                                             data-target="main-image" name="cover_image"
-                                            accept=".png,.jpg,.jpeg,.gif, |image/*">
+                                            accept=".webp, .png,.jpg,.jpeg,.gif, |image/*">
                                         <div class="upload-file__img upload-file__img_banner">
                                             <img src="{{asset('public/assets/admin/img/media/banner-upload-file.png')}}" alt="" >
                                         </div>

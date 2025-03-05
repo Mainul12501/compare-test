@@ -106,7 +106,7 @@
                             </div>
                             <div class="custom-file">
                                 <input type="file" name="image" id="customFileUpload" class="custom-file-input"
-                                    accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*">
+                                    accept=".webp, .jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*">
                                 <span class="custom-file-label">{{translate('messages.choose_file')}}</span>
                             </div>
                         </label>

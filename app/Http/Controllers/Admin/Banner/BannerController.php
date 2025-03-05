@@ -21,7 +21,6 @@ use Illuminate\View\View;
 
 class BannerController extends BaseController
 {
-    // v2.8.1 checked
     public function __construct(
         protected BannerRepositoryInterface $bannerRepo,
         protected BannerService $bannerService,

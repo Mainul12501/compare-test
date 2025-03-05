@@ -55,7 +55,6 @@ class DeliveryManAddRequest extends FormRequest
                     }
                 },
             ],
-            'agreement_document'=>'required|file|max:5120|mimes:jpg,png,jpeg,gif,bmp,tif,tiff',
         ];
     }
 

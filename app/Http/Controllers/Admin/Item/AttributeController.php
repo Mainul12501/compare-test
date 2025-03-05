@@ -20,7 +20,6 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class AttributeController extends BaseController
 {
-    // v2.8.1 checked
     public function __construct(
         protected AttributeRepositoryInterface $attributeRepo,
         protected AttributeService $attributeService,

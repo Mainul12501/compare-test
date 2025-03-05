@@ -33,7 +33,7 @@ class Localization
         } catch (\Exception $exception) {
             info($exception->getMessage());
         }
-        if ($request->is('store-panel*')) {
+        if ($request->is('vendor-panel*')) {
             if (session()->has('vendor_local')) {
                 App::setLocale(session()->get('vendor_local'));
             }

@@ -9,7 +9,6 @@ use Illuminate\Http\Request;
 
 class AttributeController extends Controller
 {
-    // v2.8.1 checked
     function list(Request $request)
     {
         $attributes = Attribute::orderBy('name')->get();

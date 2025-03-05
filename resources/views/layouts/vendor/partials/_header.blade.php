@@ -88,7 +88,7 @@
                                         <span class="card-text">{{\App\CentralLogics\Helpers::get_loggedin_user()->email}}</span>
                                     </div>
                                     <div class="avatar avatar-sm avatar-circle">
-                                        <img class="avatar-img  onerror-image"  data-onerror-image="{{asset('public/assets/admin/img/160x160/img1.jpg')}}"
+                                        <img class="avatar-img  onerror-image aspect-1-1"  data-onerror-image="{{asset('public/assets/admin/img/160x160/img1.jpg')}}"
                                         src="{{ \App\CentralLogics\Helpers::get_loggedin_user()->toArray()['image_full_url'] }}"
                                             alt="Image Description">
                                         <span class="avatar-status avatar-sm-status avatar-status-success"></span>
@@ -101,7 +101,7 @@
                                 <div class="dropdown-item-text">
                                     <div class="media align-items-center">
                                         <div class="avatar avatar-sm avatar-circle mr-2">
-                                            <img class="avatar-img  onerror-image"  data-onerror-image="{{asset('public/assets/admin/img/160x160/img1.jpg')}}"
+                                            <img class="avatar-img  onerror-image aspect-1-1 "  data-onerror-image="{{asset('public/assets/admin/img/160x160/img1.jpg')}}"
                                             src="{{ \App\CentralLogics\Helpers::get_loggedin_user()->toArray()['image_full_url'] }}"
                                                  alt="Owner image">
                                         </div>
@@ -143,7 +143,46 @@ $Payable_Balance = $wallet?->collected_cash  > 0 ? 1: 0;
 $cash_in_hand_overflow=  \App\Models\BusinessSetting::where('key' ,'cash_in_hand_overflow_store')->first()?->value;
 $cash_in_hand_overflow_store_amount =  \App\Models\BusinessSetting::where('key' ,'cash_in_hand_overflow_store_amount')->first()?->value;
 $val= (string) ($cash_in_hand_overflow_store_amount - (($cash_in_hand_overflow_store_amount * 10)/100));
+
+    $store_data=\App\CentralLogics\Helpers::get_store_data();
+    $store_data->load(['translations','orders','storage','storeConfig','module']);
+    // ->loadCount([
+    //     'orders as total_orders',
+    //     'orders as canceled_orders' => function ($query) {
+    //         $query->where('order_status', 'canceled');
+    //     }
+    // ]);
+    $subscription_deadline_warning_days =  \App\Models\BusinessSetting::where('key','subscription_deadline_warning_days')->first()?->value ?? 7;
+    $subscription_deadline_warning_message =  \App\Models\BusinessSetting::where('key','subscription_deadline_warning_message')->first()?->value ?? null;
+
+
+        // if ($store_data->canceled_orders > 0 && $store_data?->module?->module_type == 'rental' && addon_published_status('Rental') ) {
+        //     $store_data['cancellation_rate']= (($store_data->canceled_orders / $store_data->total_orders) * 100) ;
+        // }
+
 ?>
+
+{{-- @if (data_get($store_data,'cancellation_rate')  >= \App\CentralLogics\Helpers::get_business_settings('order_cancelation_rate_warning_limit') && data_get($store_data,'cancellation_rate')  <= \App\CentralLogics\Helpers::get_business_settings('order_cancelation_rate_block_limit') && $store_data?->module?->module_type == 'rental' && addon_published_status('Rental') )
+
+    <div class="alert __alert-2 alert-warning m-0 py-1 px-2" role="alert">
+        <img class="rounded mr-1"  width="25" src="{{ asset('/public/assets/admin/img/header_warning.png') }}" alt="">
+        <div class="cont">
+            <h4 class="m-0">{{ translate('Attentions_!') }} </h4>
+            {{ translate('Your cancelation rate is getting higher. If cancelation rate is reach 20%, your account will automatically suspended.') }}
+        </div>
+    </div>
+    @elseif(data_get($store_data,'cancellation_rate')  >= \App\CentralLogics\Helpers::get_business_settings('order_cancelation_rate_block_limit') && $store_data?->module?->module_type == 'rental' && addon_published_status('Rental') )
+
+
+    <div class="alert __alert-2 alert-warning m-0 py-1 px-2" role="alert">
+        <img class="rounded mr-1"  width="25" src="{{ asset('/public/assets/admin/img/header_warning.png') }}" alt="">
+        <div class="cont">
+            <h4 class="m-0">{{ translate('Attention_Please') }} </h4>
+            {{ translate('Your account has been suspended due to high cancelation rate. Contact with admin.') }}
+        </div>
+    </div>
+@endif --}}
+
 
 @if ($Payable_Balance == 1 &&  $cash_in_hand_overflow &&  $wallet?->balance < 0 &&  $val <=  abs($wallet?->collected_cash)  )
     <div class="alert __alert-2 alert-warning m-0 py-1 px-2" role="alert">
@@ -167,17 +206,12 @@ $val= (string) ($cash_in_hand_overflow_store_amount - (($cash_in_hand_overflow_s
 
 
 
-    <?php
-    $store_data=\App\CentralLogics\Helpers::get_store_data();
-    $subscription_deadline_warning_days =  \App\Models\BusinessSetting::where('key','subscription_deadline_warning_days')->first()?->value ?? 7;
-    $subscription_deadline_warning_message =  \App\Models\BusinessSetting::where('key','subscription_deadline_warning_message')->first()?->value ?? null;
-    ?>
 
 
 
 
 
-@if ( !in_array($store_data->store_business_model, ['none','commission']) && !Request::is('store-panel/subscription/*') )
+@if ( !in_array($store_data->store_business_model, ['none','commission']) && !Request::is('vendor-panel/subscription/*') )
 
         <?php
             $pers=10;
@@ -188,7 +222,7 @@ $val= (string) ($cash_in_hand_overflow_store_amount - (($cash_in_hand_overflow_s
                     $pers=  439.6 * $pers / 100;
             }
         ?>
-        @if ($store_data?->store_sub?->is_trial == 0 && $store_data?->store_sub?->expiry_date_parsed && $store_data?->store_sub->expiry_date_parsed->subDays($subscription_deadline_warning_days)->isBefore(now()) && Request::is('store-panel'))
+        @if ($store_data?->store_sub?->is_trial == 0 && $store_data?->store_sub?->expiry_date_parsed && $store_data?->store_sub->expiry_date_parsed->subDays($subscription_deadline_warning_days)->isBefore(now()) && Request::is('vendor-panel'))
 
                 <!--Always in header Renew -->
                 <div class="renew-badge mb-20" id="renew-badge">
@@ -206,7 +240,7 @@ $val= (string) ($cash_in_hand_overflow_store_amount - (($cash_in_hand_overflow_s
 
 
 
-        @elseif ( Session::get('subscription_renew_close_btn') !== true && $store_data?->store_sub?->is_trial == 0  && $store_data?->store_sub?->expiry_date_parsed && $store_data?->store_sub->expiry_date_parsed->subDays($subscription_deadline_warning_days)->isBefore(now()) && !Request::is('store-panel'))
+        @elseif ( Session::get('subscription_renew_close_btn') !== true && $store_data?->store_sub?->is_trial == 0  && $store_data?->store_sub?->expiry_date_parsed && $store_data?->store_sub->expiry_date_parsed->subDays($subscription_deadline_warning_days)->isBefore(now()) && !Request::is('vendor-panel'))
 
 
                 <div class="renew-badge mb-20 hide-warning" id="renew-badge">

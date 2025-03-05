@@ -1,21 +1,14 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Admin\DeliveryMan\DeliveryManController;
-use Illuminate\Support\Facades\Http;
-use App\Http\Controllers\Vendor\WalletMethodController;
 
 
 Route::group(['namespace' => 'Admin', 'as' => 'admin.'], function () {
 
-    Route::get('accept/{id}', [WalletMethodController::class, 'accept'])->name('accept-dis-wid-met');   // v2.8.1
-    Route::delete('delete-row/{id}', [WalletMethodController::class, 'delete'])->name('delete-dis-wid-met');    // v2.8.1
     Route::group(['middleware' => ['admin', 'current-module']], function () {
-//        Route::get('/test', function () {
-//            return view('admin-views.login-setup.login_page');
-//        });
-
-        Route::get('drivemond-panel', 'DriveMondController@drivemondExternalLogin')->name('drivemond-panel');
+        Route::get('/test', function () {
+        });
+        // Route::get('drivemond-panel', 'DriveMondController@drivemondExternalLogin')->name('drivemond-panel');
         Route::get('get-all-stores', 'VendorController@get_all_stores')->name('get_all_stores');
         Route::get('lang/{locale}', 'LanguageController@lang')->name('lang');
         Route::get('settings', 'SystemController@settings')->name('settings');
@@ -26,8 +19,6 @@ Route::group(['namespace' => 'Admin', 'as' => 'admin.'], function () {
         Route::get('system-currency', 'SystemController@system_currency')->name('system_currency');
         //dashboard
         Route::get('/', 'DashboardController@dashboard')->name('dashboard');
-        Route::get('/show-all-pending-requests', 'DashboardController@showAllPendingRequests')->name('show-all-pending-requests');
-        Route::get('/redirect-to-pending-pages', 'DashboardController@redirectToPendingPages')->name('redirect-to-pending-pages');
 
         Route::get('maintenance-mode', 'SystemController@maintenance_mode')->name('maintenance-mode');
         Route::get('landing-page', 'SystemController@landing_page')->name('landing-page');
@@ -159,16 +150,13 @@ Route::group(['namespace' => 'Admin', 'as' => 'admin.'], function () {
             Route::get('status/{id}/{status}', 'FlashSaleController@status_product')->name('status-product');
         });
 
-        Route::group(['prefix' => 'message', 'as' => 'message.', 'middleware' => ['module:customer_management']], function () {
+        Route::group(['prefix' => 'message', 'as' => 'message.'], function () {
             Route::get('list', 'ConversationController@list')->name('list');
             Route::post('store/{user_id}', 'ConversationController@store')->name('store');
             Route::get('view/{conversation_id}/{user_id}', 'ConversationController@view')->name('view');
         });
 
-        Route::get('download-document/{fileName}', 'VendorController@download_document')->name('download-document');    // v2.8.1
-        Route::group(['prefix' => 'delivery-man', 'as' => 'delivery-man.'], function () {   // v2.8.1
-            Route::get('download-document-dm/{fileName}', [DeliveryManController::class,'download_document'])->name('download-document-dm');    // v2.8.1
-        }); // v2.8.1
+
 
 
         Route::group(['prefix' => 'store', 'as' => 'store.'], function () {
@@ -194,7 +182,6 @@ Route::group(['namespace' => 'Admin', 'as' => 'admin.'], function () {
                 Route::get('view/{store}/{tab?}/{sub_tab?}', 'VendorController@view')->name('view');
                 Route::get('list', 'VendorController@list')->name('list');
                 Route::get('pending-requests', 'VendorController@pending_requests')->name('pending-requests');
-                Route::get('pending-method-requests', 'VendorController@pending_method_requests')->name('pending-method-requests'); // v2.8.1
                 Route::get('deny-requests', 'VendorController@deny_requests')->name('deny-requests');
                 Route::post('search', 'VendorController@search')->name('search');
                 Route::get('export', 'VendorController@export')->name('export');
@@ -241,86 +228,6 @@ Route::group(['namespace' => 'Admin', 'as' => 'admin.'], function () {
             Route::get('message/list', 'VendorController@conversation_list')->name('message-list');
         });
 
-        Route::group(['prefix' => 'company', 'as' => 'company.'], function () {     // v2.8.1
-            Route::get('get-stores-data/{store}', 'CompanyController@get_store_data')->name('get-stores-data');     // v2.8.1
-            Route::get('store-filter/{id}', 'CompanyController@store_filter')->name('store-filter');        // v2.8.1
-            Route::get('get-account-data/{store}', 'CompanyController@get_account_data')->name('store-filter');     // v2.8.1
-            Route::get('get-stores', 'CompanyController@get_stores')->name('get-stores');       // v2.8.1
-            Route::get('get-addons', 'CompanyController@get_addons')->name('get_addons');       // v2.8.1
-
-            Route::group(['middleware' => ['module:store']], function () {      // v2.8.1
-                Route::get('update-application/{id}/{status}', 'CompanyController@update_application')->name('application');        // v2.8.1
-                Route::get('add', 'CompanyController@index')->name('add');      // v2.8.1
-                Route::post('store', 'CompanyController@store')->name('store');     // v2.8.1
-                Route::get('edit/{id}', 'CompanyController@edit')->name('edit');        // v2.8.1
-                Route::post('update/{store}', 'CompanyController@update')->name('update');      // v2.8.1
-                Route::post('discount/{store}', 'CompanyController@discountSetup')->name('discount');       // v2.8.1
-                Route::post('update-settings/{store}', 'CompanyController@updateStoreSettings')->name('update-settings');       // v2.8.1
-                Route::post('update-meta-data/{store}', 'CompanyController@updateStoreMetaData')->name('update-meta-data');     // v2.8.1
-                Route::delete('delete/{store}', 'CompanyController@destroy')->name('delete');       // v2.8.1
-                Route::delete('clear-discount/{store}', 'CompanyController@cleardiscount')->name('clear-discount');     // v2.8.1
-                // Route::get('view/{store}', 'CompanyController@view')->name('view_tab');
-                Route::get('disbursement-export/{id}/{type}', 'CompanyController@disbursement_export')->name('disbursement-export');        // v2.8.1
-                Route::get('view/{store}/{tab?}/{sub_tab?}', 'CompanyController@view')->name('view');       // v2.8.1
-                Route::get('list', 'CompanyController@list')->name('list');     // v2.8.1
-                Route::get('pending-requests', 'CompanyController@pending_requests')->name('pending-requests');     // v2.8.1
-                Route::get('deny-requests', 'CompanyController@deny_requests')->name('deny-requests');      // v2.8.1
-                Route::get('pending-method-requests', 'CompanyController@pending_method_requests')->name('pending-method-requests');        // v2.8.1
-                Route::post('search', 'CompanyController@search')->name('search');      // v2.8.1
-                Route::get('export', 'CompanyController@export')->name('export');       // v2.8.1
-                Route::get('store-wise-reviwe-export', 'CompanyController@store_wise_reviwe_export')->name('store_wise_reviwe_export');     // v2.8.1
-                Route::get('export/cash/{type}/{store_id}', 'CompanyController@cash_export')->name('cash_export');      // v2.8.1
-                Route::get('export/order/{type}/{store_id}', 'CompanyController@order_export')->name('order_export');       // v2.8.1
-                Route::get('export/withdraw/{type}/{store_id}', 'CompanyController@withdraw_trans_export')->name('withdraw_trans_export');      // v2.8.1
-                Route::get('status/{store}/{status}', 'CompanyController@status')->name('status');      // v2.8.1
-                Route::get('featured/{store}/{status}', 'CompanyController@featured')->name('featured');        // v2.8.1
-                Route::get('toggle-settings-status/{store}/{status}/{menu}', 'CompanyController@store_status')->name('toggle-settings');        // v2.8.1
-                Route::post('status-filter', 'CompanyController@status_filter')->name('status-filter');     // v2.8.1
-
-
-
-                Route::get('recommended-store', 'CompanyController@recommended_store')->name('recommended_store');      // v2.8.1
-                Route::get('recommended-store-add', 'CompanyController@recommended_store_add')->name('recommended_store_add');      // v2.8.1
-                Route::get('recommended-store-status/{id}/{status}', 'CompanyController@recommended_store_status')->name('recommended_store_status');       // v2.8.1
-                Route::delete('recommended-store-remove/{id}', 'CompanyController@recommended_store_remove')->name('recommended_store_remove');     // v2.8.1
-                Route::get('shuffle-recommended-store/{status}', 'CompanyController@shuffle_recommended_store')->name('shuffle_recommended_store');     // v2.8.1
-
-                Route::get('selected-stores', 'CompanyController@selected_stores')->name('selected_stores');        // v2.8.1
-
-
-                //Import and export
-                Route::get('bulk-import', 'CompanyController@bulk_import_index')->name('bulk-import');      // v2.8.1
-                Route::post('bulk-import', 'CompanyController@bulk_import_data');       // v2.8.1
-                Route::get('bulk-export', 'CompanyController@bulk_export_index')->name('bulk-export-index');        // v2.8.1
-                Route::post('bulk-export', 'CompanyController@bulk_export_data')->name('bulk-export');      // v2.8.1
-                //Store shcedule
-                Route::post('add-schedule', 'CompanyController@add_schedule')->name('add-schedule');        // v2.8.1
-                Route::get('remove-schedule/{store_schedule}', 'CompanyController@remove_schedule')->name('remove-schedule');       // v2.8.1
-            });     // v2.8.1
-
-            Route::group(['middleware' => ['module:withdraw_list']], function () {      // v2.8.1
-                Route::post('withdraw-status/{id}', 'VendorController@withdrawStatus')->name('withdraw_status');        // v2.8.1
-                Route::get('withdraw_list', 'VendorController@withdraw')->name('withdraw_list');        // v2.8.1
-                Route::post('withdraw_search', 'VendorController@withdraw_search')->name('withdraw_search');        // v2.8.1
-                Route::get('withdraw_export', 'VendorController@withdraw_export')->name('withdraw_export');     // v2.8.1
-                Route::get('withdraw-view/{withdraw_id}/{seller_id}', 'VendorController@withdraw_view')->name('withdraw_view');     // v2.8.1
-            });     // v2.8.1
-
-            // message
-            Route::get('message/{conversation_id}/{user_id}', 'VendorController@conversation_view')->name('message-view');      // v2.8.1
-            Route::get('message/list', 'VendorController@conversation_list')->name('message-list');     // v2.8.1
-        });     // v2.8.1
-
-        Route::group(['prefix' => 'company', 'as' => 'company.'], function () {     // v2.8.1
-            Route::get('add', 'VendorController@company_index')->name('add');       // v2.8.1
-            Route::post('store', 'VendorController@company_store')->name('store');      // v2.8.1
-            Route::get('edit/{id}', 'VendorController@company_edit')->name('edit');     // v2.8.1
-            Route::post('update/{store}', 'VendorController@company_update')->name('update');       // v2.8.1
-            Route::get('list', 'VendorController@company_list')->name('list');      // v2.8.1
-            Route::get('export', 'VendorController@company_export')->name('export');        // v2.8.1
-            Route::delete('delete/{store}', 'VendorController@company_destroy')->name('delete');        // v2.8.1
-        });     // v2.8.1
-
 
         Route::get('addon/system-addons', function (){
             return to_route('admin.system-addon.index');
@@ -362,7 +269,7 @@ Route::group(['namespace' => 'Admin', 'as' => 'admin.'], function () {
             Route::get('export-orders/{file_type}/{status}/{type}', 'OrderController@export_orders')->name('export');
 
             Route::get('offline/payment/list/{status}', 'OrderController@offline_verification_list')->name('offline_verification_list');
-            Route::get('third-party-company', 'OrderController@third_party_company')->name('third-party-company');  // v2.8.1
+
         });
         // Refund
         Route::group(['prefix' => 'refund', 'as' => 'refund.', 'middleware' => ['module:order']], function () {
@@ -378,10 +285,7 @@ Route::group(['namespace' => 'Admin', 'as' => 'admin.'], function () {
 
 
 
-        Route::group(['prefix' => 'business-settings', 'as' => 'business-settings.', 'middleware' => ['module:settings']], function () {
-            Route::get('download-delivery-man-agreement', 'BusinessSettingsController@download_dm_agereement')->name('download-delivery-man-agreement');    // v2.8.1
-            Route::get('download-store-agreement', 'BusinessSettingsController@download_store_agereement')->name('download-store-agreement');   // v2.8.1
-            Route::get('download-courier-company-agreement', 'BusinessSettingsController@download_courier_company_agereement')->name('download-courier-company-agreement'); // v2.8.1
+        Route::group(['prefix' => 'business-settings', 'as' => 'business-settings.', 'middleware' => ['module:settings', 'actch']], function () {
             Route::get('business-setup/{tab?}', 'BusinessSettingsController@business_index')->name('business-setup');
             Route::get('react-setup', 'BusinessSettingsController@react_setup')->name('react-setup');
             Route::post('react-update', 'BusinessSettingsController@react_update')->name('react-update');
@@ -415,7 +319,8 @@ Route::group(['namespace' => 'Admin', 'as' => 'admin.'], function () {
             Route::post('review-section/update/{id}', 'BusinessSettingsController@review_update')->name('review-update');
             Route::delete('review/delete/{review}', 'BusinessSettingsController@review_destroy')->name('review-delete');
             Route::get('pages/react-landing-page-settings/{tab?}', 'BusinessSettingsController@react_landing_page_settings')->name('react-landing-page-settings');
-            Route::POST('pages/react-landing-page-settings/{tab?}', 'BusinessSettingsController@update_react_landing_page_settings')->name('react-landing-page-settings');
+            Route::POST('pages/react-landing-page-settings/{tab?}',
+                'BusinessSettingsController@update_react_landing_page_settings')->name('react-landing-page-settings');
             Route::DELETE('react-landing-page-settings/{tab}/{key}', 'BusinessSettingsController@delete_react_landing_page_settings')->name('react-landing-page-settings-delete');
             Route::get('review-react-status/{id}/{status}', 'BusinessSettingsController@review_react_status')->name('review-react-status');
             Route::get('pages/react-landing-page-settings/testimonials/review-react-list/edit/{id}', 'BusinessSettingsController@review_react_edit')->name('review-react-edit');
@@ -585,6 +490,8 @@ Route::group(['namespace' => 'Admin', 'as' => 'admin.'], function () {
         // Subscribed customer Routes
         Route::group(['prefix' => 'customer', 'as' => 'customer.'], function () {
 
+
+
             Route::group(['prefix' => 'wallet', 'as' => 'wallet.', 'middleware' => ['module:customer_wallet']], function () {
                 Route::get('add-fund', 'CustomerWalletController@add_fund_view')->name('add-fund');
                 Route::post('add-fund', 'CustomerWalletController@add_fund');
@@ -594,7 +501,7 @@ Route::group(['namespace' => 'Admin', 'as' => 'admin.'], function () {
 
                 // Subscribed customer Routes
                 Route::get('subscribed', 'CustomerController@subscribedCustomers')->name('subscribed');
-                 Route::post('subscriber-search', 'CustomerController@subscriberMailSearch')->name('subscriberMailSearch'); // v2.8.1
+                // Route::post('subscriber-search', 'CustomerController@subscriberMailSearch')->name('subscriberMailSearch');
                 Route::get('subscriber-search', 'CustomerController@subscribed_customer_export')->name('subscriber-export');
 
                 Route::get('loyalty-point/report', 'LoyaltyPointController@report')->name('loyalty-point.report');
@@ -658,7 +565,6 @@ Route::group(['namespace' => 'Admin', 'as' => 'admin.'], function () {
             Route::post('store-summary-report-search', 'ReportController@store_summary_search')->name('store-summary-report-search');
             Route::get('store-summary-report-export', 'ReportController@store_summary_export')->name('store-summary-report-export');
             Route::get('store-wise-sales-report', 'ReportController@store_sales_report')->name('store-sales-report');
-            Route::post('store-wise-sales-report-search', 'ReportController@store_sales_search')->name('store-sales-report-search');
             Route::get('store-wise-sales-report-export', 'ReportController@store_sales_export')->name('store-sales-report-export');
             Route::get('store-wise-order-report', 'ReportController@store_order_report')->name('store-order-report');
             Route::post('store-wise-order-report-search', 'ReportController@store_order_search')->name('store-order-report-search');
@@ -724,17 +630,13 @@ Route::group(['namespace' => 'Admin', 'as' => 'admin.'], function () {
                     Route::post('set-date', 'CustomerWalletController@set_date')->name('set-date');
                     Route::get('report', 'CustomerWalletController@report')->name('report');
                     Route::get('export', 'CustomerWalletController@export')->name('export');
-
-                    //        show wallet to bank req list
-                    Route::get('/show-wallet-transfer-list/{status?}', [WalletMethodController::class, 'showList'])->name('show-wallet-transfer-list'); // v2.8.1
-                    Route::get('/change-wallet-to-bank-req-status/{walletToBank}/{status?}', [WalletMethodController::class, 'changeWalletToBankStatus'])->name('change-wallet-to-bank-req-status');    // v2.8.1
                 });
 
                 Route::group(['middleware' => ['module:customer_management']], function () {
 
                     // Subscribed customer Routes
                     Route::get('subscribed', 'CustomerController@subscribedCustomers')->name('subscribed');
-                    Route::post('subscriber-search', 'CustomerController@subscriberMailSearch')->name('subscriberMailSearch');  // v2.8.1
+                    // Route::post('subscriber-search', 'CustomerController@subscriberMailSearch')->name('subscriberMailSearch');
                     Route::get('subscriber-search', 'CustomerController@subscribed_customer_export')->name('subscriber-export');
 
                     Route::get('loyalty-point/report', 'LoyaltyPointController@report')->name('loyalty-point.report');
@@ -795,7 +697,6 @@ Route::group(['namespace' => 'Admin', 'as' => 'admin.'], function () {
                 Route::post('store-summary-report-search', 'ReportController@store_summary_search')->name('store-summary-report-search');
                 Route::get('store-summary-report-export', 'ReportController@store_summary_export')->name('store-summary-report-export');
                 Route::get('store-wise-sales-report', 'ReportController@store_sales_report')->name('store-sales-report');
-                Route::post('store-wise-sales-report-search', 'ReportController@store_sales_search')->name('store-sales-report-search');    // v2.8.1
                 Route::get('store-wise-sales-report-export', 'ReportController@store_sales_export')->name('store-sales-report-export');
                 Route::get('store-wise-order-report', 'ReportController@store_order_report')->name('store-order-report');
                 Route::post('store-wise-order-report-search', 'ReportController@store_order_search')->name('store-order-report-search');
@@ -847,20 +748,6 @@ Route::group(['namespace' => 'Admin', 'as' => 'admin.'], function () {
                 Route::post('default-status-update', 'WithdrawalMethodController@default_status_update')->name('default-status-update');
                 Route::get('get-method-info', 'WithdrawalMethodController@getMethodInfo')->name('getMethodInfo');
             });
-
-            Route::group(['prefix' => 'store', 'as' => 'store.','middleware' => ['module:withdraw_list']], function () {    // v2.8.1
-                Route::group(['prefix' => 'offline_payment', 'as' => 'offline_payment.'], function () { // v2.8.1
-                    Route::get('list/{status}', 'OfflinePaymentMethodController@store_offline_verification_list')->name('store_offline_verification_list'); // v2.8.1
-                    Route::get('company-list/{status}', 'OfflinePaymentMethodController@company_offline_verification_list')->name('company_offline_verification_list'); // v2.8.1
-                    Route::get('verifications', 'OfflinePaymentMethodController@offline_payment_verification')->name('verifications');  // v2.8.1
-                }); // v2.8.1
-            }); // v2.8.1
-            Route::group(['prefix' => 'delivery_man', 'as' => 'delivery_man.','middleware' => ['module:withdraw_list']], function () {  // v2.8.1
-                Route::group(['prefix' => 'offline_payment', 'as' => 'offline_payment.'], function () { // v2.8.1
-                    Route::get('list/{status}', 'OfflinePaymentMethodController@delivery_man_offline_verification_list')->name('delivery_man_offline_verification_list');   // v2.8.1
-                    Route::get('verifications', 'OfflinePaymentMethodController@delivery_man_offline_payment_verification')->name('verifications'); // v2.8.1
-                }); // v2.8.1
-            }); // v2.8.1
 
             Route::group(['prefix' => 'store-disbursement', 'as' => 'store-disbursement.', 'middleware' => ['module:account']], function () {
                 Route::get('list', 'StoreDisbursementController@list')->name('list');

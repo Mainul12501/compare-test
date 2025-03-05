@@ -14,7 +14,6 @@ use Illuminate\Support\Facades\Validator;
 
 class CouponController extends Controller
 {
-    // v2.8.1 checked
     public function list(Request $request)
     {
         if (!$request->hasHeader('zoneId')) {

@@ -268,13 +268,6 @@
                                 @if(\App\CentralLogics\Helpers::get_store_data()->module->module_type == 'food')
                                 <th class="px-4 border-0"><h4 class="m-0 text-capitalize">{{translate('addons')}}</h4></th>
                                 @endif
-{{--                                v2.8.1 start--}}
-                                @if(isset($product->weight))
-                                <th class="px-4 border-0">
-                                    <h4 class="m-0 text-capitalize">{{ translate('Weight (Kg)') }}</h4>
-                                </th>
-                                @endif
-{{--                                v2.8.1 end--}}
                                 <th class="px-4 border-0">
                                     <h4 class="m-0 text-capitalize">{{ translate('tags') }}</h4>
                                 </th>
@@ -400,13 +393,6 @@
                                 @endif
                                 </td>
                                 @endif
-{{--                                v2.8.1 start--}}
-                                @if(isset($product->weight))
-                                    <td>
-                                        {{$product->weight}}
-                                    </td>
-                                @endif
-{{--                                v2.8.1 end--}}
                                 @if ($product->tags)
                                 <td>
                                     @foreach($product->tags as $c)

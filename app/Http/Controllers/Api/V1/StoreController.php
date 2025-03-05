@@ -16,7 +16,6 @@ use Illuminate\Support\Facades\DB;
 
 class StoreController extends Controller
 {
-    // v2.8.1 checked
     public function get_stores(Request $request, $filter_data="all")
     {
         if (!$request->hasHeader('zoneId')) {

@@ -13,11 +13,9 @@ use RecursiveIteratorIterator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\DB;
 
 class LanguageController extends Controller
 {
-    // v2.8.1 checked
     public function index()
     {       $language = BusinessSetting::where('key', 'system_language')->exists();
         if(!$language){

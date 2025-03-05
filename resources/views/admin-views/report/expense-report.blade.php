@@ -57,12 +57,12 @@
                         </div>
                         <div class="col-sm-6 col-md-3">
                             <select name="store_id"
-                                data-placeholder="{{ translate('messages.select_store') }}"
+                                data-placeholder="{{ translate('messages.select_vendor') }}"
                                 class="js-data-example-ajax form-control set-filter" data-url="{{ url()->full() }}" data-filter="store_id">
                                 @if (isset($store))
                                     <option value="{{ $store->id }}" selected>{{ $store->name }}</option>
                                 @else
-                                    <option value="all" selected>{{ translate('messages.all_stores') }}</option>
+                                    <option value="all" selected>{{ translate('messages.all_vendors') }}</option>
                                 @endif
                             </select>
                         </div>
@@ -211,7 +211,7 @@
                                 <th class="border-0">{{translate('sl')}}</th>
                                 <th class="border-0">{{translate('messages.order_id')}}</th>
                                 @if (addon_published_status('Rental'))
-                                    <th class="border-0">{{translate('trip_id')}}</th>
+                                <th class="border-0">{{translate('trip_id')}}</th>
                                 @endif
                                 <th class="border-0">{{translate('Date & Time')}}</th>
                                 <th class="border-0">{{ translate('Expense Type') }}</th>
@@ -238,16 +238,16 @@
                                     @endif
                                 </td>
                                 @if (addon_published_status('Rental'))
-                                    <td>
-                                        @if ($exp->trip)
+                                <td>
+                                    @if ($exp->trip)
 
-                                            <div>
-                                                <a class="text-dark" href="{{ route('admin.rental.trip.details', $exp->trip->id) }}">{{ $exp['trip_id'] }}</a>
-                                            </div>
-                                        @else
-                                            <label class="badge badge-primary">{{translate('messages.Other_Expenses')}}</label>
-                                        @endif
-                                    </td>
+                                    <div>
+                                        <a class="text-dark" href="{{ route('admin.rental.trip.details', $exp->trip->id) }}">{{ $exp['trip_id'] }}</a>
+                                    </div>
+                                    @else
+                                    <label class="badge badge-primary">{{translate('messages.Other_Expenses')}}</label>
+                                    @endif
+                                </td>
                                 @endif
                                 <td>
                                     {{date('Y-m-d '.config('timeformat'),strtotime($exp->created_at))}}

@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Validator;
 
 class CartController extends Controller
 {
-    // v2.8.1 checked
     public function get_carts(Request $request)
     {
         $validator = Validator::make($request->all(), [

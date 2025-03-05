@@ -76,6 +76,10 @@ class Banner extends Model
     {
         return $this->morphMany(Storage::class, 'data');
     }
+    public function store()
+    {
+        return $this->belongsTo(Store::class, 'data');
+    }
 
     /**
      * @param $value

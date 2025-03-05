@@ -14,20 +14,4 @@ class DisbursementWithdrawalMethod extends Model
         'store_id' => 'integer',
         'is_default'=>'boolean',
     ];
-    // v2.8.1 code start
-    protected $guarded = []; //mainul
-
-    public function withdrawalMethod()
-    {
-        return $this->belongsTo(WithdrawalMethod::class);
-    }
-    public function store()
-    {
-        return $this->belongsTo(Store::class);
-    }
-    public function deliveryMan()
-    {
-        return $this->belongsTo(DeliveryMan::class);
-    }
-    // v2.8.1 code ends
 }

@@ -81,12 +81,8 @@
                     <li class="navbar-vertical-aside-has-menu {{ Request::is('admin/order') ? 'active' : '' }}">
                         <a class="js-navbar-vertical-aside-menu-link nav-link nav-link-toggle" href="javascript:" title="{{ translate('messages.orders') }}">
                             <i class="tio-shopping-cart nav-icon"></i>
-                            @php($pendingOrdersOnMenu = \App\Models\Order::where(['order_status' => 'pending'])->where('order_type', '!=', 'parcel')->where('module_id', 4)->count() ?? 0)
-                            <span class="text-truncate {{ $pendingOrdersOnMenu > 0 ? ' position-relative overflow-visible' : 'navbar-vertical-aside-mini-mode-hidden-elements' }}">
+                            <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">
                                 {{ translate('messages.orders') }}
-                                @if(0 < $pendingOrdersOnMenu)
-                                    <span class="btn-status btn-status-danger border-0 size-8px"></span>
-                                @endif
                             </span>
                         </a>
                         <ul class="js-navbar-vertical-aside-submenu nav nav-sub" style="display:{{ Request::is('admin/order*') ? 'block' : 'none' }}">
@@ -315,14 +311,6 @@
                 </li>
                 @endif
                 <!-- End Coupon -->
-                 @if (\App\CentralLogics\Helpers::module_permission_check('cashback'))
-                 <li class="navbar-vertical-aside-has-menu {{ Request::is('admin/cashback*') ? 'active' : '' }}">
-                    <a class="js-navbar-vertical-aside-menu-link nav-link" href="{{ route('admin.cashback.add-new') }}" title="{{ translate('messages.cashback') }}">
-                        <i class="tio-settings-back nav-icon"></i>
-                        <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">{{ translate('messages.cashback') }}</span>
-                    </a>
-                </li>
-                @endif
 
                 <!-- Notification -->
                 @if (\App\CentralLogics\Helpers::module_permission_check('notification'))

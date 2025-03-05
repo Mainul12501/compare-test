@@ -18,7 +18,6 @@ use Illuminate\View\View;
 
 class CommonConditionController extends BaseController
 {
-    // v2.8.1 checked
     public function __construct(
         protected CommonConditionRepositoryInterface $conditionRepo,
         protected CommonConditionService $conditionService,

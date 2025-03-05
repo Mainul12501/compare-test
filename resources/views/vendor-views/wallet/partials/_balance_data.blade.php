@@ -3,9 +3,6 @@
     <?php
 
     $disbursement_type = \App\Models\BusinessSetting::where('key' , 'disbursement_type')->first()->value ?? 'manual';
-    if(\App\CentralLogics\Helpers::get_store_data()->store_type == 'company'){  // v2.8.1
-        $disbursement_type = 'manual';  // v2.8.1
-    }   // v2.8.1
     $min_amount_to_pay_store = \App\Models\BusinessSetting::where('key' , 'min_amount_to_pay_store')->first()->value ?? 0;
 
     $wallet_earning =  round($wallet->total_earning - ($wallet->total_withdrawn + $wallet->pending_withdraw) , 8);
@@ -273,19 +270,15 @@
 
                 <ul class="nav nav-tabs page-header-tabs pb-2">
                     <li class="nav-item">
-                        <a class="nav-link {{ Request::is('store-panel/wallet') ?'active':''}}"  href="{{ route('vendor.wallet.index') }}">{{translate('messages.withdraw_request')}}</a>
+                        <a class="nav-link {{ Request::is('vendor-panel/wallet') ?'active':''}}"  href="{{ route('vendor.wallet.index') }}">{{translate('messages.withdraw_request')}}</a>
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link  {{Request::is('store-panel/wallet/wallet-payment-list') ?'active':''}}" href="{{route('vendor.wallet.wallet_payment_list')}}"  aria-disabled="true">{{translate('messages.Payment_history')}}</a>
+                        <a class="nav-link  {{Request::is('vendor-panel/wallet/wallet-payment-list') ?'active':''}}" href="{{route('vendor.wallet.wallet_payment_list')}}"  aria-disabled="true">{{translate('messages.Payment_history')}}</a>
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link  {{Request::is('store-panel/wallet/disbursement-list') ?'active':''}}" href="{{route('vendor.wallet.getDisbursementList')}}"  aria-disabled="true">{{translate('messages.Next_Payouts')}}</a>
-                    </li>
-{{--                    v2.8.1--}}
-                    <li class="nav-item">
-                        <a class="nav-link  {{Request::is('store-panel/wallet/offline-payment-list') ?'active':''}}" href="{{route('vendor.wallet.offline_payment_list')}}"  aria-disabled="true">{{translate('messages.offline_payment')}}</a>
+                        <a class="nav-link  {{Request::is('vendor-panel/wallet/disbursement-list') ?'active':''}}" href="{{route('vendor.wallet.getDisbursementList')}}"  aria-disabled="true">{{translate('messages.Next_Payouts')}}</a>
                     </li>
                 </ul>
 

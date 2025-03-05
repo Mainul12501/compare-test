@@ -19,7 +19,6 @@ use Illuminate\View\View;
 
 class CashBackController extends BaseController
 {
-    // v2.8.1 checked
     public function __construct(
         protected CashBackRepositoryInterface $cashBackRepo,
         protected CashBackService $cashBackService,

@@ -17,7 +17,6 @@ use Illuminate\Support\Facades\Validator;
 
 class CustomerWalletController extends Controller
 {
-    // v2.8.1 checked
     public function add_fund_view()
     {
         if (BusinessSetting::where('key', 'wallet_status')->first()->value != 1) {

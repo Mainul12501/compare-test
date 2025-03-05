@@ -42,8 +42,8 @@ class ExpenseReportExport implements  FromView, ShouldAutoSize, WithStyles,WithC
     }
 
     public function styles(Worksheet $sheet) {
-        $sheet->getStyle('A2:F2')->getFont()->setBold(true);
-        $sheet->getStyle('A3:F3')->getFill()->applyFromArray([
+        $sheet->getStyle('A2:G2')->getFont()->setBold(true);
+        $sheet->getStyle('A3:G3')->getFill()->applyFromArray([
             'fillType' => 'solid',
             'rotation' => 0,
             'color' => ['rgb' => '9F9F9F'],
@@ -63,7 +63,7 @@ class ExpenseReportExport implements  FromView, ShouldAutoSize, WithStyles,WithC
         $sheet->getStyle('A1:C1')->applyFromArray($styleArray);
         return [
             // Define the style for cells with data
-            'A1:F'.$this->data['expenses']->count() +3 => [
+            'A1:G'.$this->data['expenses']->count() +3 => [
                 'borders' => [
                     'allBorders' => [
                         'borderStyle' => Border::BORDER_THIN,
@@ -79,7 +79,7 @@ class ExpenseReportExport implements  FromView, ShouldAutoSize, WithStyles,WithC
     {
         return [
             AfterSheet::class => function(AfterSheet $event) {
-                $event->sheet->getStyle('A1:F1') // Adjust the range as per your needs
+                $event->sheet->getStyle('A1:G1') // Adjust the range as per your needs
                     ->getAlignment()
                     ->setHorizontal(Alignment::HORIZONTAL_CENTER)
                     ->setVertical(Alignment::VERTICAL_CENTER);
@@ -96,19 +96,19 @@ class ExpenseReportExport implements  FromView, ShouldAutoSize, WithStyles,WithC
                     ->setHorizontal(Alignment::HORIZONTAL_CENTER)
                     ->setVertical(Alignment::VERTICAL_CENTER);
 
-                $event->sheet->getStyle('A3:F'.$this->data['expenses']->count() +3)
+                $event->sheet->getStyle('A3:G'.$this->data['expenses']->count() +3)
                     ->getAlignment()
                     ->setHorizontal(Alignment::HORIZONTAL_CENTER)
                     ->setVertical(Alignment::VERTICAL_CENTER);
-                $event->sheet->getStyle('D2:F2')
+                $event->sheet->getStyle('D2:G2')
                     ->getAlignment()
                     ->setHorizontal(Alignment::HORIZONTAL_LEFT)
                     ->setVertical(Alignment::VERTICAL_CENTER);
 
 
-                    $event->sheet->mergeCells('A1:F1');
+                    $event->sheet->mergeCells('A1:G1');
                     $event->sheet->mergeCells('A2:C2');
-                    $event->sheet->mergeCells('D2:F2');
+                    $event->sheet->mergeCells('D2:G2');
 
                     $event->sheet->getDefaultRowDimension()->setRowHeight(30);
                     $event->sheet->getRowDimension(1)->setRowHeight(50);

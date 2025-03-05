@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\Validator;
 
 class FlashSaleController extends Controller
 {
-    // v2.8.1 checked
     public function get_flash_sales(Request $request){
         if (!$request->hasHeader('zoneId')) {
             $errors = [];
@@ -22,7 +21,9 @@ class FlashSaleController extends Controller
         }
         $zone_id= $request->header('zoneId');
         try {
-            $flash_sales = FlashSale::with(['activeProducts','activeProducts.item'])->module(config('module.current_module_data')['id'])->whereHas('module.zones', function($query)use($zone_id){
+            $flash_sales = FlashSale::with(['activeProducts','activeProducts.item'])
+            ->module(config('module.current_module_data')['id'])
+            ->whereHas('module.zones', function($query)use($zone_id){
                 $query->whereIn('zones.id', json_decode($zone_id, true));
             })->whereHas('activeProducts.item.store',function($query) use ($zone_id){
                 $query->when(config('module.current_module_data'), function($query){
@@ -64,6 +65,7 @@ class FlashSaleController extends Controller
             $query->whereIn('zones.id', json_decode($zone_id, true));
         })->module(config('module.current_module_data')['id'])
         ->running()->active()->first();
+ 
         if(!$flash_sale){
             return response()->json([
                 'errors' => [
@@ -72,7 +74,13 @@ class FlashSaleController extends Controller
             ], 403);
         }
         try {
-            $flash_sale_items = FlashSaleItem::where('flash_sale_id',$flash_sale->id)->where('available_stock' ,'>' ,0 )->active()->paginate($limit, ['*'], 'page', $offset);
+            $flash_sale_items = FlashSaleItem::where('flash_sale_id',$flash_sale->id)->where('available_stock' ,'>' ,0 )->active()
+
+            ->wherehas('item.store', function($query)use($zone_id){
+                $query->whereIn('zone_id',json_decode($zone_id, true));
+            })
+
+            ->paginate($limit, ['*'], 'page', $offset);
             if ($flash_sale_items) {
                 $flash_sale_items->each(function ($activeProduct) {
                     $activeProduct->item = Helpers::product_data_formatting($activeProduct->item, false, false, app()->getLocale());

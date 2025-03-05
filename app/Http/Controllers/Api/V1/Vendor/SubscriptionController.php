@@ -2,11 +2,8 @@
 
 namespace App\Http\Controllers\Api\V1\Vendor;
 
-use App\Models\Module;
 use App\Models\Store;
-use App\Library\Payer;
-use App\Traits\Payment;
-use App\Library\Receiver;
+use App\Models\Module;
 use App\Models\StoreWallet;
 use Illuminate\Http\Request;
 use App\CentralLogics\Helpers;
@@ -17,7 +14,6 @@ use Illuminate\Support\Facades\DB;
 use App\Models\SubscriptionPackage;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Mail;
-use App\Library\Payment as PaymentInfo;
 use App\Models\SubscriptionTransaction;
 use Illuminate\Support\Facades\Validator;
 use App\Models\SubscriptionBillingAndRefundHistory;
@@ -25,15 +21,16 @@ use Modules\Rental\Emails\ProviderSubscriptionCancel;
 
 class SubscriptionController extends Controller
 {
-    // v2.8.1 checked
-    public function package_view(Request $request){
+    public function package_view(Request $request)
+    {
         $module = Module::whereId($request->module_id)->first();
-        $packages= SubscriptionPackage::where('status',1)
+        $packages = SubscriptionPackage::where('status', 1)
             ->where('module_type', $module?->module_type == 'rental' && addon_published_status('Rental') ? 'rental' : 'all')
             ->latest()->get();
-        return response()->json(['packages'=> $packages], 200);
+        return response()->json(['packages' => $packages], 200);
     }
-    public function business_plan(Request $request){
+    public function business_plan(Request $request)
+    {
 
 
         $validator = Validator::make($request->all(), [
@@ -42,81 +39,72 @@ class SubscriptionController extends Controller
             'business_plan' => 'required|in:subscription,commission',
             'package_id' => 'nullable|required_if:business_plan,subscription',
             'payment_gateway' => 'nullable|required_if:business_plan,subscription',
-            // 'callback' => 'nullable|required_if:business_plan,subscription',
-            'payment_platform'=>'nullable|in:app,web'
+            'payment_platform' => 'nullable|in:app,web'
         ]);
         if ($validator->fails()) {
             return response()->json(['errors' => Helpers::error_processor($validator)], 403);
         }
 
-        $store= Store::Where('id',$request->store_id)->first();
-        if($request->business_plan == 'subscription' && $request->package_id != null ) {
-
-            // $type=$request->type ?? 'new_join';
-            // if( Helpers::subscriptionConditionsCheck(store_id:$request->store_id,package_id:$request->package_id) == 'downgrade_error'){
-
-            //     return response()->json([
-            //         'errors' => ['message' => translate('messages.You_can_not_downgraded_to_this_package_please_choose_a_package_with_higher_upload_limits')]
-            //     ], 403);
-            // }
-
+        $store = Store::Where('id', $request->store_id)->first();
+        if ($request->business_plan == 'subscription' && $request->package_id != null) {
             $package = SubscriptionPackage::withoutGlobalScope('translate')->find($request->package_id);
-            $pending_bill= SubscriptionBillingAndRefundHistory::where(['store_id'=>$store->id,
-            'transaction_type'=>'pending_bill', 'is_success' =>0])?->sum('amount') ?? 0;
-            if(!in_array($request->payment_gateway,['wallet','free_trial'])){
-                $url= $request->has('callback')?$request['callback']:session('callback');
+            $pending_bill = SubscriptionBillingAndRefundHistory::where([
+                'store_id' => $store->id,
+                'transaction_type' => 'pending_bill',
+                'is_success' => 0
+            ])?->sum('amount') ?? 0;
+            if (!in_array($request->payment_gateway, ['wallet', 'free_trial'])) {
+                $url = $request->has('callback') ? $request['callback'] : session('callback');
                 $data = [
-                    'redirect_link' => Helpers::subscriptionPayment(store_id:$store->id,package_id:$package->id,payment_gateway:$request->payment_gateway,payment_platform:$request->payment_platform ?? 'web',url:$url,pending_bill:$pending_bill,type: $request?->type),
+                    'redirect_link' => Helpers::subscriptionPayment(store_id: $store->id, package_id: $package->id, payment_gateway: $request->payment_gateway, payment_platform: $request->payment_platform ?? 'web', url: $url, pending_bill: $pending_bill, type: $request?->type),
                 ];
 
                 return response()->json($data, 200);
             }
 
-            if($request->payment_gateway == 'wallet'){
-            $wallet= StoreWallet::firstOrNew(['vendor_id'=> $store->vendor_id]);
-            $balance = BusinessSetting::where('key', 'wallet_status')->first()?->value == 1 ? $wallet?->balance ?? 0 : 0;
+            if ($request->payment_gateway == 'wallet') {
+                $wallet = StoreWallet::firstOrNew(['vendor_id' => $store->vendor_id]);
+                $balance = BusinessSetting::where('key', 'wallet_status')->first()?->value == 1 ? $wallet?->balance ?? 0 : 0;
 
-                if($balance > $package?->price){
-                    $reference= 'wallet_payment_by_vendor';
-                    $plan_data=   Helpers::subscription_plan_chosen(store_id:$store->id,package_id:$package->id,payment_method:'wallet',discount:0,pending_bill:$pending_bill,reference:$reference,type: $request?->type);
-                    if($plan_data != false){
-                        $wallet->total_withdrawn= $wallet?->total_withdrawn + $package->price;
+                if ($balance > $package?->price) {
+                    $reference = 'wallet_payment_by_vendor';
+                    $plan_data =   Helpers::subscription_plan_chosen(store_id: $store->id, package_id: $package->id, payment_method: 'wallet', discount: 0, pending_bill: $pending_bill, reference: $reference, type: $request?->type);
+                    if ($plan_data != false) {
+                        $wallet->total_withdrawn = $wallet?->total_withdrawn + $package->price;
                         $wallet?->save();
                     }
-                }
-                else{
+                } else {
                     return response()->json([
-                    'errors' => ['message' => translate('messages.Insufficient_balance_in_wallet')]
-                ], 403);
+                        'errors' => ['message' => translate('messages.Insufficient_balance_in_wallet')]
+                    ], 403);
                 }
             }
 
-            if($request->payment_gateway == 'free_trial'){
-                $plan_data=   Helpers::subscription_plan_chosen(store_id:$store->id,package_id:$package->id,payment_method:'free_trial',discount:0,pending_bill:$pending_bill,reference:'free_trial',type: 'new_join');
+            if ($request->payment_gateway == 'free_trial') {
+                $plan_data =   Helpers::subscription_plan_chosen(store_id: $store->id, package_id: $package->id, payment_method: 'free_trial', discount: 0, pending_bill: $pending_bill, reference: 'free_trial', type: 'new_join');
             }
 
-            $data=[
+            $data = [
                 'store_business_model' => 'subscription',
-                'logo'=> $store->logo,
+                'logo' => $store->logo,
                 'message' => translate('messages.application_placed_successfully')
-                ];
-                return response()->json($data,200);
-            }
-        elseif($request->business_plan == 'commission' ){
+            ];
+            return response()->json($data, 200);
+        } elseif ($request->business_plan == 'commission') {
             $store->store_business_model = 'commission';
             $store->save();
             StoreSubscription::where(['store_id' => $store->id])->update([
                 'status' => 0,
             ]);
-        $data=['store_business_model' => 'commission',
-        'logo'=> $store->logo,
-        'message' => translate('messages.application_placed_successfully')
-        ];
-        return response()->json($data,200);
-    }
+            $data = [
+                'store_business_model' => 'commission',
+                'logo' => $store->logo,
+                'message' => translate('messages.application_placed_successfully')
+            ];
+            return response()->json($data, 200);
+        }
 
-    return response()->json([],403);
-
+        return response()->json([], 403);
     }
 
 
@@ -135,42 +123,43 @@ class SubscriptionController extends Controller
         if ($validator->fails()) {
             return response()->json(['errors' => Helpers::error_processor($validator)], 403);
         }
-        $limit = $request['limite']??25;
-        $offset = $request['offset']??1;
+        $limit = $request['limite'] ?? 25;
+        $offset = $request['offset'] ?? 1;
         $from = $request->from;
         $to = $request->to;
         $store_id = $request->vendor->stores[0]->id;
 
-        $transactions=  SubscriptionTransaction::where('store_id', $store_id)->latest()
-        ->with('store:id,name','package:id,package_name')
-        ->when(isset($key), function($query) use($key){
-            $query->where(function ($q) use ($key) {
-                foreach ($key as $value) {
-                    $q->Where('id', 'like', "%{$value}%");
-                }
-                $q->orWhereHas('store' , function ($q) use ($key) {
+        $transactions =  SubscriptionTransaction::where('store_id', $store_id)->latest()
+            ->with('store:id,name', 'package:id,package_name')
+            ->when(isset($key), function ($query) use ($key) {
+                $query->where(function ($q) use ($key) {
                     foreach ($key as $value) {
-                    $q->where('name', 'like', "%{$value}%");
-                }
+                        $q->Where('id', 'like', "%{$value}%");
+                    }
+                    $q->orWhereHas('store', function ($q) use ($key) {
+                        foreach ($key as $value) {
+                            $q->where('name', 'like', "%{$value}%");
+                        }
+                    });
                 });
-            });
-        })
-        ->when(isset($from) &&  isset($to) ,function($query) use($from,$to){
-            $query->whereBetween('created_at', [$from.' 00:00:00', $to.' 23:59:29']);
-        })
+            })
+            ->when(isset($from) &&  isset($to), function ($query) use ($from, $to) {
+                $query->whereBetween('created_at', [$from . ' 00:00:00', $to . ' 23:59:29']);
+            })
 
-        ->paginate($limit, ['*'], 'page', $offset);
+            ->paginate($limit, ['*'], 'page', $offset);
 
-            $data = [
-                'total_size' => $transactions->total(),
-                'limit' => $limit,
-                'offset' => $offset,
-                'transactions' => $transactions->items()
-            ];
-            return response()->json($data,200);
+        $data = [
+            'total_size' => $transactions->total(),
+            'limit' => $limit,
+            'offset' => $offset,
+            'transactions' => $transactions->items()
+        ];
+        return response()->json($data, 200);
     }
 
-    public function cancelSubscription(Request $request){
+    public function cancelSubscription(Request $request)
+    {
 
         $validator = Validator::make($request->all(), [
             'store_id' => 'required',
@@ -180,13 +169,13 @@ class SubscriptionController extends Controller
             return response()->json(['errors' => Helpers::error_processor($validator)], 403);
         }
 
-        StoreSubscription::where([ 'id'=>$request->subscription_id , 'store_id' => $request->store_id])->update([
+        StoreSubscription::where(['id' => $request->subscription_id, 'store_id' => $request->store_id])->update([
             'is_canceled' => 1,
             'canceled_by' => 'store',
         ]);
 
         try {
-            $store=Store::where('id',$request->store_id)->first();
+            $store = Store::where('id', $request->store_id)->first();
             if($store?->module?->module_type == 'rental' && addon_published_status('Rental')){
                 if( Helpers::getRentalNotificationStatusData('provider','provider_subscription_cancel','push_notification_status',$store->id)  &&  $store?->vendor?->firebase_token){
                     $data = [
@@ -234,11 +223,11 @@ class SubscriptionController extends Controller
             info($ex->getMessage());
         }
 
-        return response()->json(['success'],200);
-
+        return response()->json(['success'], 200);
     }
 
-    public function checkProductLimits(Request $request){
+    public function checkProductLimits(Request $request)
+    {
 
         $validator = Validator::make($request->all(), [
             'store_id' => 'required',
@@ -248,21 +237,23 @@ class SubscriptionController extends Controller
             return response()->json(['errors' => Helpers::error_processor($validator)], 403);
         }
 
-        $disable_item_count=0;
-        if(data_get(Helpers::subscriptionConditionsCheck(store_id:$request->store_id,package_id:$request->package_id) , 'disable_item_count') > 0){
-            $disable_item_count = (int) (data_get(Helpers::subscriptionConditionsCheck(store_id:$request->store_id,package_id:$request->package_id) , 'disable_item_count',0));
+        $disable_item_count = 0;
+        if (data_get(Helpers::subscriptionConditionsCheck(store_id: $request->store_id, package_id: $request->package_id), 'disable_item_count') > 0) {
+            $disable_item_count = (int) (data_get(Helpers::subscriptionConditionsCheck(store_id: $request->store_id, package_id: $request->package_id), 'disable_item_count', 0));
         }
 
-        $store = Store::where('id',$request->store_id)->with('store_sub_update_application')->first();
-        $store_subscription= $store->store_sub_update_application;
-        $cash_backs=[];
+        $store = Store::where('id', $request->store_id)->with('store_sub_update_application')->first();
+        $store_subscription = $store->store_sub_update_application;
+        $cash_backs = [];
 
-        if($store->store_business_model == 'subscription' &&  $store_subscription->status == 1 && $store_subscription->is_canceled == 0 && $store_subscription->is_trial == 0  && $store_subscription->package_id !=  $request->package_id){
-            $cash_backs= Helpers::calculateSubscriptionRefundAmount(store:$store, return_data:true);
+        if ($store->store_business_model == 'subscription' &&  $store_subscription->status == 1 && $store_subscription->is_canceled == 0 && $store_subscription->is_trial == 0  && $store_subscription->package_id !=  $request->package_id) {
+            $cash_backs = Helpers::calculateSubscriptionRefundAmount(store: $store, return_data: true);
         }
 
-        return  response()->json(['disable_item_count'=> $disable_item_count,
-                                    'back_amount'=> (float)data_get($cash_backs,'back_amount',0),
-                                    'days'=> (int) data_get($cash_backs,'days',0) ],200);
+        return  response()->json([
+            'disable_item_count' => $disable_item_count,
+            'back_amount' => (float)data_get($cash_backs, 'back_amount', 0),
+            'days' => (int) data_get($cash_backs, 'days', 0)
+        ], 200);
     }
 }

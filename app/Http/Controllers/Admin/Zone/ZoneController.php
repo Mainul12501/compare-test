@@ -25,7 +25,6 @@ use App\Contracts\Repositories\TranslationRepositoryInterface;
 
 class ZoneController extends BaseController
 {
-    // v2.8.1 checked
     public function __construct(
         protected ZoneRepositoryInterface $zoneRepo,
         protected ZoneService $zoneService,

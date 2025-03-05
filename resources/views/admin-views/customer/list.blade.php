@@ -15,7 +15,7 @@
                     <img src="{{asset('/public/assets/admin/img/people.png')}}" class="w--26" alt="">
                 </span>
                 <span>
-                     {{ translate('messages.customers') }} <span class="badge badge-soft-dark ml-2" id="count">{{ $customers->total() ?? 0 }}</span> <!--v2.8.1-->
+                     {{ translate('messages.customers') }}
                 </span>
             </h1>
         </div>
@@ -82,41 +82,7 @@
                 </h3>
                 <div class="search--button-wrapper justify-content-end">
 
-{{--                    v2.8.1 code start--}}
-                    <div class="col-sm-auto min--240">
-                        <select name="zone_id" class="form-control js-select2-custom set-filter"
-                                data-filter="zone_id"
-                                data-url="{{ url()->full() }}">
-                            <option value="all">{{ translate('messages.All_Zones') }}</option>
-                            @foreach(\App\Models\Zone::orderBy('name')->get() as $z)
-                                <option
-                                    value="{{$z['id']}}" {{ request()->get('zone_id')  == $z['id']?'selected':''}}>
-                                    {{$z['name']}}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
 
-                    <div class="col-sm-auto min--240">
-                        <select name="order_wise" class="form-control js-select2-custom set-filter"
-                                data-filter="order_wise"
-                                data-url="{{ url()->full() }}">
-                            <option  {{ request()->get('order_wise')  == 'top'?'selected':''}}  value="top">{{ translate('messages.Total_orders') }} ({{ translate('messages.High_to_Low') }})</option>
-                            <option {{ request()->get('order_wise')  == 'least'?'selected':''}}  value="least">{{ translate('messages.Total_orders') }} ({{ translate('messages.Low_to_High') }})</option>
-                            <option {{ request()->get('order_wise')  == 'latest'?'selected':''}}  value="latest">{{ translate('messages.New_Customers') }}</option>
-                        </select>
-                    </div>
-
-                    <div class="col-sm-auto min--240">
-                        <select name="filter" class="form-control js-select2-custom set-filter"
-                                data-filter="filter"
-                                data-url="{{ url()->full() }}">
-                            <option  {{ request()->get('filter')  == 'all'?'selected':''}} value="all">{{ translate('messages.All_Customers') }}</option>
-                            <option  {{ request()->get('filter')  == 'active'?'selected':''}} value="active">{{ translate('messages.Active_Customers') }}</option>
-                            <option  {{ request()->get('filter')  == 'blocked'?'selected':''}} value="blocked">{{ translate('messages.Inactive_Customers') }}</option>
-                        </select>
-                    </div>
-{{--                    v2.8.1 code end--}}
                     <form class="search-form">
                         <!-- Search -->
                         <div class="input-group input--group">
@@ -163,99 +129,6 @@
                 <!-- End Row -->
             </div>
             <!-- End Header -->
-
-            <!-- v2.8.1 start -->
-            <!-- Unfold -->
-            <div class="hs-unfold">
-                <a class="js-hs-unfold-invoker btn btn-sm btn-white min-height-40" href="javascript:;"
-                   data-hs-unfold-options='{
-                                    "target": "#showHideDropdown",
-                                    "type": "css-animation"
-                                }'>
-                    <i class="tio-table mr-1"></i> {{ translate('messages.columns') }} <span
-                        class="badge badge-soft-dark rounded-circle ml-1"></span>
-                </a>
-
-                <div id="showHideDropdown"
-                     class="hs-unfold-content dropdown-unfold dropdown-menu dropdown-menu-right dropdown-card min--240">
-                    <div class="card card-sm">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <span class="mr-2">{{ translate('messages.name') }}</span>
-
-                                <!-- Checkbox Switch -->
-                                <label class="toggle-switch toggle-switch-sm" for="toggleColumn_name">
-                                    <input type="checkbox" class="toggle-switch-input"
-                                           id="toggleColumn_name" checked>
-                                    <span class="toggle-switch-label">
-                                                <span class="toggle-switch-indicator"></span>
-                                            </span>
-                                </label>
-                                <!-- End Checkbox Switch -->
-                            </div>
-
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <span class="mr-2">{{ translate('messages.contact_information') }}</span>
-
-                                <!-- Checkbox Switch -->
-                                <label class="toggle-switch toggle-switch-sm" for="toggleColumn_email">
-                                    <input type="checkbox" class="toggle-switch-input"
-                                           id="toggleColumn_email" checked>
-                                    <span class="toggle-switch-label">
-                                                <span class="toggle-switch-indicator"></span>
-                                            </span>
-                                </label>
-                                <!-- End Checkbox Switch -->
-                            </div>
-
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <span class="mr-2">{{ translate('messages.total_order') }}</span>
-
-                                <!-- Checkbox Switch -->
-                                <label class="toggle-switch toggle-switch-sm"
-                                       for="toggleColumn_total_order">
-                                    <input type="checkbox" class="toggle-switch-input"
-                                           id="toggleColumn_total_order" checked>
-                                    <span class="toggle-switch-label">
-                                                <span class="toggle-switch-indicator"></span>
-                                            </span>
-                                </label>
-                                <!-- End Checkbox Switch -->
-                            </div>
-
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <span class="mr-2">{{ translate('messages.active/Inactive') }}</span>
-
-                                <!-- Checkbox Switch -->
-                                <label class="toggle-switch toggle-switch-sm" for="toggleColumn_status">
-                                    <input type="checkbox" class="toggle-switch-input"
-                                           id="toggleColumn_status" checked>
-                                    <span class="toggle-switch-label">
-                                                <span class="toggle-switch-indicator"></span>
-                                            </span>
-                                </label>
-                                <!-- End Checkbox Switch -->
-                            </div>
-
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="mr-2">{{ translate('messages.actions') }}</span>
-
-                                <!-- Checkbox Switch -->
-                                <label class="toggle-switch toggle-switch-sm" for="toggleColumn_actions">
-                                    <input type="checkbox" class="toggle-switch-input"
-                                           id="toggleColumn_actions" checked>
-                                    <span class="toggle-switch-label">
-                                                <span class="toggle-switch-indicator"></span>
-                                            </span>
-                                </label>
-                                <!-- End Checkbox Switch -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- End Unfold -->
-            <!-- v2.8.1 end -->
 
             <div class="card-body p-0">
                 <!-- Table -->

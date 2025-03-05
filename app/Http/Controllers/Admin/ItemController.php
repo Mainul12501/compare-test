@@ -65,12 +65,6 @@ class ItemController extends Controller
             'description.*' => 'max:1000',
             'name.0' => 'required',
             'description.0' => 'required',
-            'weight' =>'required_if:module_type,ecommerce',     // v2.8.1
-//            vmw weight modification
-
-            'vmw_height' => 'required',
-            'vmw_width' => 'required',
-            'vmw_length' => 'required',
         ], [
             'description.*.max' => translate('messages.description_length_warning'),
             'name.0.required' => translate('messages.item_name_required'),
@@ -338,14 +332,6 @@ class ItemController extends Controller
         if ($module_type == 'grocery') {
             $item->organic = $request->organic ?? 0;
         }
-        $vmw_weight = ($request->vmw_height * $request->vmw_width * $request->vmw_length) / 5000;
-        $item->weight = max($request->weight, $vmw_weight);  // vmw weight modification
-        $item->vmw_height = $request->vmw_height;   // vmw weight modification
-        $item->vmw_width = $request->vmw_width;   // vmw weight modification
-        $item->vmw_length = $request->vmw_length;   // vmw weight modification
-        $item->static_weight = $request->weight;   // vmw weight modification
-
-
         $item->stock = $request->current_stock ?? 0;
         $item->images = $images;
         $item->is_halal =  $request->is_halal ?? 0;
@@ -377,7 +363,7 @@ class ItemController extends Controller
 
     public function view($id)
     {
-        $product = Item::withoutGlobalScope(StoreScope::class)->where(['id' => $id])->first();
+        $product = Item::withoutGlobalScope(StoreScope::class)->where(['id' => $id])->firstOrFail();
         $reviews = Review::where(['item_id' => $id])->latest()->paginate(config('default_pagination'));
         return view('admin-views.product.view', compact('product', 'reviews'));
     }
@@ -430,11 +416,6 @@ class ItemController extends Controller
             'discount' => 'required|numeric|min:0',
             'name.0' => 'required',
             'description.0' => 'required',
-            'weight' =>'required_if:module_type,ecommerce', // v2.8.1
-
-
-
-
         ], [
             'description.*.max' => translate('messages.description_length_warning'),
             'category_id.required' => translate('messages.category_required'),
@@ -601,13 +582,7 @@ class ItemController extends Controller
             }
         }
         //combinations end
-        $images = $item['images'];  // v2.8.1
-        if ($request->has('item_images')) { // v2.8.1
-            foreach ($request->item_images as $img) {   // v2.8.1
-                $image = Helpers::upload('product/', 'png', $img);  // v2.8.1
-                array_push($images, ['img'=>$image, 'storage'=> Helpers::getDisk()]);   // v2.8.1
-            }   // v2.8.1
-        }   // v2.8.1
+
 
 
         $food_variations = [];
@@ -664,16 +639,6 @@ class ItemController extends Controller
         $item->organic = $request->organic ?? 0;
         $item->veg = $request->veg;
         $item->images = $images;
-//        $item->weight = $request->weight;   // v2.8.1
-
-        $vmw_weight = ($request->vmw_height * $request->vmw_width * $request->vmw_length) / 5000;
-        $item->weight = max($request->weight, $vmw_weight);  // vmw weight modification
-        $item->vmw_height = $request->vmw_height;   // vmw weight modification
-        $item->vmw_width = $request->vmw_width;   // vmw weight modification
-        $item->vmw_length = $request->vmw_length;   // vmw weight modification
-        $item->static_weight = $request->weight;   // vmw weight modification
-
-
         if (Helpers::get_mail_status('product_approval') && $request?->temp_product) {
 
 
@@ -1301,11 +1266,15 @@ class ItemController extends Controller
                         return back();
                     }
                     if (isset($collection['Price']) && ($collection['Price'] < 0)) {
-                        Toastr::error(translate('messages.Price_must_be_greater_then_0') . ' ' . $collection['Id']);
+                        Toastr::error(translate('messages.Price_must_be_greater_then_0_on_id') . ' ' . $collection['Id']);
                         return back();
                     }
                     if (isset($collection['Discount']) && ($collection['Discount'] < 0)) {
-                        Toastr::error(translate('messages.Discount_must_be_greater_then_0') . ' ' . $collection['Id']);
+                        Toastr::error(translate('messages.Discount_must_be_greater_then_0_on_id') . ' ' . $collection['Id']);
+                        return back();
+                    }
+                    if (data_get($collection,'Image') != "" &&  strlen(data_get($collection,'Image')) > 30 ) {
+                        Toastr::error(translate('messages.Image_name_must_be_in_30_char._on_id') . ' ' . $collection['Id']);
                         return back();
                     }
                     try {
@@ -1350,7 +1319,7 @@ class ItemController extends Controller
                 }
             }catch(\Exception $e){
                 info(["line___{$e->getLine()}",$e->getMessage()]);
-                Toastr::error(translate('messages.failed_to_import_data'));
+                Toastr::error($e->getMessage());
                 return back();
             }
             try {
@@ -1368,7 +1337,7 @@ class ItemController extends Controller
             } catch (\Exception $e) {
                 DB::rollBack();
                 info(["line___{$e->getLine()}", $e->getMessage()]);
-                Toastr::error(translate('messages.failed_to_import_data'));
+                Toastr::error($e->getMessage());
                 return back();
             }
             Toastr::success(translate('messages.product_imported_successfully', ['count' => count($data)]));
@@ -1391,6 +1360,10 @@ class ItemController extends Controller
                     }
                     if (isset($collection['Discount']) && ($collection['Discount'] > 100)) {
                         Toastr::error(translate('messages.Discount_must_be_less_then_100') . ' ' . $collection['Id']);
+                        return back();
+                    }
+                    if (data_get($collection,'Image') != "" &&  strlen(data_get($collection,'Image')) > 30 ) {
+                        Toastr::error(translate('messages.Image_name_must_be_in_30_char_on_id') . ' ' . $collection['Id']);
                         return back();
                     }
                     try {
@@ -1440,7 +1413,7 @@ class ItemController extends Controller
                 }
             }catch(\Exception $e){
                 info(["line___{$e->getLine()}",$e->getMessage()]);
-                Toastr::error(translate('messages.failed_to_import_data'));
+                Toastr::error($e->getMessage());
                 return back();
             }
         try {
@@ -1463,7 +1436,7 @@ class ItemController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             info(["line___{$e->getLine()}", $e->getMessage()]);
-            Toastr::error(translate('messages.failed_to_import_data'));
+            Toastr::error($e->getMessage());
             return back();
         }
         Toastr::success(translate('messages.product_imported_successfully', ['count' => count($data)]));
@@ -1501,8 +1474,7 @@ class ItemController extends Controller
         $product = Item::withoutGlobalScope(StoreScope::class)->find($request['id']);
 
         return response()->json([
-            'view' => view('admin-views.product.partials._get_stock_data', compact('product'))->render(),
-//            'view' => view('admin-views.product.partials._update_stock', compact('product'))->render()  // v2.8.1
+            'view' => view('admin-views.product.partials._get_stock_data', compact('product'))->render()
         ]);
     }
     public function get_stock(Request $request)
@@ -1930,7 +1902,6 @@ class ItemController extends Controller
     }
     public function approved(Request $request)
     {
-
         $data = TempProduct::withoutGlobalScope(StoreScope::class)->findOrfail($request->id);
 
         $item= Item::withoutGlobalScope(StoreScope::class)->withoutGlobalScope('translate')->with('translations')->findOrfail($data->item_id);
@@ -1976,12 +1947,6 @@ class ItemController extends Controller
         $item->is_halal = $data->is_halal;
         $item->stock =  $data->stock;
         $item->is_approved = 1;
-//        $item->weight =  $data->weight;     // v2.8.1
-        $item->weight = $data->weight;  // vmw weight modification
-        $item->vmw_height = $data->vmw_height;   // vmw weight modification
-        $item->vmw_width = $data->vmw_width;   // vmw weight modification
-        $item->vmw_length = $data->vmw_length;   // vmw weight modification
-        $item->static_weight = $data->weight;   // vmw weight modification
 
         $item->save();
         $item->tags()->sync(json_decode($data->tag_ids));
@@ -1993,6 +1958,12 @@ class ItemController extends Controller
 
         if($item->module->module_type == 'pharmacy'){
             DB::table('pharmacy_item_details')->where('temp_product_id' , $data->id)->update([
+                'item_id' => $item->id,
+                'temp_product_id' => null
+                ]);
+        }
+        if($item->module->module_type == 'ecommerce'){
+            DB::table('ecommerce_item_details')->where('temp_product_id' , $data->id)->update([
                 'item_id' => $item->id,
                 'temp_product_id' => null
                 ]);

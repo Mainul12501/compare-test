@@ -11,7 +11,7 @@ use Brian2694\Toastr\Facades\Toastr;
 
 class AutomatedMessageController extends Controller
 {
-    // v2.8.1 checked
+
     public function store(Request $request)
     {
         $request->validate([

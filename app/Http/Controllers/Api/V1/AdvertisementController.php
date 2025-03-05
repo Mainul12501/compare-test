@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Cache;
 
 class AdvertisementController extends Controller
 {
-    // v2.8.1 checked
     public function get_adds(Request $request)
     {
         $zone_ids= $request->header('zoneId');

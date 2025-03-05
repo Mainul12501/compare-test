@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\Config;
 
 class FlashSaleController extends Controller
 {
-    // v2.8.1 checked
     function index(Request $request)
     {
         $key = explode(' ', $request['search']);

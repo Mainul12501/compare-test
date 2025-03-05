@@ -131,7 +131,7 @@
                                         <a class="btn action-btn btn--primary btn-outline-primary"  data-toggle="tooltip" data-placement="top" data-original-title="{{ translate('messages.edit') }}" href="{{route('admin.users.delivery-man.edit',[$dm['id']])}}" ><i class="tio-edit"></i>
                                         </a>
                                         @if($dm->application_status !='denied')
-                                        <a class="btn action-btn btn--danger btn-outline-danger data-deny" data-toggle="tooltip" data-placement="top"
+                                        <a class="btn action-btn btn--danger btn-outline-danger request-alert" data-toggle="tooltip" data-placement="top"
                                         data-original-title="{{ translate('messages.deny') }}" data-url="{{route('admin.users.delivery-man.application',[$dm['id'],'denied'])}}" data-message="{{translate('messages.you_want_to_deny_this_application')}}"
                                             href="javascript:"><i class="tio-clear font-weight-bold"></i></a>
                                         @endif
@@ -180,8 +180,7 @@
                 confirmButtonColor: '#FC6A57',
                 cancelButtonText: '{{translate('messages.no')}}',
                 confirmButtonText: '{{translate('messages.yes')}}',
-                reverseButtons: true,
-                html: `<textarea name="reason" class="form-control" id="" cols="30" rows="5"></textarea>`, /*v2.8.1*/
+                reverseButtons: true
             }).then((result) => {
                 if (result.value) {
                     location.href = url;
@@ -189,32 +188,5 @@
             })
         }
     </script>
-{{--    v2.8.1 code start--}}
-    <script>
-        $('.data-deny').on('click', function(){
-            // let url = $(this).data('url');
-            // let message = $(this).data('message');
-
-            Swal.fire({
-                title: 'Are you sure',
-                // text: message,
-                type: 'warning',
-                showCancelButton: true,
-                cancelButtonColor: 'default',
-                confirmButtonColor: '#FC6A57',
-                cancelButtonText: 'No',
-                confirmButtonText: 'Yes',
-                reverseButtons: true,
-                html: `<p>Tell us why you want to deny this application.</p><textarea name="reason" class="form-control" id="denyReason" cols="30" rows="3"></textarea>`
-            }).then((result) => {
-                if (result.value) {
-                    let url = $(this).data('url')+'?reason='+$('#denyReason').val();
-                    // console.log(url);
-                    location.href = url;
-                }
-            })
-        })
-    </script>
-{{--    v2.8.1 code end--}}
 @endpush
 

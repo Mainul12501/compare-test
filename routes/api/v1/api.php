@@ -34,7 +34,6 @@ Route::group(['namespace' => 'Api\V1', 'middleware'=>'localization'], function (
     Route::get('zone/check', 'ZoneController@zonesCheck');
 
     Route::get('offline_payment_method_list', 'ConfigController@offline_payment_method_list');
-//    unchecked controllers start
     Route::group(['prefix' => 'auth', 'namespace' => 'Auth'], function () {
         Route::post('sign-up', 'CustomerAuthController@register');
         Route::post('login', 'CustomerAuthController@login');
@@ -42,8 +41,6 @@ Route::group(['namespace' => 'Api\V1', 'middleware'=>'localization'], function (
         Route::post('verify-phone', 'CustomerAuthController@verify_phone_or_email');
         Route::post('update-info', 'CustomerAuthController@update_info');
         Route::post('firebase-verify-token', 'CustomerAuthController@firebase_auth_verify');
-        Route::post('check-email', 'CustomerAuthController@check_email');   //v2.8.1
-        Route::post('verify-email', 'CustomerAuthController@verify_email'); //v2.8.1
 
         Route::post('forgot-password', 'PasswordResetController@reset_password_request');
         Route::post('verify-token', 'PasswordResetController@verify_token');
@@ -51,7 +48,7 @@ Route::group(['namespace' => 'Api\V1', 'middleware'=>'localization'], function (
         Route::put('firebase-reset-password', 'PasswordResetController@firebase_auth_verify');
 
         Route::post('guest/request','CustomerAuthController@guest_request');
-//    unchecked controllers ends
+
         Route::group(['prefix' => 'delivery-man'], function () {
             Route::post('login', 'DeliveryManLoginController@login');
             Route::post('store', 'DeliveryManLoginController@store');
@@ -60,8 +57,6 @@ Route::group(['namespace' => 'Api\V1', 'middleware'=>'localization'], function (
             Route::post('verify-token', 'DMPasswordResetController@verify_token');
             Route::post('firebase-verify-token', 'DMPasswordResetController@firebase_auth_verify');
             Route::put('reset-password', 'DMPasswordResetController@reset_password_submit');
-
-
         });
         Route::group(['prefix' => 'vendor'], function () {
             Route::post('login', 'VendorLoginController@login');
@@ -95,8 +90,7 @@ Route::group(['namespace' => 'Api\V1', 'middleware'=>'localization'], function (
 
     Route::group(['prefix' => 'delivery-man'], function () {
         Route::get('last-location', 'DeliverymanController@get_last_location');
-        Route::get('sent-withdraw-req-to-dm/{delivery_men}/{type}', [\App\Http\Controllers\Vendor\DeliveryManController::class, 'sent_withdraw_req_to_dm']);   // cash-on-hand
-        Route::get('transfer-collected-cash-to-store', [\App\Http\Controllers\Vendor\DeliveryManController::class, 'trans_col_cash_to_store']);   // cash-on-hand
+
 
         Route::group(['prefix' => 'reviews','middleware'=>['auth:api']], function () {
             Route::get('/{delivery_man_id}', 'DeliveryManReviewController@get_reviews');
@@ -140,8 +134,6 @@ Route::group(['namespace' => 'Api\V1', 'middleware'=>'localization'], function (
             Route::post('make-wallet-adjustment', 'DeliverymanController@make_wallet_adjustment')->name('make_wallet_adjustment');
             Route::get('wallet-payment-list', 'DeliverymanController@wallet_payment_list')->name('wallet_payment_list');
             Route::get('wallet-provided-earning-list', 'DeliverymanController@wallet_provided_earning_list')->name('wallet_provided_earning_list');
-            Route::post('make-collected-cash-payment-offline', 'DeliverymanController@make_payment_offline')->name('make_payment_offline');     // v2.8.1
-            Route::get('offline-payment-list', 'DeliverymanController@offline_payment_list')->name('offline_payment_list');     // v2.8.1
 
 
             // Chatting
@@ -151,8 +143,6 @@ Route::group(['namespace' => 'Api\V1', 'middleware'=>'localization'], function (
                 Route::get('details', 'ConversationController@dm_messages');
                 Route::post('send', 'ConversationController@dm_messages_store');
             });
-            //            get dm trans history
-            Route::get('/trans-history/{dmId?}', 'DeliverymanController@dmTransHistoy')->name('dm_trans_history');  // v2.8.1
         });
     });
 
@@ -185,12 +175,10 @@ Route::group(['namespace' => 'Api\V1', 'middleware'=>'localization'], function (
         Route::post('make-collected-cash-payment', 'VendorController@make_payment')->name('make_payment');
         Route::post('make-wallet-adjustment', 'VendorController@make_wallet_adjustment')->name('make_wallet_adjustment');
         Route::get('wallet-payment-list', 'VendorController@wallet_payment_list')->name('wallet_payment_list');
-        Route::post('make-collected-cash-payment-offline', 'VendorController@make_payment_offline')->name('make_payment_offline');      // v2.8.1
-        Route::get('offline-payment-list', 'VendorController@offline_payment_list')->name('offline_payment_list');      // v2.8.1
+
 
         Route::get('get-withdraw-method-list', 'WithdrawMethodController@withdraw_method_list');
 
-        Route::post('third-party-company', 'VendorController@third_party_company')->name('third-party-company');    // v2.8.1
         Route::group(['prefix' => 'withdraw-method'], function () {
             Route::get('list', 'WithdrawMethodController@get_disbursement_withdrawal_methods');
             Route::post('store', 'WithdrawMethodController@disbursement_withdrawal_method_store');
@@ -271,7 +259,6 @@ Route::group(['namespace' => 'Api\V1', 'middleware'=>'localization'], function (
             Route::post('update/{id}', 'DeliveryManController@update');
             Route::delete('delete', 'DeliveryManController@delete');
             Route::post('search', 'DeliveryManController@search');
-
         });
         // Food
         Route::group(['prefix'=>'item'], function(){
@@ -312,6 +299,7 @@ Route::group(['namespace' => 'Api\V1', 'middleware'=>'localization'], function (
         Route::get('/get-zone-id', 'ConfigController@get_zone');
         Route::get('place-api-autocomplete', 'ConfigController@place_api_autocomplete');
         Route::get('distance-api', 'ConfigController@distance_api');
+        Route::get('direction-api', 'ConfigController@direction_api');
         Route::get('place-api-details', 'ConfigController@place_api_details');
         Route::get('geocode-api', 'ConfigController@geocode_api');
         Route::get('get-PaymentMethods', 'ConfigController@getPaymentMethods');
@@ -383,8 +371,6 @@ Route::group(['namespace' => 'Api\V1', 'middleware'=>'localization'], function (
                 Route::post('transfer-mart-to-drivemond', 'WalletController@transferMartToDrivemondWallet');
                 Route::post('transfer-mart-from-drivemond', 'WalletController@transferMartFromDrivemondWallet')->withoutMiddleware('auth:api');
             });
-            //            wallet to bank transfer routes
-            Route::post('/req-to-transfer', 'WalletController@reqToTransfer');      // v2.8.1
 
             Route::get('visit-again', 'OrderController@order_again');
 
@@ -502,12 +488,13 @@ Route::group(['namespace' => 'Api\V1', 'middleware'=>'localization'], function (
             Route::get('/items', 'FlashSaleController@get_flash_sale_items');
         });
 
-        Route::get('coupon/list', 'CouponController@list');
+        Route::get('coupon/list/all', 'CouponController@list');
         Route::group(['prefix' => 'coupon', 'middleware' => 'auth:api'], function () {
+            Route::get('list', 'CouponController@list');
             Route::get('apply', 'CouponController@apply');
         });
-        Route::get('cashback/list', 'CashBackController@list');
         Route::group(['prefix' => 'cashback', 'middleware' => 'auth:api'], function () {
+            Route::get('list', 'CashBackController@list');
             Route::get('getCashback', 'CashBackController@getCashback');
         });
 
@@ -518,5 +505,5 @@ Route::group(['namespace' => 'Api\V1', 'middleware'=>'localization'], function (
     Route::get('vehicle/extra_charge', 'ConfigController@extra_charge');
     Route::get('get-vehicles', 'ConfigController@get_vehicles');
 });
-Route::get('show-agreement/{key}', 'VendorController@showAgreement');   // v2.8.1
+
 WebSocketsRouter::webSocket('/delivery-man/live-location', DMLocationSocketHandler::class);

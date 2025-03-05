@@ -42,7 +42,7 @@ active
     <form action="{{ route('admin.business-settings.subscriptionackage.store') }}" method="post">
         @csrf
         @method('post')
-
+                <input type="hidden" value="{{ $module }}"  name="module"  >
                 <div class="card-body">
                         @if ($language)
                         <ul class="nav nav-tabs mb-3">
@@ -148,18 +148,18 @@ active
                 <div class="card-body">
                     <div class="check--item-wrapper check--item-wrapper-2 mt-0">
                         @if ($module == 'all')
-                            <div class="check-item">
-                                <label class="form-group form-check form--check">
-                                    <input type="checkbox" class="form-check-input package-available-feature"  {{ old('pos_system') == 1 ? 'checked' : '' }} name="pos_system" value="1">
-                                    <span class="form-check-label text-dark">{{ translate('messages.pos_system') }}</span>
-                                </label>
-                            </div>
-                            <div class="check-item">
-                                <label class="form-group form-check form--check">
-                                    <input type="checkbox" class="form-check-input package-available-feature" {{ old('self_delivery') == 1 ? 'checked' : '' }}  name="self_delivery" value="1">
-                                    <span class="form-check-label text-dark">{{ translate('messages.self_delivery') }}</span>
-                                </label>
-                            </div>
+                        <div class="check-item">
+                            <label class="form-group form-check form--check">
+                                <input type="checkbox" class="form-check-input package-available-feature"  {{ old('pos_system') == 1 ? 'checked' : '' }} name="pos_system" value="1">
+                                <span class="form-check-label text-dark">{{ translate('messages.pos_system') }}</span>
+                            </label>
+                        </div>
+                        <div class="check-item">
+                            <label class="form-group form-check form--check">
+                                <input type="checkbox" class="form-check-input package-available-feature" {{ old('self_delivery') == 1 ? 'checked' : '' }}  name="self_delivery" value="1">
+                                <span class="form-check-label text-dark">{{ translate('messages.self_delivery') }}</span>
+                            </label>
+                        </div>
                         @endif
 
                         <div class="check-item">

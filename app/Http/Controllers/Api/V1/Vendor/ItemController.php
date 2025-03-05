@@ -48,7 +48,6 @@ class ItemController extends Controller
             'price' => 'required|numeric|min:0.01',
             'discount' => 'required|numeric|min:0',
             'translations'=>'required',
-            'weight' =>'required_if:module_type,ecommerce', // v2.8.1
         ], [
             'category_id.required' => translate('messages.category_required'),
         ]);
@@ -341,7 +340,6 @@ class ItemController extends Controller
         $item->images = $images;
         $item->unit_id = $request->unit;
         $item->organic = $request->organic??0;
-        $item->weight = $request->weight;   // v2.8.1
         $item->is_halal =  $request->is_halal ?? 0;
         $item->save();
         $item->tags()->sync($tag_ids);
@@ -453,7 +451,6 @@ class ItemController extends Controller
             'category_id' => 'required',
             'price' => 'required|numeric|min:0.01',
             'discount' => 'required|numeric|min:0',
-            'weight' =>'required_if:module_type,ecommerce',     // v2.8.1
 
         ], [
             'category_id.required' => translate('messages.category_required'),
@@ -606,21 +603,7 @@ class ItemController extends Controller
         //combinations end
 
 
-        $images = $p['images']; // v2.8.1
 
-        foreach ($p['images'] as $img) {    // v2.8.1
-            if (!in_array($img, json_decode($request->images, true))) { // v2.8.1
-                Helpers::check_and_delete('product/' , $img);   // v2.8.1
-                $key = array_search($img, $images); // v2.8.1
-                unset($images[$key]);   // v2.8.1
-            }   // v2.8.1
-        }   // v2.8.1
-        if ($request->has('item_images')){  // v2.8.1
-            foreach ($request->item_images as $img) {   // v2.8.1
-                $image = Helpers::upload('product/', 'png', $img);  // v2.8.1
-                array_push($images, ['img'=>$image, 'storage'=> Helpers::getDisk()]);   // v2.8.1
-            }   // v2.8.1
-        }   // v2.8.1
 
 
 
@@ -670,7 +653,6 @@ class ItemController extends Controller
         $p->variations = json_encode($variations);
         $p->food_variations = json_encode($food_variations);
         $p->price = $request->price;
-        $p->image = $request->has('image') ? Helpers::update('product/', $p->image, 'png', $request->file('image')) : $p->image;    // v2.8.1
         $p->available_time_starts = $request->available_time_starts;
         $p->available_time_ends = $request->available_time_ends;
         $p->discount = $request->discount_type == 'amount' ? $request->discount : $request->discount;
@@ -680,10 +662,8 @@ class ItemController extends Controller
         $p->add_ons = $request->has('addon_ids') ? json_encode(explode(',',$request->addon_ids)) : json_encode([]);
         $p->stock= $request->current_stock??0;
         $p->veg = $request->veg??0;
-        $p->images = array_values($images); // v2.8.1
         $p->unit_id = $request->unit;
         $p->organic = $request->organic??0;
-        $p->weight = $request->weight;  // v2.8.1
         $p->is_halal =  $request->is_halal ?? 0;
 
         $product_approval_datas = \App\Models\BusinessSetting::where('key', 'product_approval_datas')->first()?->value ?? '';
@@ -969,8 +949,6 @@ class ItemController extends Controller
 
         $item->name = $translated_data[0]['value'];
         $item->description = $translated_data[1]['value'];
-//        $item->image = $data->image;    // v2.8.1
-//        $item->images = $data->images;  // v2.8.1
 
         $item->store_id = $data->store_id;
         $item->module_id = $data->module_id;
@@ -1006,7 +984,6 @@ class ItemController extends Controller
         $item->is_halal =  $request->is_halal ?? 0;
         $item->is_prescription_required =  $request->is_prescription_required ?? 0;
         $item->basic =  $request->basic ?? 0;
-        $item->weight = $data->weight;  // v2.8.1
 
 
 

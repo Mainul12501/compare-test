@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Http;
 
 class ExternalConfigurationController extends Controller
 {
-    // v2.8.1 checked
     public function index()
     {
         if(auth('admin')->user()->role_id != 1){

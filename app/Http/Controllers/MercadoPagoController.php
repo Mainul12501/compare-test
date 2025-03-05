@@ -12,14 +12,9 @@ use MercadoPago\Client\Payment\PaymentClient;
 use MercadoPago\Exceptions\MPApiException;
 use MercadoPago\MercadoPagoConfig;
 use MercadoPago\Client\Common\RequestOptions;
-use Illuminate\Routing\Controller;
-//use MercadoPago\SDK;
-//use MercadoPago\Payment;
-//use MercadoPago\Payer;
 
 class MercadoPagoController extends Controller
 {
-    // v2.8.1 checked
     use Processor;
 
     private PaymentRequest $paymentRequest;

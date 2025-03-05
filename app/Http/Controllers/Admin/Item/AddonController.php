@@ -35,7 +35,6 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class AddonController extends BaseController
 {
-    // v2.8.1 checked
     use ImportExportTrait;
 
     public function __construct(

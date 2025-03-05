@@ -40,7 +40,6 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Response;
 
 class BusinessSettingsController extends Controller
 {
@@ -190,11 +189,6 @@ class BusinessSettingsController extends Controller
             'value' => $request['dm_picture_upload_status']
         ]);
 
-        //        dm agreement start --- mainul
-        DB::table('business_settings')->updateOrInsert(['key' => 'dm_agreement'], [ // v2.8.1
-            'value' => $request['dm_agreement'] // v2.8.1
-        ]); // v2.8.1
-
         Toastr::success(translate('messages.successfully_updated_to_changes_restart_app'));
         return back();
     }
@@ -279,25 +273,6 @@ class BusinessSettingsController extends Controller
             'value' => $request['product_gallery']
         ]);
 
-        //        update store agreement start --- mainul
-        DB::table('business_settings')->updateOrInsert(['key' => 'store_agreement'], [  // v2.8.1
-            'value' => $request['store_agreement']  // v2.8.1
-        ]); // v2.8.1
-        if($request->file('courier_company_agereement')){   // v2.8.1
-            $license_extension = $request->file('courier_company_agereement')->extension(); // v2.8.1
-            $courier_company_agereement = \App\Models\BusinessSetting::where('key', 'courier_company_agereement')->first(); // v2.8.1
-            if(isset($courier_company_agereement->value)){  // v2.8.1
-                $old_file_name=$courier_company_agereement->value;  // v2.8.1
-                DB::table('business_settings')->updateOrInsert(['key' => 'courier_company_agereement'], [   // v2.8.1
-                    'value' => Helpers::update('agereement/', $old_file_name,$license_extension, $request->file('courier_company_agereement'))  // v2.8.1
-                ]); // v2.8.1
-            }   // v2.8.1
-            else{   // v2.8.1
-                DB::table('business_settings')->updateOrInsert(['key' => 'courier_company_agereement'], [   // v2.8.1
-                    'value' => Helpers::upload('agereement/',$license_extension, $request->file('courier_company_agereement'))  // v2.8.1
-                ]); // v2.8.1
-            }   // v2.8.1
-        }   // v2.8.1
 
         Toastr::success(translate('messages.successfully_updated_to_changes_restart_app'));
         return back();
@@ -309,22 +284,28 @@ class BusinessSettingsController extends Controller
             'home_delivery_status' => 'required_without:takeaway_status',
             'takeaway_status' => 'required_without:home_delivery_status',
         ]);
+        $key_datas=[
+            'order_cancelation_rate_limit_status' => 'order_cancelation_rate_limit_status',
+            'order_cancelation_rate_block_limit' => 'order_cancelation_rate_block_limit',
+            'order_cancelation_rate_warning_limit' => 'order_cancelation_rate_warning_limit',
+            'order_delivery_verification' => 'odc',
+            'schedule_order' => 'schedule_order',
+            'prescription_order_status' => 'prescription_order_status',
+            'home_delivery_status' => 'home_delivery_status',
+            'takeaway_status' => 'takeaway_status',
+            'schedule_order_slot_duration_time_format' => 'schedule_order_slot_duration_time_format',
+            'takeaway_status' => 'takeaway_status',
+            ];
 
-        Helpers::businessUpdateOrInsert(['key' => 'order_delivery_verification'], [
-            'value' => $request['odc']
-        ]);
-        Helpers::businessUpdateOrInsert(['key' => 'schedule_order'], [
-            'value' => $request['schedule_order']
-        ]);
-        Helpers::businessUpdateOrInsert(['key' => 'prescription_order_status'], [
-            'value' => $request['prescription_order_status']
-        ]);
-        Helpers::businessUpdateOrInsert(['key' => 'home_delivery_status'], [
-            'value' => $request['home_delivery_status']
-        ]);
-        Helpers::businessUpdateOrInsert(['key' => 'takeaway_status'], [
-            'value' => $request['takeaway_status']
-        ]);
+        if($request->order_cancelation_rate_limit_status &&  $request->order_cancelation_rate_warning_limit >  $request->order_cancelation_rate_block_limit ){
+            Toastr::error(translate('messages.Providers_will_be_blocked_with_out_warning.Warning_rate_must_be_smaller'));
+            return back();
+        }
+        foreach($key_datas as $key => $request_key){
+                Helpers::businessUpdateOrInsert(['key' => $key], [
+                    'value' => $request->{$request_key} ?? 0
+                ]);
+            }
 
         $time = $request['schedule_order_slot_duration'];
         if ($request['schedule_order_slot_duration_time_format'] == 'hour') {
@@ -333,10 +314,6 @@ class BusinessSettingsController extends Controller
         Helpers::businessUpdateOrInsert(['key' => 'schedule_order_slot_duration'], [
             'value' => $time
         ]);
-        Helpers::businessUpdateOrInsert(['key' => 'schedule_order_slot_duration_time_format'], [
-            'value' => $request['schedule_order_slot_duration_time_format']
-        ]);
-
         $values = [];
         foreach (config('module.module_type') as $key => $value) {
             $values[$value] = $request[$value] ?? 0;
@@ -1981,7 +1958,7 @@ class BusinessSettingsController extends Controller
             "exchange_rate" => $request['exchange_rate'],
         ]);
         Toastr::success(translate('messages.currency_updated_successfully'));
-        return redirect('store-panel/business-settings/currency-add');
+        return redirect('vendor-panel/business-settings/currency-add');
     }
 
     public function currency_delete($id)
@@ -2143,7 +2120,6 @@ class BusinessSettingsController extends Controller
 
     public function about_us_update(Request $request)
     {
-        // dd($request->all());
         $this->update_data($request, 'about_us');
         $this->update_data($request, 'about_title');
         Toastr::success(translate('messages.about_us_updated'));
@@ -2153,11 +2129,9 @@ class BusinessSettingsController extends Controller
     public function fcm_index(Request $request)
     {
         abort_if($request?->module_type == 'rental' && !addon_published_status('Rental'), 404);
-        $fcm_credentials = Helpers::get_business_settings('fcm_credentials');
-//        return view('admin-views.business-settings.fcm-index', compact('fcm_credentials'));
         return view($request->module_type == 'rental' && addon_published_status('Rental')
             ? 'admin-views.business-settings.fcm-index-rental'
-            : 'admin-views.business-settings.fcm-index', compact('fcm_credentials'));
+            : 'admin-views.business-settings.fcm-index');
     }
 
     public function fcm_config()
@@ -2175,10 +2149,6 @@ class BusinessSettingsController extends Controller
         Helpers::businessUpdateOrInsert(['key' => 'fcm_project_id'], [
             'value' => $request['projectId']
         ]);
-
-//        Helpers::businessUpdateOrInsert(['key' => 'push_notification_key'], [
-//            'value' => $request['push_notification_key']
-//        ]);
 
         Helpers::businessUpdateOrInsert(['key' => 'fcm_credentials'], [
             'value' => json_encode([
@@ -2573,47 +2543,47 @@ class BusinessSettingsController extends Controller
         Toastr::success(translate('messages.message_updated'));
         return back();
     }
-
     public function update_fcm_messages_rental(Request $request)
     {
-        $messageKeys = [
-            'trip_pending_message' => 'trip_pending_message',
-            'trip_confirm_message' => 'trip_confirm_message',
-            'trip_ongoing_message' => 'trip_ongoing_message',
-            'trip_complete_message' => 'trip_complete_message',
-            'trip_cancel_message' => 'trip_cancel_message',
-        ];
+            $messageKeys = [
+                'trip_pending_message' => 'trip_pending_message',
+                'trip_confirm_message' => 'trip_confirm_message',
+                'trip_ongoing_message' => 'trip_ongoing_message',
+                'trip_complete_message' => 'trip_complete_message',
+                'trip_cancel_message' => 'trip_cancel_message',
+            ];
 
-        foreach ($messageKeys as $requestKey => $notificationKey) {
+            foreach ($messageKeys as $requestKey => $notificationKey) {
 
-            $notification = NotificationMessage::firstOrNew([
-                'module_type' => 'rental',
-                'key' => $notificationKey,
-            ]);
+                $notification = NotificationMessage::firstOrNew([
+                    'module_type' => 'rental',
+                    'key' => $notificationKey,
+                ]);
 
 
-            $notification->message = $request[$requestKey][array_search('en', $request->lang)];
-            $notification->status = isset($request[$requestKey . '_status']) && $request[$requestKey . '_status'] == 1 ? 1 : 0;
-            $notification->save();
+                $notification->message = $request[$requestKey][array_search('en', $request->lang)];
+                $notification->status = isset($request[$requestKey . '_status']) && $request[$requestKey . '_status'] == 1 ? 1 : 0;
+                $notification->save();
 
-            foreach ($request->lang as $index => $locale) {
-                if (!empty($request[$requestKey][$index])) {
-                    Translation::updateOrInsert(
-                        [
-                            'translationable_type' => NotificationMessage::class,
-                            'translationable_id' => $notification->id,
-                            'locale' => $locale,
-                            'key' => $notificationKey,
-                        ],
-                        ['value' => $request[$requestKey][$index]]
-                    );
+                foreach ($request->lang as $index => $locale) {
+                    if (!empty($request[$requestKey][$index])) {
+                        Translation::updateOrInsert(
+                            [
+                                'translationable_type' => NotificationMessage::class,
+                                'translationable_id' => $notification->id,
+                                'locale' => $locale,
+                                'key' => $notificationKey,
+                            ],
+                            ['value' => $request[$requestKey][$index]]
+                        );
+                    }
                 }
             }
-        }
 
         Toastr::success(translate('messages.message_updated'));
         return back();
     }
+
 
     public function location_setup(Request $request)
     {
@@ -2694,8 +2664,9 @@ class BusinessSettingsController extends Controller
                 array_push($credential_array, $data);
             }
         }
-        BusinessSetting::where('key', 'social_login')->update([
-            'value' => $credential_array
+
+        Helpers::businessUpdateOrInsert(['key' => 'social_login'], [
+            'value' =>$credential_array
         ]);
 
         Toastr::success(translate('messages.credential_updated', ['service' => $service]));
@@ -2722,7 +2693,6 @@ class BusinessSettingsController extends Controller
                     'service_file' => isset($fileName) ? $fileName : $data['service_file'],
                     'redirect_url_flutter' => $request['redirect_url_flutter'],
                     'redirect_url_react' => $request['redirect_url_react'],
-                    'redirect_url' => $request['redirect_url'] ?? url('/'), // v2.8.1
                 ];
                 array_push($credential_array, $cred);
             } else {
@@ -7643,55 +7613,30 @@ class BusinessSettingsController extends Controller
         return true;
     }
 
-    // v2.8.1 full function
-    public function download_dm_agereement(){
-        $dm_agreement = \App\Models\BusinessSetting::where('key', 'dm_agreement')->first();
-        $fileName=$dm_agreement->value;
-        $path = '/agereement/';
-        if (Storage::disk('public')->exists($path . $fileName)) {
-            return Response::download(storage_path('app/public/agereement/' . $fileName));
-        }
-    }
-    // v2.8.1 full function
-    public function download_store_agereement(){
-        $store_agreement = \App\Models\BusinessSetting::where('key', 'store_agreement')->first();
-        $fileName=$store_agreement->value;
-        $path = '/agereement/';
-        if (Storage::disk('public')->exists($path . $fileName)) {
-            return Response::download(storage_path('app/public/agereement/' . $fileName));
-        }
-    }
-    // v2.8.1 full function
-    public function download_courier_company_agereement(){
-        $store_agreement = \App\Models\BusinessSetting::where('key', 'store_agreement')->first();
-        $fileName=$store_agreement->value;
-        $path = '/agereement/';
-        if (Storage::disk('public')->exists($path . $fileName)) {
-            return Response::download(storage_path('app/public/agereement/' . $fileName));
-        }
-    }
-
 
     public function notification_setup(Request $request)
     {
+
         abort_if(!addon_published_status('Rental') && $request?->module == 'rental',404 );
 
         if (NotificationSetting::count() == 0) {
             Helpers::notificationDataSetup();
         }
-
         if(addon_published_status('Rental') && $request?->module == 'rental'){
             Helpers::getRentalAdminNotificationSetupDatasetup();
         }
 
-            Helpers::addNewAdminNotificationSetupDataSetup();
-        $data = NotificationSetting::
-        where('module_type', $request?->module == 'rental' ? 'rental'  : 'all')
+        Helpers::addNewAdminNotificationSetupDataSetup();
+
+        $data = NotificationSetting::where('module_type', $request?->module == 'rental' ? 'rental'  : 'all')
         ->when($request?->type == null || $request?->type == 'admin', function ($query) {
             $query->where('type', 'admin');
         })
             ->when($request?->type == 'store', function ($query) {
                 $query->where('type', 'store');
+            })
+            ->when($request?->type == 'provider', function ($query) {
+                $query->where('type', 'provider');
             })
             ->when($request?->type == 'customers', function ($query) {
                 $query->where('type', 'customer');
@@ -7702,7 +7647,8 @@ class BusinessSettingsController extends Controller
 
 
         $business_name = BusinessSetting::where('key', 'business_name')->first()?->value;
-        return view( $request?->module == 'rental' ? 'admin-views.business-settings.notification_setup_rental' : 'admin-views.business-settings.notification_setup', compact('business_name', 'data'));
+
+        return view(  $request?->module == 'rental' ? 'admin-views.business-settings.notification_setup_rental' : 'admin-views.business-settings.notification_setup', compact('business_name', 'data'));
 
     }
 

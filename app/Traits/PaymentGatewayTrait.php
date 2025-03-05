@@ -127,7 +127,10 @@ trait PaymentGatewayTrait
             ],
             "paystack" => [
                 "NGN" => "Nigerian Naira",
-                "KES" => "Kenyan Shilling"
+                "KES" => "Kenyan Shilling",
+                "GHS" => "Ghana Cedi",
+                "ZAR" => "South African Rand",
+                "XOF" => "West African CFA Franc countries",
             ],
             "paytabs" => [
                 "AED" => "United Arab Emirates Dirham",
@@ -173,6 +176,7 @@ trait PaymentGatewayTrait
                 "NOK" => "Norwegian Krone",
                 "SEK" => "Swedish Krona",
                 "SGD" => "Singapore Dollar",
+                "RON" => "Romanian leu (RON) currency",
                 "HKD" => "Hong Kong Dollar"
             ],
             "swish" => [

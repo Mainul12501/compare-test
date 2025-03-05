@@ -10,13 +10,11 @@ use App\Models\OrderTransaction;
 use Brian2694\Toastr\Facades\Toastr;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Storage;
 use App\CentralLogics\Helpers;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
-use Twilio\Rest\Api\V2010\Account\IncomingPhoneNumber\TollFreeInstance;
 
 class DeliveryManController extends Controller
 {
@@ -74,8 +72,6 @@ class DeliveryManController extends Controller
             'email' => 'required|unique:delivery_men',
             'phone' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:10|unique:delivery_men',
             'password' => ['required', Password::min(8)->mixedCase()->letters()->numbers()->symbols()->uncompromised()],
-            'agreement_document'=>'required|file|max:5120|mimes:jpg,png,jpeg,gif,bmp,tif,tiff', // v2.8.1
-            'vehicle_id' => 'required_if:store_type,company'    // v2.8.1
         ]);
 
         if ($validator->fails()) {
@@ -107,27 +103,16 @@ class DeliveryManController extends Controller
         $dm->identity_number = $request->identity_number;
         $dm->identity_type = $request->identity_type;
         $dm->store_id =  Helpers::get_store_id();
-        $dm->zone_id =  Helpers::get_store_data()->zone_id; // v2.8.1
         $dm->identity_image = $identity_image;
         $dm->image = $image_name;
         $dm->active = 0;
         $dm->earning = 0;
-//        $dm->type = 'restaurant_wise';
-        if($request->store_type == 'company'){  // v2.8.1
-            $dm->type = 'company_wise'; // v2.8.1
-
-        }else{  // v2.8.1
-            $dm->type = 'restaurant_wise';  // v2.8.1
-        }   // v2.8.1
-        $dm->vehicle_id = $request->vehicle_id; // v2.8.1 --- updated on 10-2-2025 issue slide
-        $agreement_document_extension = $request->file('agreement_document')->extension();  // v2.8.1
-        $dm->agreement_document = Helpers::upload('delivery-man/', $agreement_document_extension, $request->file('agreement_document'));    // v2.8.1
+        $dm->type = 'restaurant_wise';
         $dm->password = bcrypt($request->password);
         $dm->save();
 
         return response()->json(['message' => translate('messages.deliveryman_added_successfully')], 200);
 
-        return redirect('store-panel/delivery-man/list');
     }
 
     public function edit($id)
@@ -254,16 +239,8 @@ class DeliveryManController extends Controller
         $delivery_man->identity_type = $request->identity_type;
         $delivery_man->identity_image = $identity_image;
         $delivery_man->image = $image_name;
-//        if($request->store_type == 'company'){  // v2.8.1
-//            $delivery_man->vehicle_id = $request->vehicle_id;   // v2.8.1
-//        }   // v2.8.1
-        $delivery_man->vehicle_id = $request->vehicle_id;   // vehicle id should be updated in case of restaurant
 
         $delivery_man->password = strlen($request->password)>1?bcrypt($request->password):$delivery_man['password'];
-        if($request->file('agreement_document')){   // v2.8.1
-            $agreement_document_extension = $request->file('agreement_document')->extension();  // v2.8.1
-            $delivery_man->agreement_document = Helpers::upload('delivery-man/', $agreement_document_extension, $request->file('agreement_document'));  // v2.8.1
-        }   // v2.8.1
         $delivery_man->save();
 
         if($delivery_man->userinfo) {
@@ -277,7 +254,6 @@ class DeliveryManController extends Controller
 
         return response()->json(['message' => translate('messages.deliveryman_updated_successfully')], 200);
 
-        return redirect('store-panel/delivery-man/list');
     }
 
     public function delete(Request $request)
@@ -349,88 +325,6 @@ class DeliveryManController extends Controller
             'view'=>view('vendor-views.delivery-man.partials._transation',compact('digital_transaction'))->render(),
             'count'=>$digital_transaction->count()
         ]);
-    }
-
-    public function download_document($fileName){
-        $path = '/delivery-man/';
-        if (Storage::disk('public')->exists($path . $fileName)) {
-            return Response::download(storage_path('app/public/delivery-man/' . $fileName));
-        }
-    }
-
-    public function sent_withdraw_req_to_dm(Request $request, $deliveryManId, $type = 'sent')
-    {
-        $dm = DeliveryMan::findOrFail($deliveryManId);
-        $msg = '';
-        if ($dm)
-        {
-            if ($type == 'sent')
-            {
-                if ($dm->collected_cash > 0)
-                {
-                    if ($dm->withdraw_req_status == 0)
-                    {
-                        $dm->withdraw_req_status = 1;
-                        $dm->save();
-                        $msg = 'withdraw request has been sent successfully.';
-                        Toastr::success($msg);
-                    } else {
-                        $msg = 'Already withdraw request has been sent.';
-                        Toastr::warning($msg);
-                    }
-                } else {
-                    $msg = 'Delivery Man has 0 amount at his hand.';
-                    Toastr::error($msg);
-                }
-            } elseif ($type == 'accept')
-            {
-                if ($dm->dm_withdraw_to_store_status == 1)
-                {
-                    $dm->dm_withdraw_to_store_status = 2;
-                    $dm->withdraw_req_status = 0;
-                    $dm->collected_cash = 0;
-                    $dm->save();
-                    $msg = 'Delivery man collected cash adjusted successfully.';
-                    Toastr::success($msg);
-                }
-            } else {
-                $msg = 'Please select a request type between sent and accept.';
-                Toastr::error($msg);
-            }
-
-        } else {
-            $msg = 'Delivery Man not found. Please Try Again.';
-            Toastr::error($msg);
-        }
-
-        if ($request->ajax() || $request->req_from == 'app')
-        {
-            return \response()->json(['msg'=> $msg]);
-        }
-        return redirect(url('/store-panel/delivery-man/list'));
-    }
-
-    public function trans_col_cash_to_store(Request $request)
-    {
-        $dm = DeliveryMan::findOrFail($request->delivery_man_id);
-        if ($dm)
-        {
-            if ($dm->dm_withdraw_to_store_status != 1)
-            {
-                $dm->dm_withdraw_to_store_status = 1;   // enable this line if you want to enable store approval for adjust collected cash
-//                $dm->withdraw_req_status = 0; // disable this line if you want to enable store approval for adjust collected cash
-//                $dm->collected_cash = 0; // disable this line if you want to enable store approval for adjust collected cash
-
-
-                $dm->last_withdraw_date_to_store = now();
-                $dm->save();
-                return \response()->json('Withdraw Request sent to Store successfully.', 200);
-            } else {
-                return \response()->json('Your previous request is still pending.', 200);
-            }
-        } else {
-            return \response()->json(['code' => 204, 'msg' => 'Delivery man not found. Please try again.']);
-        }
     }
 
 }

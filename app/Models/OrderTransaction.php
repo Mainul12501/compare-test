@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Scopes\ZoneScope;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class OrderTransaction extends Model
 {
@@ -37,5 +38,9 @@ class OrderTransaction extends Model
         return $query->where(function($query){
             $query->whereIn('status', ['refunded_with_delivery_charge', 'refunded_without_delivery_charge']);
         });
+    }
+    protected static function booted()
+    {
+        static::addGlobalScope(new ZoneScope);
     }
 }

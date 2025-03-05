@@ -491,9 +491,9 @@
 
                     <div class="mb-2 initial--21">
                         <select name="zone[]" id="zone_ids" class="form-control js-select2-custom" multiple="multiple">
-                        @foreach(\App\Models\Zone::all() as $zone)
-                            <option value="{{$zone->id}}" {{isset($zone_ids)?(in_array($zone->id, $zone_ids)?'selected':''):''}}>{{$zone->name}}</option>
-                        @endforeach
+                            @foreach(\App\Models\Zone::get(['id','name']) as $zone)
+                                <option value="{{$zone->id}}" {{isset($zone_ids)?(in_array($zone->id, $zone_ids)?'selected':''):''}}>{{$zone->name}}</option>
+                            @endforeach
                         </select>
                     </div>
                     @if (!$parcel_order)
@@ -617,50 +617,45 @@
 @endsection
 
 @push('script_2')
-    <script src="{{asset('public/assets/admin')}}/js/view-pages/order-list.js"></script>
-    <script>
-        "use strict";
-        $(document).on('ready', function () {
-            @if($filter_count>0)
-            $('#filter_count').html({{$filter_count}});
-            @endif
+        <script src="{{asset('public/assets/admin')}}/js/view-pages/order-list.js"></script>
 
-            $('#zone_ids').on('change', function () {
-                $('#vendor_ids').val(null).trigger('change');
-                $('#vendor_ids').trigger('change');
-            });
+        <script>
+            $(document).ready(function () {
 
-            $('#vendor_ids').select2({
-                ajax: {
-                    url: '{{url('/')}}/admin/store/get-stores',
-                    data: function (params) {
-                        return {
-                            q: params.term, // search term
-                            // zone_ids: zone_id, // old v2.12 code
-                            zone_ids: $('#zone_ids').val(),
-                            page: params.page
-                        };
-                    },
-                    processResults: function (data) {
-                        return {
-                        results: data
-                        };
-                    },
-                    __port: function (params, success, failure) {
-                        let $request = $.ajax(params);
+                @if($filter_count > 0)
+                $('#filter_count').html({{$filter_count}});
+                @endif
 
-                        $request.then(success);
-                        $request.fail(failure);
+                $('#zone_ids').on('change', function () {
+                    $('#vendor_ids').val(null).trigger('change');
+                    $('#vendor_ids').trigger('change');
+                });
 
-                        return $request;
+                $('#vendor_ids').select2({
+                    ajax: {
+                        url: '{{url('/')}}/admin/store/get-stores',
+                        data: function (params) {
+                            return {
+                                q: params.term,
+                                zone_ids: $('#zone_ids').val(),
+                                page: params.page
+                            };
+                        },
+                        processResults: function (data) {
+                            return {
+                                results: data
+                            };
+                        }
                     }
-                }
-            });
+                });
 
-            $('#reset').on('click', function(){
-                location.href = '{{url('/')}}/admin/order/filter/reset';
+                $('#reset').on('click', function(){
+                    location.href = '{{url('/')}}/admin/order/filter/reset';
+                });
             });
-
+        </script>
+        <script>
+        $(document).ready(function () {
             // INITIALIZATION OF DATATABLES
             // =======================================================
             let datatable = $.HSCore.components.HSDatatables.init($('#datatable'), {
@@ -776,10 +771,7 @@
         });
 
 
-        $('#reset').on('click', function(){
-            // e.preventDefault();
-            location.href = '{{url('/')}}/admin/order/filter/reset';
-        });
+
 
         $('#search-form').on('submit', function (e) {
             $.ajaxSetup({

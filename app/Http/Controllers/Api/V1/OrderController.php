@@ -39,8 +39,6 @@ use App\Models\ParcelDeliveryInstruction;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
 use MatanYadaev\EloquentSpatial\Objects\Point;
-use Stripe\Product;
-use App\Models\Module;
 
 class OrderController extends Controller
 {
@@ -195,11 +193,7 @@ class OrderController extends Controller
         $store = null;
         $free_delivery_by = null;
         $distance_data = $request->distance;
-        $weight = $request->weight ?? 1; // v2.8.1
         $increased=0;
-        $total_weight = 0;      // v2.8.1
-        $free_delivery_type = null;     // v2.8.1
-        $per_kg_charge = 0;     // v2.8.1
         $maximum_shipping_charge = 0;
 
         if($request['order_type'] == 'delivery' && !Helpers::get_business_settings('home_delivery_status')){
@@ -249,36 +243,19 @@ class OrderController extends Controller
                 ], 403);
             }
 
-//            // v2.12 start-- comment out the code if v2.8.1 codes not working for data(dmcehicle)
-//        $data =  DMVehicle::active()->where(function ($query) use ($distance_data) {
-//            $query->where('starting_coverage_area', '<=', $distance_data)->where('maximum_coverage_area', '>=', $distance_data)
-//            ->orWhere(function ($query) use ($distance_data) {
-//                $query->where('starting_coverage_area', '>=', $distance_data);
-//            });
-//        })
-//            ->orderBy('starting_coverage_area')->first();
-//            // v2.12 end-- comment out the code if v2.8.1 codes not working for data(dmcehicle)
-
-        $data =  DMVehicle::active()->where(function ($query) use ($weight) {   // v2.8.1
-            $query->where('minimum_weight', '<=', $weight)->where('maximum_weight', '>=', $weight)  // v2.8.1
-                ->orWhere(function ($query) use ($weight) { // v2.8.1
-                    $query->where('minimum_weight', '>=', $weight); // v2.8.1
-                }); // v2.8.1
-        })  // v2.8.1
-            ->orderBy('minimum_weight')->first();   // v2.8.1
-        if(!$data){ // v2.8.1
-            $data = DMVehicle::active() // v2.8.1
-                ->where('maximum_weight', '<', $weight) // v2.8.1
-                ->orderByDesc('maximum_weight') // v2.8.1
-                ->first();  // v2.8.1
-        }   // v2.8.1
+        $data =  DMVehicle::active()->where(function ($query) use ($distance_data) {
+            $query->where('starting_coverage_area', '<=', $distance_data)->where('maximum_coverage_area', '>=', $distance_data)
+            ->orWhere(function ($query) use ($distance_data) {
+                $query->where('starting_coverage_area', '>=', $distance_data);
+            });
+        })
+            ->orderBy('starting_coverage_area')->first();
 
         $extra_charges = (float) (isset($data) ? $data->extra_charges  : 0);
         $vehicle_id = (isset($data) ? $data->id  : null);
 
 
         $zone = null;
-        $parcel_zone_id = null; // v2.8.1
         if ($request->latitude && $request->longitude) {
             $point = new Point($request->latitude, $request->longitude);
             if ($request->order_type == 'parcel') {
@@ -288,7 +265,6 @@ class OrderController extends Controller
                 $zone = Zone::whereIn('id', $zone_ids)->whereContains('coordinates', new Point($request->latitude, $request->longitude, POINT_SRID))->wherehas('modules',function($q){
                     $q->where('module_type','parcel');
                 })->first();
-                $parcel_zone_id = $zone->id ?? null;    // v2.8.1
             } else{
                 $store = Store::with(['discount', 'store_sub'])->selectRaw('*, IF(((select count(*) from `store_schedule` where `stores`.`id` = `store_schedule`.`store_id` and `store_schedule`.`day` = ' . $schedule_at->format('w') . ' and `store_schedule`.`opening_time` < "' . $schedule_at->format('H:i:s') . '" and `store_schedule`.`closing_time` >"' . $schedule_at->format('H:i:s') . '") > 0), true, false) as open')->where('id', $request->store_id)->first();
 
@@ -403,7 +379,6 @@ class OrderController extends Controller
                     $coupon_created_by = $coupon->created_by;
                     if ($coupon->coupon_type == 'free_delivery') {
                         $delivery_charge = 0;
-                        $free_delivery_type = 'free_delivery';  // v2.8.1
                         $free_delivery_by =  $coupon_created_by;
                         $coupon_created_by = null;
                     }
@@ -421,7 +396,6 @@ class OrderController extends Controller
                 $per_km_shipping_charge = $module_wise_delivery_charge->pivot->per_km_shipping_charge;
                 $minimum_shipping_charge = $module_wise_delivery_charge->pivot->minimum_shipping_charge;
                 $maximum_shipping_charge = $module_wise_delivery_charge->pivot->maximum_shipping_charge;
-                $per_kg_charge = $module_wise_delivery_charge->pivot->per_kg_charge;    // v2.8.1
             } else {
                 $per_km_shipping_charge = (float)BusinessSetting::where(['key' => 'per_km_shipping_charge'])->first()->value;
                 $minimum_shipping_charge = (float)BusinessSetting::where(['key' => 'minimum_shipping_charge'])->first()->value;
@@ -432,7 +406,6 @@ class OrderController extends Controller
                 $per_km_shipping_charge = $store->per_km_shipping_charge;
                 $minimum_shipping_charge = $store->minimum_shipping_charge;
                 $maximum_shipping_charge = $store->maximum_shipping_charge;
-                $per_kg_charge = $store->per_kg_charge; // v2.8.1
                 $extra_charges = 0;
                 $vehicle_id = null;
                 $increased=0;
@@ -442,7 +415,6 @@ class OrderController extends Controller
                 $per_km_shipping_charge = $store->per_km_shipping_charge;
                 $minimum_shipping_charge = $store->minimum_shipping_charge;
                 $maximum_shipping_charge = $store->maximum_shipping_charge;
-                $per_kg_charge = $store->per_kg_charge; /// v2.8.1
                 $extra_charges = 0;
                 $increased=0;
             }
@@ -453,12 +425,10 @@ class OrderController extends Controller
                 $per_km_shipping_charge = 0;
                 $minimum_shipping_charge = 0;
                 $maximum_shipping_charge = 0;
-                $per_kg_charge = 0;     // v2.8.1
                 $extra_charges = 0;
                 $distance_data = 0;
                 $vehicle_id = null;
                 $original_delivery_charge = 0;
-                $free_delivery_type = 'free_delivery';  /// v2.8..1
                 $increased=0;
             }
 
@@ -487,11 +457,9 @@ class OrderController extends Controller
             if (isset($parcel_category) && isset($parcel_category->parcel_minimum_shipping_charge)) {
                 $per_km_shipping_charge = $parcel_category->parcel_per_km_shipping_charge;
                 $minimum_shipping_charge = $parcel_category->parcel_minimum_shipping_charge;
-                $per_kg_charge = $parcel_category->parcel_per_kg_charge;    /// v2.8.11
             } else {
                 $per_km_shipping_charge = (float)BusinessSetting::where(['key' => 'parcel_per_km_shipping_charge'])->first()->value;
                 $minimum_shipping_charge = (float)BusinessSetting::where(['key' => 'parcel_minimum_shipping_charge'])->first()->value;
-                $per_kg_charge = (float)BusinessSetting::where(['key' => 'parcel_per_kg_charge'])->first()->value;  /// v2.8.1
             }
 
             $original_delivery_charge = (($request->distance * $per_km_shipping_charge )> $minimum_shipping_charge) ? ($request->distance * $per_km_shipping_charge )+ $extra_charges : ($minimum_shipping_charge + $extra_charges);
@@ -510,7 +478,7 @@ class OrderController extends Controller
         }
 
         $address = [
-            'contact_person_name' => $request->contact_person_name ? $request->contact_person_name : ($request->user?$request->user->f_name . ' ' . $request->user->f_name:''),
+            'contact_person_name' => $request->contact_person_name ? $request->contact_person_name : ($request->user?$request->user->f_name . ' ' . $request->user->l_name:''),
             'contact_person_number' => $request->contact_person_number ? $request->contact_person_number : ($request->user?$request->user->phone:''),
 //            'contact_person_number' => $request->contact_person_number ? ($request->user ? $request->contact_person_number :str_replace('+', '', $request->contact_person_number)) : ($request->user?$request->user->phone:''),
             'contact_person_email' => $request->contact_person_email ? $request->contact_person_email : ($request->user?$request->user->email:''),
@@ -737,7 +705,6 @@ class OrderController extends Controller
                             $total_addon_price += $or_d['total_add_on_price'];
                             $product_price += $price * $or_d['quantity'];
                             $store_discount_amount += $or_d['discount_on_item'] * $or_d['quantity'];
-                            $total_weight += $product->weight * $or_d['quantity'];  // v2.8.1
                         }
                     } else {
                         return response()->json([
@@ -816,7 +783,6 @@ class OrderController extends Controller
                             $flash_sale_admin_discount_amount += $or_d['discount_type']=='flash_sale'?$product_discount['admin_discount_amount'] * $or_d['quantity']:0;
                             $flash_sale_vendor_discount_amount += $or_d['discount_type']=='flash_sale'?$product_discount['vendor_discount_amount'] * $or_d['quantity']:0;
                             $order_details[] = $or_d;
-                            $total_weight += $product->weight * $or_d['quantity'];  // v2.8.1
                         } else {
 
                             if (count(json_decode($product['variations'], true)) > 0 && count($c['variation'])>0) {
@@ -870,7 +836,6 @@ class OrderController extends Controller
                             $flash_sale_admin_discount_amount += $or_d['discount_type']=='flash_sale'?$product_discount['admin_discount_amount'] * $or_d['quantity']:0;
                             $flash_sale_vendor_discount_amount += $or_d['discount_type']=='flash_sale'?$product_discount['vendor_discount_amount'] * $or_d['quantity']:0;
                             $order_details[] = $or_d;
-                            $total_weight += $product->weight * $or_d['quantity'];  // v2.8.1
                         }
                     } else {
                         return response()->json([
@@ -939,21 +904,18 @@ class OrderController extends Controller
                 if ($free_delivery_over <= $product_price + $total_addon_price - $coupon_discount_amount - $store_discount_amount - $flash_sale_admin_discount_amount - $flash_sale_vendor_discount_amount) {
                     $order->delivery_charge = 0;
                     $free_delivery_by = 'admin';
-                    $free_delivery_type = 'free_delivery';  // v2.8.1
                 }
             }
 
             if ($store->free_delivery) {
                 $order->delivery_charge = 0;
                 $free_delivery_by = 'vendor';
-                $free_delivery_type = 'free_delivery';  // v2.8.1
             }
 
             if ($coupon) {
                 if ($coupon->coupon_type == 'free_delivery') {
                     if ($coupon->min_purchase <= $product_price + $total_addon_price - $store_discount_amount - $flash_sale_admin_discount_amount - $flash_sale_vendor_discount_amount) {
                         $order->delivery_charge = 0;
-                        $free_delivery_type = 'free_delivery';  // v2.8.1
                         $free_delivery_by = $coupon->created_by;
                     }
                 }
@@ -968,19 +930,6 @@ class OrderController extends Controller
             $order->total_tax_amount = round($total_tax_amount, config('round_up_to_digit'));
             $order->order_amount = round($total_price + $tax_a + $order->delivery_charge, config('round_up_to_digit'));
             $order->free_delivery_by = $free_delivery_by;
-            //weight wise charge
-            $original_delivery_charge = ((($request->distance * $per_km_shipping_charge) +($total_weight * $per_kg_charge)) > $minimum_shipping_charge) ? (($request->distance * $per_km_shipping_charge) + ($total_weight * $per_kg_charge)) : $minimum_shipping_charge;   // v2.8.1
-            $order->original_delivery_charge = round($original_delivery_charge, config('round_up_to_digit'));   // v2.8.1
-            $order->order_amount = round($total_price + $tax_a + $order->dm_tips + $order->additional_charge + $order->delivery_charge, config('round_up_to_digit'));   // v2.8.1
-            if($free_delivery_type != 'free_delivery'){ // v2.8.1
-                $delivery_charge = $original_delivery_charge + $extra_charges;  // v2.8.1
-                if ($maximum_shipping_charge  >= $minimum_shipping_charge  && $delivery_charge >  $maximum_shipping_charge) {   // v2.8.1
-                    $delivery_charge = $maximum_shipping_charge + $extra_charges;   // v2.8.1
-                }   // v2.8.1
-                // $order->delivery_charge = round($delivery_charge, config('round_up_to_digit')) ?? 0;
-                $order->delivery_charge = substr(number_format($delivery_charge, config('round_up_to_digit')+1, '.', ''), 0, -1)??0;    // v2.8.1
-                $order->order_amount = round($total_price + $tax_a + $delivery_charge + $order->dm_tips + $order->additional_charge, config('round_up_to_digit'));  // v2.8.1
-            }   // v2.8.1
         } else {
             $point = new Point(json_decode($request->receiver_details, true)['latitude'], json_decode($request->receiver_details, true)['longitude']);
             $zone_id =  json_decode($request->receiver_details, true)['zone_id'];
@@ -992,17 +941,10 @@ class OrderController extends Controller
                     'errors' => $errors
                 ], 403);
             }
-            $order->delivery_charge = round($original_delivery_charge + $extra_charges, config('round_up_to_digit')) ?? 0;  // v2.8.1
+            $order->delivery_charge = round($original_delivery_charge, config('round_up_to_digit')) ?? 0;
             $order->original_delivery_charge = round($original_delivery_charge, config('round_up_to_digit'));
             $order->order_amount = round($order->delivery_charge, config('round_up_to_digit'));
         }
-//        $vmw_weight = ($request->vmw_height * $request->vmw_width * $request->vmw_length) / 5000;
-//        $order->weight = $request->weight;  // v2.8.1
-        $order->weight = $request->weight ?? 0;  // v2.8.1
-        $order->vmw_height = $request->vmw_height ?? 0;  // vmw modification
-        $order->vmw_width = $request->vmw_width ?? 0;  // vmw modification
-        $order->vmw_length = $request->vmw_length ?? 0;  // vmw modification
-        $order->static_weight = $request->static_weight ?? 0;  // vmw modification
         $order->flash_admin_discount_amount = round($flash_sale_admin_discount_amount, config('round_up_to_digit'));
         $order->flash_store_discount_amount = round($flash_sale_vendor_discount_amount, config('round_up_to_digit'));
 
@@ -1034,6 +976,15 @@ class OrderController extends Controller
             DB::beginTransaction();
             $order->save();
             if ($request->order_type !== 'parcel') {
+                if (count($order_details) == 0) {
+                    $errors = [];
+                    array_push($errors, ['code' => 'order_details', 'message' => translate('messages.You_can_not_place_empty_orders')]);
+                    DB::rollBack();
+                    return response()->json([
+                        'errors' => $errors
+                    ], 403);
+                }
+
                 foreach ($order_details as $key => $item) {
                     $order_details[$key]['order_id'] = $order->id;
 
@@ -1595,7 +1546,7 @@ class OrderController extends Controller
         }
         $user_id = $request->user ? $request->user->id : $request['guest_id'];
 
-        $paginator = Order::with(['delivery_company','store', 'delivery_man.rating', 'parcel_category', 'refund:order_id,admin_note,customer_note'])->withCount('details')->where(['user_id' => $user_id])->whereIn('order_status', ['delivered', 'canceled', 'refund_requested', 'refund_request_canceled', 'refunded', 'failed'])     // v2.8.1
+        $paginator = Order::with(['store', 'delivery_man.rating', 'parcel_category', 'refund:order_id,admin_note,customer_note'])->withCount('details')->where(['user_id' => $user_id])->whereIn('order_status', ['delivered', 'canceled', 'refund_requested', 'refund_request_canceled', 'refunded', 'failed'])
 
         // ->when(!isset($request->user) , function($query){
         //     $query->where('is_guest' , 1);
@@ -1636,7 +1587,7 @@ class OrderController extends Controller
         }
         $user_id = $request->user ? $request->user->id : $request['guest_id'];
 
-        $paginator = Order::with(['delivery_company','store', 'delivery_man.rating', 'parcel_category'])        // v2.8.1
+        $paginator = Order::with(['store', 'delivery_man.rating', 'parcel_category'])
         // ->when(!isset($request->user) , function($query){
         //     $query->where('is_guest' , 1);
         // })
@@ -1673,7 +1624,7 @@ class OrderController extends Controller
         }
         $user_id = $request?->user?->id ;
 
-        $order = Order::with('delivery_company','details', 'offline_payments','parcel_category')    // v2.8.1
+        $order = Order::with('details', 'offline_payments','parcel_category')
 //        ->when(!isset($request->user) , function($query){
 //            $query->where('is_guest' , 1);
 //        })
@@ -1843,36 +1794,6 @@ class OrderController extends Controller
             } catch (\Exception $ex) {
                 info($ex->getMessage());
             }
-
-            try {   // v2.8.1
-                $storeEmail = Store::find($order->store_id)->email; // v2.8.1
-                if (config('mail.status') && $storeEmail !=null && $mail_status == '1') {   // v2.8.1
-                    Mail::to($storeEmail)->send(new RefundRequest($order->id)); // v2.8.1
-                }   // v2.8.1
-            } catch (\Exception $ex) {  // v2.8.1
-                info($ex->getMessage());    // v2.8.1
-            }   // v2.8.1
-            $data = [   // v2.8.1
-                'title' => 'You have a refund request', // v2.8.1
-                'description' => 'You have a refund request of order - '.$order->id,    // v2.8.1
-                'order_id' => $order->id,   // v2.8.1
-                'type' => 'general',    // v2.8.1
-                'image' => ''   // v2.8.1
-            ];  // v2.8.1
-            if ($order?->store && $order->store?->vendor) { // v2.8.1
-                try {   // v2.8.1
-                    \App\CentralLogics\Helpers::send_push_notif_to_device($order->store->vendor->firebase_token, $data);    // v2.8.1
-                    DB::table('user_notifications')->insert([   // v2.8.1
-                        'data' => json_encode($data),   // v2.8.1
-                        'vendor_id' => $order->store->vendor_id,    // v2.8.1
-                        'created_at' => now(),  // v2.8.1
-                        'updated_at' => now()   // v2.8.1
-                    ]); // v2.8.1
-                } catch (\Exception $exception) {   // v2.8.1
-                    info($exception->getMessage()); // v2.8.1
-                }   // v2.8.1
-            }   // v2.8.1
-
             return response()->json(['message' => translate('messages.refund_request_placed_successfully')], 200);
         }
         return response()->json([

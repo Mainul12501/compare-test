@@ -141,7 +141,7 @@ $countryCode= strtolower($country?$country->value:'auto');
                             @if ($toggle_store_registration)
                             <li>
                                 <a class="" href="{{ route('restaurant.create') }}">
-                                    {{ translate('messages.store_registration') }}
+                                    {{ translate('messages.vendor_registration') }}
                                 </a>
                             </li>
                             @if ($toggle_dm_registration)
@@ -155,20 +155,6 @@ $countryCode= strtolower($country?$country->value:'auto');
                                     href="{{ route('deliveryman.create') }}">{{ translate('messages.deliveryman_registration') }}</a>
                             </li>
                         @endif
-{{--                            v2.8.1 start--}}
-                                @if ($toggle_dm_registration)
-                                    <li>
-                                        <hr class="dropdown-divider">
-                                    </li>
-                                @endif
-                                @if ($toggle_dm_registration)
-                                    <li>
-                                        <a class="" href="{{ route('company.create') }}">
-                                            {{ translate('messages.Courier_Company_registration') }}
-                                        </a>
-                                    </li>
-                                @endif
-{{--                            v2.8.1 end--}}
                         </ul>
                     </div>
                     @endif
@@ -477,10 +463,10 @@ $countryCode= strtolower($country?$country->value:'auto');
                         items: 3,
                     },
                     768: {
-                        items: 5,
+                        items: 6,
                     },
                     1200: {
-                        items: 5,
+                        items: 6,
                     },
                 },
                 onInitialized: function (e) {

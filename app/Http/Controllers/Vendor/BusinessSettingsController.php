@@ -2,11 +2,9 @@
 
 namespace App\Http\Controllers\Vendor;
 
-use App\Models\NotificationSetting;
 use App\Models\Store;
 use App\Models\StoreConfig;
 use App\Models\Translation;
-use App\Models\Zone;
 use Illuminate\Http\Request;
 use App\Models\StoreSchedule;
 use App\CentralLogics\Helpers;
@@ -14,6 +12,7 @@ use App\Models\BusinessSetting;
 use App\Http\Controllers\Controller;
 use Brian2694\Toastr\Facades\Toastr;
 use App\Models\StoreNotificationSetting;
+use App\Models\Zone;
 use Illuminate\Support\Facades\Validator;
 
 class BusinessSettingsController extends Controller
@@ -23,8 +22,11 @@ class BusinessSettingsController extends Controller
 
     public function store_index()
     {
+
+
         $store = Helpers::get_store_data();
         $store = Store::withoutGlobalScope('translate')->findOrFail($store->id);
+
         if($store->module_type == 'rental' ){
             $zones=Zone::active()->get(['id','name']);
             return view('rental::provider.settings.settings', compact('store','zones'));
@@ -38,8 +40,7 @@ class BusinessSettingsController extends Controller
             'gst' => 'required_if:gst_status,1',
             'extra_packaging_amount' => 'required_if:extra_packaging_status,1',
             'per_km_delivery_charge'=>'required_with:minimum_delivery_charge',
-            'minimum_delivery_charge'=>'required_with:per_km_delivery_charge',
-            'per_kg_charge'=>'required_if:module_type,ecommerce',   // v2.8.1
+            'minimum_delivery_charge'=>'required_with:per_km_delivery_charge'
         ], [
             'gst.required_if' => translate('messages.gst_can_not_be_empty'),
             'extra_packaging_amount.required_if' => translate('messages.extra_packaging_amount_can_not_be_empty'),
@@ -56,7 +57,7 @@ class BusinessSettingsController extends Controller
         }
 
         $store->minimum_order = $request->minimum_order??0;
-//        $store->gst = json_encode(['status'=>$request->gst_status, 'code'=>$request->gst]);   // v2.8.1
+        $store->gst = json_encode(['status'=>$request->gst_status, 'code'=>$request->gst]);
         // $store->delivery_charge = $store->self_delivery_system?$request->delivery_charge??0: $store->delivery_charge;
         $store->minimum_shipping_charge = $store->sub_self_delivery?$request->minimum_delivery_charge??0: $store->minimum_shipping_charge;
         $store->per_km_shipping_charge = $store->sub_self_delivery?$request->per_km_delivery_charge??0: $store->per_km_shipping_charge;
@@ -64,7 +65,6 @@ class BusinessSettingsController extends Controller
         $store->maximum_shipping_charge = $store->sub_self_delivery?$request->maximum_shipping_charge??0: $store->maximum_shipping_charge;
         $store->order_place_to_schedule_interval = $request->order_place_to_schedule_interval;
         $store->delivery_time = $request->minimum_delivery_time .'-'. $request->maximum_delivery_time.' '.$request->delivery_time_type;
-        $store->per_kg_charge = $store->self_delivery_system?$request->per_kg_charge??0: $store->per_kg_charge; // v2.8.1
         $store->save();
         $conf = StoreConfig::firstOrNew(
             ['store_id' =>  $store->id]
@@ -153,6 +153,7 @@ class BusinessSettingsController extends Controller
         }else{
             Toastr::success(translate('messages.store').' '.translate('messages.meta_data_updated'));
         }
+
         return back();
     }
     public function store_status(Store $store, Request $request)
@@ -194,7 +195,6 @@ class BusinessSettingsController extends Controller
             );
             $conf[$request->menu] = $request->status;
             $conf->save();
-
             if($store->module->module_type == 'rental' && addon_published_status('Rental')){
                 Toastr::success(translate('messages.provider settings updated!'));
             }else{
@@ -217,10 +217,9 @@ class BusinessSettingsController extends Controller
     public function active_status(Request $request)
     {
         $store = Helpers::get_store_data();
-        $store->active = $store->active?0:1;
+        $store->active = !$store->active;
         $store->save();
         return response()->json(['message' => $store->active?($store->module->module_type == 'rental' ? translate('provider') : translate('store')).' '.translate('messages.opened'):($store->module->module_type == 'rental' ? translate('provider') : translate('store')).' '.translate('messages.temporarily_closed')], 200);
-//        return response()->json(['message' => $store->active?translate('messages.store_opened'):translate('messages.store_temporarily_closed')], 200);
     }
 
     public function add_schedule(Request $request)
@@ -281,19 +280,13 @@ class BusinessSettingsController extends Controller
 
     public function notification_index()
     {
-//        if(StoreNotificationSetting::where('store_id',Helpers::get_store_id())->count() == 0 ){
-//            Helpers::storeNotificationDataSetup(Helpers::get_store_id());
-//        }
         $module_type=Helpers::get_store_data()->module->module_type;
         if(StoreNotificationSetting::where('store_id',Helpers::get_store_id())->count() == 0 ){
             $module_type == 'rental' ? Helpers::storeRentalNotificationDataSetup(Helpers::get_store_id()) : Helpers::storeNotificationDataSetup(Helpers::get_store_id());
         }
-//        $data= StoreNotificationSetting::where('store_id',Helpers::get_store_id())->get();
         $data= StoreNotificationSetting::where('store_id',Helpers::get_store_id())->where('module_type',  $module_type == 'rental' ?'rental':'all' )->get();
-
-
         $business_name= BusinessSetting::where('key','business_name')->first()?->value;
-        return view('vendor-views.business-settings.notification-index', compact('business_name' ,'data'));
+        return view('vendor-views.business-settings.notification-index', compact('business_name' ,'data', 'module_type'));
     }
 
     public function notification_status_change($key, $type){

@@ -154,10 +154,10 @@
                                 </div>
                                 <ul>
                                     <li>
-                                        {{ucfirst(\App\CentralLogics\Helpers::get_settings('opening_day'))}}- {{ucfirst(\App\CentralLogics\Helpers::get_settings('closing_day'))}}
+                                        {{translate(\App\CentralLogics\Helpers::get_settings('opening_day'))}}- {{translate(\App\CentralLogics\Helpers::get_settings('closing_day'))}}
                                     </li>
                                     <li>
-                                        {{date("g:i A", strtotime(\App\CentralLogics\Helpers::get_settings('opening_time') ))}}- {{date("g:i A", strtotime(\App\CentralLogics\Helpers::get_settings('closing_time') ))}}
+                                        {{\App\CentralLogics\Helpers::time_format(\App\CentralLogics\Helpers::get_settings('opening_time')) }}- {{ \App\CentralLogics\Helpers::time_format( \App\CentralLogics\Helpers::get_settings('closing_time'))}}
                                     </li>
                                 </ul>
                             </div>
@@ -169,13 +169,13 @@
                         @csrf
                         <div class="row g-4">
                             <div class="col-sm-6">
-                                <input type="text" required name="name" placeholder="Your Name" class="form-control form--control">
+                                <input type="text" required name="name" placeholder="{{ translate('Your Name') }}" class="form-control form--control">
                             </div>
                             <div class="col-sm-6">
-                                <input type="email" required name="email" placeholder="Email" class="form-control form--control">
+                                <input type="email" required name="email" placeholder="{{ translate('Email') }}" class="form-control form--control">
                             </div>
                             <div class="col-sm-12">
-                                <input type="text" required name="subject" placeholder="Subject" class="form-control form--control">
+                                <input type="text" required name="subject" placeholder="{{ translate('Subject') }}" class="form-control form--control">
                             </div>
                             <div class="col-sm-12">
                                 <textarea name="message" required class="form-control form--control" placeholder="Message"></textarea>

@@ -229,8 +229,11 @@ class ConfigServiceProvider extends ServiceProvider
             }
 
             $data = BusinessSetting::where(['key' => 's3_credential'])->first();
-            $credentials = json_decode($data['value'], true);
-            $config = (boolean)BusinessSetting::where(['key' => 'local_storage'])->first()->value;
+            $credentials= null;
+            if($data?->value){
+                $credentials = json_decode($data['value'], true);
+            }
+            $config = (boolean)BusinessSetting::where(['key' => 'local_storage'])->first()?->value;
             if ($credentials) {
                 Config::set('filesystems.default', $config ? ($config == 0 ? 's3' : 'local') : 'local');
                 Config::set('filesystems.disks.s3.key', $credentials['key']);
@@ -242,7 +245,6 @@ class ConfigServiceProvider extends ServiceProvider
             }
 
         } catch (\Exception $ex) {
-
         }
     }
 }

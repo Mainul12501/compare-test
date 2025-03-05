@@ -139,10 +139,6 @@
                             <div class="col-sm-2">
                                 <label for="">{{ translate('maximum_cod_order_amount') }} ({{ \App\CentralLogics\Helpers::currency_symbol() }})</label>
                             </div>
-{{--                            v2.8.1--}}
-                            <div class="col-sm-2">
-                                <label for="">{{ translate('per_kg_charge') }} ({{ \App\CentralLogics\Helpers::currency_symbol() }})</label>
-                            </div>
                         </div>
                         @if (count($zone->modules) > 0)
                             @foreach ($zone->modules as $module)
@@ -173,42 +169,36 @@
                                     name="module_data[{{ $module->id }}][maximum_cod_order_amount]"
                                     placeholder="{{ translate('enter_Amount') }}"
                                     title="{{ translate('set_maximum_cod_order_amount') }}"
-                                    value="{{ $module->pivot->maximum_cod_order_amount }}" readonly></div>
-                                <div class="col-sm-2"><input type="number" class="form-control"
-                                                             name="module_data[{{ $module->id }}][per_kg_charge]" step=".01"
-                                                             min="0" placeholder="{{ translate('Set charge from parcel category') }}"
-                                                             data-toggle="tooltip" data-placement="right"
-                                                             data-original-title="{{ translate('messages.You have to set category wise charge from parcel category') }}" readonly></div>
-
+                                    value="{{ $module->pivot->maximum_cod_order_amount }}" ></div>
                             </div>
-                                @elseif ($module->module_type == 'rental' && addon_published_status('Rental'))
-                                    <div class="row gy-1 module-row" id="module_{{ $module->id }}">
-                                        <div class="col-sm-4"><input type="text" class="form-control"
-                                                                     value="{{ $module->module_name }}"
-                                                                     placeholder="{{ translate('messages.Not applicable') }}" readonly></div>
-                                        <div class="col-sm-2"><input type="number" class="form-control"
-                                                                     name="module_data[{{ $module->id }}][per_km_shipping_charge]" step=".01"
-                                                                     min="0" placeholder="{{ translate('Not applicable') }}"
-                                                                     data-toggle="tooltip" data-placement="right"
-                                                                     data-original-title="{{ translate('messages.Not applicable') }}" readonly></div>
-                                        <div class="col-sm-2"><input type="number" step=".01" min="0"
-                                                                     class="form-control"
-                                                                     name="module_data[{{ $module->id }}][minimum_shipping_charge]"
-                                                                     placeholder="{{ translate('Not applicable') }}"
-                                                                     data-toggle="tooltip" data-placement="right"
-                                                                     data-original-title="{{ translate('messages.Not applicable') }}" readonly></div>
-                                        <div class="col-sm-2"><input type="number" step=".01" min="0"
-                                                                     class="form-control"
-                                                                     name="module_data[{{ $module->id }}][maximum_shipping_charge]"
-                                                                     placeholder="{{ translate('Not applicable') }}"
-                                                                     data-toggle="tooltip" data-placement="right"
-                                                                     data-original-title="{{ translate('messages.Not applicable') }}" readonly></div>
-                                        <div class="col-sm-2"><input type="number" step=".01" min="0"
-                                                                     class="form-control"
-                                                                     name="module_data[{{ $module->id }}][maximum_cod_order_amount]"
-                                                                     placeholder="{{ translate('Not applicable') }}"
-                                                                     title="{{ translate('Not applicable') }}" readonly></div>
-                                    </div>
+                            @elseif ($module->module_type == 'rental' && addon_published_status('Rental'))
+                            <div class="row gy-1 module-row" id="module_{{ $module->id }}">
+                                <div class="col-sm-4"><input type="text" class="form-control"
+                                        value="{{ $module->module_name }}"
+                                        placeholder="{{ translate('messages.Not applicable') }}" readonly></div>
+                                <div class="col-sm-2"><input type="number" class="form-control"
+                                        name="module_data[{{ $module->id }}][per_km_shipping_charge]" step=".01"
+                                        min="0" placeholder="{{ translate('Not applicable') }}"
+                                        data-toggle="tooltip" data-placement="right"
+                                        data-original-title="{{ translate('messages.Not applicable') }}" readonly></div>
+                                <div class="col-sm-2"><input type="number" step=".01" min="0"
+                                        class="form-control"
+                                        name="module_data[{{ $module->id }}][minimum_shipping_charge]"
+                                        placeholder="{{ translate('Not applicable') }}"
+                                        data-toggle="tooltip" data-placement="right"
+                                        data-original-title="{{ translate('messages.Not applicable') }}" readonly></div>
+                                <div class="col-sm-2"><input type="number" step=".01" min="0"
+                                        class="form-control"
+                                        name="module_data[{{ $module->id }}][maximum_shipping_charge]"
+                                        placeholder="{{ translate('Not applicable') }}"
+                                        data-toggle="tooltip" data-placement="right"
+                                        data-original-title="{{ translate('messages.Not applicable') }}" readonly></div>
+                                <div class="col-sm-2"><input type="number" step=".01" min="0"
+                                    class="form-control"
+                                    name="module_data[{{ $module->id }}][maximum_cod_order_amount]"
+                                    placeholder="{{ translate('Not applicable') }}"
+                                    title="{{ translate('Not applicable') }}" readonly></div>
+                            </div>
                             @else
                             <div class="row gy-1 module-row" id="module_{{ $module->id }}">
                                 <div class="col-sm-4"><input type="text" class="form-control"
@@ -237,13 +227,6 @@
                                         placeholder="{{ translate('enter_Amount') }}"
                                         title="{{ translate('set_maximum_cod_order_amount') }}"
                                         value="{{ $module->pivot->maximum_cod_order_amount }}"></div>
-{{--                                v2.8.1--}}
-                                <div class="col-sm-2"><input required type="number" class="form-control"
-                                                             name="module_data[{{ $module->id }}][per_kg_charge]" step=".01"
-                                                             min="0" placeholder="{{ translate('enter_amount') }}"
-                                                             data-toggle="tooltip" data-placement="right" value="{{ $module->pivot->per_kg_charge ?? 0 }}"
-                                                             data-original-title="{{ translate('set_per_kg_charge')}}"></div>
-{{--                                v2.8.1--}}
                             </div>
                             @endif
                             @endforeach
@@ -299,6 +282,7 @@
                 } else {
                     let name = $('#choice_modules option[value="' + $(this).val() + '"]').html();
                     let found = modules.find(modul=> modul.id == $(this).val());
+
                     if (found.module_type == 'parcel'){
 
                         add_parcel_module($(this).val(), name.trim());
@@ -306,7 +290,8 @@
                     else if (found.module_type == 'rental'){
 
                         add_rental_module($(this).val(), name.trim());
-                    } else{
+                    }
+                    else{
 
                         add_more_delivery_charge_option($(this).val(), name.trim());
                     }
@@ -321,10 +306,8 @@
             }
         });
 
-        function add_more_delivery_charge_option(i, name,com = 0) {
+        function add_more_delivery_charge_option(i, name) {
             let n = name;
-            var placeholderText = com === 1 ? "{{ translate('enter_Amount') }}" : "{{ translate('Set charge only ecommerce') }}";
-            var readonly = com == 1 ? ' ' : 'readonly';
             $('#delivery_charge_options').append(
                 '<div class="row gy-1 module-row" id="module_' + i +
                 '"><div class="col-sm-4"><input type="text" class="form-control" value="' + n +
@@ -336,9 +319,7 @@
                 i +
                 '][maximum_shipping_charge]" placeholder="{{ translate('messages.enter_Amount') }}" title="{{ translate('messages.maximum delivery charge') }}"></div><div class="col-sm-2"><input type="number" step=".01" min="0" class="form-control" name="module_data[' +
                 i +
-                '][maximum_cod_order_amount]" placeholder="{{ translate('enter_Amount') }}" title="{{ translate('set_maximum_cod_order_amount') }}"></div></div><div class="col-sm-2"><input type="number" step=".01" min="0" class="form-control" name="module_data[' +
-                i +
-                '][per_kg_charge]" placeholder="' + placeholderText +'" title="{{ translate('set_maximum_cod_order_amount') }}" '+ readonly + '></div>'
+                '][maximum_cod_order_amount]" placeholder="{{ translate('enter_Amount') }}" title="{{ translate('set_maximum_cod_order_amount') }}"></div></div>'
             );
         }
         function add_parcel_module(i, name) {
@@ -354,9 +335,7 @@
                 i +
                 '][maximum_shipping_charge]" step=".01" min="0" class="form-control" placeholder="{{ translate('Set charge from parcel category') }}" value="" title="{{ translate('messages.maximum delivery charge') }}" readonly></div><div class="col-sm-2"><input type="number" step=".01" min="0" class="form-control" name="module_data[' +
                 i +
-                '][maximum_cod_order_amount]" placeholder="{{ translate('enter_Amount') }}" title="{{ translate('set_maximum_cod_order_amount') }}" readonly></div><div class="col-sm-2"><input type="number" name="module_data[' +
-                i +
-                '][per_kg_charge]" step=".01" min="0" class="form-control" placeholder="{{ translate('Set charge from parcel category') }}" value="" title="{{ translate('messages.maximum delivery charge') }}" readonly></div></div>'
+                '][maximum_cod_order_amount]" placeholder="{{ translate('enter_Amount') }}" title="{{ translate('set_maximum_cod_order_amount') }}" readonly></div></div>'
             );
         }
         function add_rental_module(i, name) {

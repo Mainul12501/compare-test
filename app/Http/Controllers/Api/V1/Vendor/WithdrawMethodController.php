@@ -36,7 +36,6 @@ class WithdrawMethodController extends Controller
                 });
             }
             )
-            ->where('pending_status', 0)
             ->latest()
             ->paginate($request['limit'], ['*'], 'page', $request['offset']);
 
@@ -94,7 +93,6 @@ class WithdrawMethodController extends Controller
             'method_name' => $method['method_name'],
             'method_fields' => json_encode($method_data),
             'is_default' => 0,
-            'store_name' => $store['name'] ?? '',
             'created_at' => now(),
             'updated_at' => now()
         ];

@@ -19,7 +19,6 @@ use ZipArchive;
 
 class FileManagerController extends Controller
 {
-    // v2.8.1 checked
     /**
      * Display a listing of the resource.
      *
@@ -143,7 +142,13 @@ class FileManagerController extends Controller
 
     public function download($file_name,$storage='public')
     {
-        return Storage::disk($storage)->download(base64_decode($file_name));
+        $decodedFileName=base64_decode($file_name);
+        if (Storage::disk($storage)->exists($decodedFileName)) {
+            return Storage::disk($storage)->download($decodedFileName);
+        } elseif(Storage::disk('local')->exists($decodedFileName)){
+            return Storage::disk('local')->download($decodedFileName);
+        }
+        return false;
     }
 
     /**

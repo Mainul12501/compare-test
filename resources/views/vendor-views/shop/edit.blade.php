@@ -3,12 +3,7 @@
     $title = $vendorData?->module_type == 'rental' && rental_module_published_status('Rental') ? 'Provider' : 'Store';
 @endphp
 @extends('layouts.vendor.app')
-{{--@section('title',translate('messages.edit_store'))--}}  <!--v2.12-->
-@if(\App\CentralLogics\Helpers::get_store_data()->store_type == 'company')
-    @section('title',translate('messages.edit_company'))
-@else
-    @section('title',translate('messages.edit_' . $title))
-@endif
+@section('title',translate('messages.edit_' . $title))
 @push('css_or_js')
     <!-- Custom styles for this page -->
     <link href="{{asset('public/assets/admin')}}/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
@@ -23,13 +18,9 @@
             <h2 class="page-header-title text-capitalize">
                 <img class="w--26" src="{{asset('/public/assets/admin/img/store.png')}}" alt="public">
                 <span>
-                    @if(\App\CentralLogics\Helpers::get_store_data()->store_type == 'company')
-                        {{translate('messages.edit_company_info')}}
-                    @else
-                        {{translate('messages.edit_'.$title.'_info')}}
-                    @endif
+                    {{translate('messages.edit_'.$title.'_info')}}
                 </span>
-            </h2>
+            </h1>
         </div>
         @php($language=\App\Models\BusinessSetting::where('key','language')->first())
         @php($language = $language->value ?? null)
@@ -167,7 +158,7 @@
                             </div>
                             <div class="custom-file">
                                 <input type="file" name="image" id="customFileUpload" class="custom-file-input"
-                                    accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*">
+                                    accept=".webp, .jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*">
                                 <label class="custom-file-label" for="customFileUpload">{{translate('messages.choose_file')}}</label>
                             </div>
                         </div>
@@ -188,7 +179,7 @@
                             </div>
                             <div class="custom-file">
                                 <input type="file" name="photo" id="coverImageUpload" class="custom-file-input"
-                                    accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*">
+                                    accept=".webp, .jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*">
                                 <label class="custom-file-label" for="coverImageUpload">{{translate('messages.choose_file')}}</label>
                             </div>
                         </div>

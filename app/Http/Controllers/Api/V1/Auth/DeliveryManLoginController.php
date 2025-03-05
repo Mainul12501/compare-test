@@ -64,10 +64,7 @@ class DeliveryManLoginController extends Controller
                 }
                 $zone_topic =  $delivery_man->type=='zone_wise'?$delivery_man->zone->deliveryman_wise_topic.'_push':'';
             }
-            if($delivery_man->type == 'restaurant_wise'){   // v2.8.1
-                $topic = 'restaurant_dm_'.$delivery_man->store_id;  // v2.8.1
-            }   // v2.8.1
-            return response()->json(['token' => $token, 'topic'=> isset($topic)?$topic:'No_topic_found', 'zone_topic' =>  $zone_topic?? '', 'parcel_topic' => isset($parcel_topic)?$parcel_topic:'No_topic_found'], 200);   // v2.8.1
+            return response()->json(['token' => $token, 'topic'=> isset($topic)?$topic:'No_topic_found', 'zone_topic' =>  $zone_topic?? ''], 200);
         } else {
             $errors = [];
             array_push($errors, ['code' => 'auth-001', 'message' => translate('Incorrect_credential,_please_try_again')]);
@@ -81,8 +78,8 @@ class DeliveryManLoginController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'f_name' => 'required',
-            'identity_type' => 'required|in:passport,driving_license,nid,nrc',  // v2.8.1
-            'identity_number' => 'required|unique:delivery_men',    // v2.8.1
+            'identity_type' => 'required|in:passport,driving_license,nid',
+            'identity_number' => 'required',
             'email' => 'required|unique:delivery_men',
             'phone' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:10|unique:delivery_men',
             'password' => ['required', Password::min(8)->mixedCase()->letters()->numbers()->symbols()->uncompromised()],
@@ -125,17 +122,6 @@ class DeliveryManLoginController extends Controller
             $identity_image = json_encode([]);
         }
 
-        $dm_img_names = [];
-        if (!empty($request->file('dm_address_proof'))) {
-            foreach ($request->dm_address_proof as $imgx) {
-                $dm_address_proof = Helpers::upload('delivery-man/address-proof/', 'png', $imgx);
-                array_push($dm_img_names, ['img'=>$dm_address_proof, 'storage'=> Helpers::getDisk()]);
-            }
-            $dm_address_proof = json_encode($dm_img_names);
-        } else {
-            $dm_address_proof = json_encode([]);
-        }
-
         $dm = New DeliveryMan();
         $dm->f_name = $request->f_name;
         $dm->l_name = $request->l_name;
@@ -143,9 +129,7 @@ class DeliveryManLoginController extends Controller
         $dm->phone = $request->phone;
         $dm->identity_number = $request->identity_number;
         $dm->identity_type = $request->identity_type;
-        $dm->dm_address = $request->dm_address; // mainul-v2.12
         $dm->identity_image = $identity_image;
-        $dm->dm_address_proof = $dm_address_proof;  // mainul-v2.12
         $dm->vehicle_id = $request->vehicle_id;
         $dm->image = $image_name;
         $dm->status = 0;

@@ -270,7 +270,7 @@
                                     </div>
                                 </div>
 
-                                {{-- @if (addon_published_status('Rental'))
+                                    {{-- @if (addon_published_status('Rental'))
                                     @php($order_cancelation_rate_limit_status = App\CentralLogics\Helpers::get_business_settings('order_cancelation_rate_limit_status') ?? 0)
 
                                     <div class="__bg-FAFAFA card shadow-none">
@@ -342,6 +342,8 @@
                                     </div>
 
                                     @endif --}}
+
+
 
                                 <div class="btn--container justify-content-end mt-3">
                                     <button type="reset" class="btn btn--reset">{{ translate('messages.reset') }}</button>

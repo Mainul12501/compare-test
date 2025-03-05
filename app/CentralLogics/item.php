@@ -8,7 +8,6 @@ use App\Models\Category;
 use App\Models\PriorityList;
 use App\Models\FlashSaleItem;
 use App\Models\BusinessSetting;
-use Twig\Node\Expression\Test\NullTest;
 
 
 class ProductLogic
@@ -1033,6 +1032,46 @@ class ProductLogic
                 'Status'=>$item->status == 1 ? 'active' : 'inactive',
                 'Veg'=>$item->veg == 1 ? 'yes' : 'no',
                 'Recommended'=>$item->recommended == 1 ? 'yes' : 'no',
+            ];
+        }
+
+        return $storage;
+    }
+
+    public static function format_export_vehicles($vehicles, $module_type): array
+    {
+        $storage = [];
+        foreach($vehicles as $vehicle)
+        {
+            $storage[] = [
+                'Id' => $vehicle->id,
+                'Name' => $vehicle->name,
+                'Description' => $vehicle->description ?? null,
+                'Thumbnail' => $vehicle->thumbnail ?? null,
+                'Images' => $vehicle->images ?? null,
+                'ZoneId' => $vehicle->zone_id ?? null,
+                'ProviderId' => $vehicle->provider_id ?? null,
+                'BrandId' => $vehicle->brand_id ?? null,
+                'CategoryId' => $vehicle->category_id ?? null,
+                'Model' => $vehicle->model ?? null,
+                'Type' => $vehicle->type ?? null,
+                'EngineCapacity' => $vehicle->engine_capacity ?? null,
+                'EnginePower' => $vehicle->engine_power ?? null,
+                'SeatingCapacity' => $vehicle->seating_capacity ?? null,
+                'AirCondition' => $vehicle->air_condition ?? 0,
+                'FuelType' => $vehicle->fuel_type ?? null,
+                'TransmissionType' => $vehicle->transmission_type ?? null,
+                'MultipleVehicles' => $vehicle->multiple_vehicles ?? 0,
+                'TripHourly' => $vehicle->trip_hourly ?? 0,
+                'TripDistance' => $vehicle->trip_distance ?? 0,
+                'HourlyPrice' => $vehicle->hourly_price ?? 0.00,
+                'DistancePrice' => $vehicle->distance_price ?? 0.00,
+                'DiscountType' => $vehicle->discount_type ?? null,
+                'DiscountPrice' => $vehicle->discount_price ?? 0.00,
+                'Tag' => $vehicle->tag ?? null,
+                'Documents' => $vehicle->documents ?? null,
+                'Status' => $vehicle->status ?? 1,
+                'NewTag' => $vehicle->new_tag ?? 1,
             ];
         }
 

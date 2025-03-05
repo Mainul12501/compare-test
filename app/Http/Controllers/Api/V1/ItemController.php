@@ -24,7 +24,6 @@ use Illuminate\Support\Facades\Validator;
 
 class ItemController extends Controller
 {
-    // v2.8.1 checked
 
     public function get_latest_products(Request $request)
     {
@@ -712,71 +711,6 @@ class ItemController extends Controller
                 'pharmacy_item_details.common_condition' => 'name',
             ];
             $q->applyRelationShipSearch(relationships:$relationships ,searchParameter:$key);
-
-
-            // $q->orWhereHas('translations',function($query)use($key){
-            //     $query->where(function($q)use($key){
-            //         foreach ($key as $value) {
-            //             $q->where('value', 'like', "%{$value}%");
-            //         };
-            //     });
-            // });
-            // $q->orWhereHas('tags',function($query)use($key){
-            //     $query->where(function($q)use($key){
-            //         foreach ($key as $value) {
-            //             $q->where('tag', 'like', "%{$value}%");
-            //         };
-            //     });
-            // });
-            // $q->orWhereHas('nutritions',function($query)use($key){
-            //     $query->where(function($q)use($key){
-            //         foreach ($key as $value) {
-            //             $q->where('nutrition', 'like', "%{$value}%");
-            //         };
-            //     });
-            // });
-            // $q->orWhereHas('allergies',function($query)use($key){
-            //     $query->where(function($q)use($key){
-            //         foreach ($key as $value) {
-            //             $q->where('allergy', 'like', "%{$value}%");
-            //         };
-            //     });
-            // });
-            // $q->orWhereHas('category.parent',function($query)use($key){
-            //     $query->where(function($q)use($key){
-            //         foreach ($key as $value) {
-            //             $q->where('name', 'like', "%{$value}%");
-            //         };
-            //     });
-            // });
-            // $q->orWhereHas('category',function($query)use($key){
-            //     $query->where(function($q)use($key){
-            //         foreach ($key as $value) {
-            //             $q->where('name', 'like', "%{$value}%");
-            //         };
-            //     });
-            // });
-            // $q->orWhereHas('generic',function($query)use($key){
-            //     $query->where(function($q)use($key){
-            //         foreach ($key as $value) {
-            //             $q->where('generic_name', 'like', "%{$value}%");
-            //         };
-            //     });
-            // });
-            // $q->orWhereHas('ecommerce_item_details.brand',function($query)use($key){
-            //     $query->where(function($q)use($key){
-            //         foreach ($key as $value) {
-            //             $q->where('name', 'like', "%{$value}%");
-            //         };
-            //     });
-            // });
-            // $q->orWhereHas('pharmacy_item_details.common_condition',function($query)use($key){
-            //     $query->where(function($q)use($key){
-            //         foreach ($key as $value) {
-            //             $q->where('name', 'like', "%{$value}%");
-            //         };
-            //     });
-            // });
         })
         ->limit(50)
         ->get(['id','name','image']);
@@ -796,6 +730,7 @@ class ItemController extends Controller
             }
 
             $relationships = [
+                'translations' => 'value',
                 'items.nutritions' => 'nutrition',
                 'items.allergies' => 'allergy',
                 'items.generic' => 'generic_name',
@@ -803,43 +738,6 @@ class ItemController extends Controller
                 'items.pharmacy_item_details.common_condition' => 'name'
             ];
             $q->applyRelationShipSearch(relationships:$relationships ,searchParameter:$key);
-
-            // $q->orWhereHas('items.nutritions',function($query)use($key){
-            //     $query->where(function($q)use($key){
-            //         foreach ($key as $value) {
-            //             $q->where('nutrition', 'like', "%{$value}%");
-            //         };
-            //     });
-            // });
-            // $q->orWhereHas('items.allergies',function($query)use($key){
-            //     $query->where(function($q)use($key){
-            //         foreach ($key as $value) {
-            //             $q->where('allergy', 'like', "%{$value}%");
-            //         };
-            //     });
-            // });
-            // $q->orWhereHas('items.generic',function($query)use($key){
-            //     $query->where(function($q)use($key){
-            //         foreach ($key as $value) {
-            //             $q->where('generic_name', 'like', "%{$value}%");
-            //         };
-            //     });
-            // });
-            // $q->orWhereHas('items.ecommerce_item_details.brand',function($query)use($key){
-            //     $query->where(function($q)use($key){
-            //         foreach ($key as $value) {
-            //             $q->where('name', 'like', "%{$value}%");
-            //         };
-            //     });
-            // });
-            // $q->orWhereHas('items.pharmacy_item_details.common_condition',function($query)use($key){
-            //     $query->where(function($q)use($key){
-            //         foreach ($key as $value) {
-            //             $q->where('name', 'like', "%{$value}%");
-            //         };
-            //     });
-            // });
-
         })
         ->when(config('module.current_module_data'), function($query)use($zone_id){
             $query->module(config('module.current_module_data')['id']);

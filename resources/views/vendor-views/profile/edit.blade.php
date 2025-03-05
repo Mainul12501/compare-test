@@ -158,7 +158,7 @@
                                 <div class="form-group col-md-9" id="select-img">
                                     <div class="custom-file">
                                         <input type="file" name="image" id="customFileUpload" class="custom-file-input"
-                                            accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*">
+                                            accept=".webp, .jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*">
                                         <label class="custom-file-label" for="customFileUpload">{{translate('messages.image_Upload')}}</label>
                                     </div>
                                 </div>

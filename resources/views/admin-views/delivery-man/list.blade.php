@@ -188,17 +188,6 @@
                             </td>
                             <td>
                                 <div class="btn--container justify-content-center">
-
-                                    @if($dm['earning'] == 0)
-                                        @if($dm['dm_withdraw_to_store_status'] == 1)
-                                            <a class="btn action-btn btn--primary btn-outline-success" href="{{route('vendor.delivery-man.sent-withdraw-req-to-dm',['delivery_men' => $dm['id'], 'type' => 'accept'])}}" title="Accept Withdraw Request of Deliveryman"><i class="tio-done font-weight-bold"></i></a>
-                                        @endif
-                                        @if($dm['collected_cash'] > 0)
-                                            <a class="btn action-btn btn--primary btn-outline-warning" href="{{route('vendor.delivery-man.sent-withdraw-req-to-dm',['delivery_men' => $dm['id'], 'type' => 'sent'])}}" title="Sent Withdraw Request to Deliveryman"><i class="tio-money"></i></a>
-                                        @endif
-                                    @endif
-
-
                                     <a class="btn action-btn btn--warning btn-outline-warning"
                                             href="{{route('admin.users.delivery-man.preview',[$dm['id']])}}"
                                             title="{{ translate('messages.view') }}"><i

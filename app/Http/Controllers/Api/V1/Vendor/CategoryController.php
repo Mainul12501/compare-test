@@ -8,7 +8,6 @@ use App\Models\Category;
 
 class CategoryController extends Controller
 {
-    // v2.8.1 checked
     public function get_categories()
     {
         try {

@@ -145,7 +145,7 @@
                             </div>
                             <div class="col-sm-6">
                                 <h5 class="text-capitalize mb-3">{{ translate('Import_Category_file') }}</h5>
-                                <div class="uploadDnD">
+                                <label class="uploadDnD d-block">
                                     <div class="form-group inputDnD input_image input_image_edit position-relative">
                                         <div class="upload-text">
                                             <div>
@@ -155,7 +155,7 @@
                                         </div>
                                         <input type="file" name="products_file" class="form-control-file text--primary font-weight-bold action-upload-section-dot-area" id="products_file">
                                     </div>
-                                </div>
+                                </label>
 
                             </div>
                         </div>

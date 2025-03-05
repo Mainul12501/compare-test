@@ -29,34 +29,6 @@ $(document).on('ready', function () {
         }
     });
 
-    // INITIALIZATION OF DATATABLES
-    // =======================================================
-    var datatable = $.HSCore.components.HSDatatables.init($('#columnSearchDatatable'), {
-        select: {
-            style: 'multi',
-            classMap: {
-                checkAll: '#datatableCheckAll',
-                counter: '#datatableCounter',
-                counterInfo: '#datatableCounterInfo'
-            }
-        },
-    });
-
-    $('#datatableSearch').on('mouseup', function (e) {
-        var $input = $(this),
-            oldValue = $input.val();
-
-        if (oldValue == "") return;
-
-        setTimeout(function(){
-            var newValue = $input.val();
-
-            if (newValue == ""){
-                // Gotcha
-                datatable.search('').draw();
-            }
-        }, 1);
-    });
 
     // INITIALIZATION OF SELECT2
     // =======================================================
@@ -78,7 +50,7 @@ $('#banner_type').on('change', function () {
         $('#item_wise').hide();
         $('#default').hide();
     } else if (order_type == 'default') {
-        $('#default').show();
+        $('#default').removeClass('d-none').show();
         $('#store_wise').hide();
         $('#item_wise').hide();
     } else {

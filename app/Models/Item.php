@@ -43,7 +43,6 @@ class Item extends Model
         'rating_count'=>'integer',
         'unit_id'=>'integer',
         'is_halal'=>'integer',
-        'weight' => 'float',    // v2.8.1
     ];
 
     protected $appends = ['unit_type','image_full_url','images_full_url'];

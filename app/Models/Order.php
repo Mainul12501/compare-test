@@ -8,17 +8,10 @@ use App\Scopes\ZoneScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Traits\ReportFilter;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\MorphOne;
-use Illuminate\Support\Facades\DB;
 
 class Order extends Model
 {
     use HasFactory , ReportFilter;
-
-    protected $fillable = [
-        'dm_otp'
-    ];
 
     protected $casts = [
         'order_amount' => 'float',
@@ -51,9 +44,6 @@ class Order extends Model
         'cutlery' => 'boolean',
         'is_guest' => 'boolean',
         'ref_bonus_amount' => 'float',
-        'third_party' => 'boolean', // v2.8.1
-        'company_id' => 'integer',  // v2.8.1
-
     ];
 
     protected $appends = ['module_type','order_attachment_full_url','order_proof_full_url'];
@@ -107,23 +97,6 @@ class Order extends Model
     {
         return $this->hasOne(CashBackHistory::class, 'order_id');
     }
-
-    // v2.8.1 code starts
-    public function delivery_company()
-    {
-        return $this->hasOne(DeliveryCompany::class,'id', 'company_id');
-    }
-    public function parcel_company()
-    {
-        return $this->belongsTo(Store::class,'parcel_company_id');
-    }
-    // v2.8.1 code ends
-    //custom start -- mainul
-    public function dmVehicle()
-    {
-        return $this->belongsTo(DmVehicle::class, 'dm_vehicle_id');
-    }
-    //custom end -- mainul
 
 
     public function offline_payments()
@@ -315,27 +288,6 @@ class Order extends Model
             $q->where('order_type', 'parcel')->orWhere('order_type', 'delivery');
         });
     }
-    // v2.8.1 code starts
-    public function scopeParcelAll($query, $store_id)
-    {
-        return $query->where('order_status', 'pending')
-            ->orWhere(function($query) use($store_id) {
-                $query->whereIn('order_status', ['pending','confirmed,','handover','accepted','item_on_the_way','delivered','canceled','failed','scheduled','on_going'])
-                    ->where('parcel_company_id', $store_id);
-            });
-
-    }
-    public function scopeCompanyOrder($query)
-    {
-        return $query->where(function ($q) {
-            $q->where('order_type', 'delivery');
-        });
-    }
-    public function scopeNot_take_away($query)
-    {
-        return $query->where('order_type', '<>', 'take_away');
-    }
-    // v2.8.1 code ends
 
     public function scopeParcelOrder($query)
     {

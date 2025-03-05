@@ -194,7 +194,7 @@
                                 <th class="border-0">{{ translate('messages.SL') }}</th>
                                 <th class="border-0">{{translate('messages.zone_Id')}}</th>
                                 <th class="border-0" >{{ translate('messages.business_Zone_name')}}</th>
-                                <th class="border-0" >{{translate('messages.stores')}}</th>
+                                <th class="border-0" >{{translate('messages.vendors')}}</th>
                                 <th class="border-0" >{{translate('messages.deliverymen')}}</th>
                                 <th class="border-0" >{{translate('messages.status')}}</th>
                                 @if ($digital_payment && $digital_payment['status']==1)
@@ -222,7 +222,11 @@
                                         {{$zone['name']}}
                                     </span>
                                     </td>
-                                    <td>{{$zone->stores_count}}</td>
+                                    <td>
+                                        {{$zone->stores->filter(function($store) {
+                                            return $store->vendor && $store->vendor->status == 1;
+                                        })->count()}}
+                                    </td>
                                     <td>{{$zone->deliverymen_count}}</td>
                                     <td>
                                         <label class="toggle-switch toggle-switch-sm" for="status-{{$zone['id']}}">

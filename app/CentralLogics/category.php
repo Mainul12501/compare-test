@@ -477,7 +477,6 @@ class CategoryLogic
 
         $item_categories = array_unique($item_categories);
 
-//        $categories = Category::where(['featured' => 1 ,'status' => 1])->whereIn('id',$item_categories)->get(['id','name','image']); // v2.8.1
         $categories = Category::where(['status' => 1])->whereIn('id',$item_categories)->get(['id','name','image']);
 
         return [

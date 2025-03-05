@@ -23,7 +23,6 @@ use Illuminate\Support\Facades\Validator;
 
 class POSController extends Controller
 {
-    // v2.8.1 checked
     public function index(Request $request)
     {
         // dd(session('cart'));

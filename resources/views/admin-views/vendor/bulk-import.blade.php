@@ -159,7 +159,7 @@
                     </div>
                     <div class="col-sm-6">
                         <h5 class="text-capitalize mb-3">{{ translate('Import_Stores_file') }}</h5>
-                        <div class="uploadDnD">
+                        <label class="uploadDnD d-block">
                             <div class="form-group inputDnD input_image input_image_edit position-relative">
                                 <div class="upload-text">
                                     <div>
@@ -169,7 +169,7 @@
                                 </div>
                                 <input type="file" name="products_file" class="form-control-file text--primary font-weight-bold action-upload-section-dot-area" id="products_file">
                             </div>
-                        </div>
+                        </label>
 
                     </div>
                 </div>
@@ -191,7 +191,7 @@
         $('#reset_btn').click(function(){
             $('#bulk__import').val(null);
         })
-        
+
         $('#reset_btn').click(function(){
         $('#products_file').val('');
         $('.filename').text('{{translate('Must_be_Excel_files_using_our_Excel_template_above')}}');

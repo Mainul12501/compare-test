@@ -14,7 +14,6 @@ use Madnest\Madzipper\Facades\Madzipper;
 
 class InstallController extends Controller
 {
-    // v2.8.1 checked
     use ActivationClass;
 
     public function step0()
@@ -130,8 +129,8 @@ class InstallController extends Controller
         //version 2.2.0
         Helpers::insert_data_settings_key('admin_login_url', 'login_admin' ,'admin');
         Helpers::insert_data_settings_key('admin_employee_login_url', 'login_admin_employee' ,'admin-employee');
-        Helpers::insert_data_settings_key('store_login_url', 'login_store' ,'store');
-        Helpers::insert_data_settings_key('store_employee_login_url', 'login_store_employee' ,'store-employee');
+        Helpers::insert_data_settings_key('store_login_url', 'login_store' ,'vendor');
+        Helpers::insert_data_settings_key('store_employee_login_url', 'login_store_employee' ,'vendor-employee');
 
         Helpers::insert_business_settings_key('check_daily_subscription_validity_check', date('Y-m-d'));
 
@@ -196,7 +195,7 @@ class InstallController extends Controller
                     BUYER_USERNAME=' . session('username') . '
                     SOFTWARE_ID=MzY3NzIxMTI=
 
-                    SOFTWARE_VERSION=2.12
+                    SOFTWARE_VERSION=3.0
                     REACT_APP_KEY=45370351
                     ';
             $file = fopen(base_path('.env'), 'w');

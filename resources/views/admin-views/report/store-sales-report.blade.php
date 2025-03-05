@@ -402,34 +402,5 @@
                 }
             });
 
-            // v2.8.1 start
-            $('#search-form').on('submit', function (e) {
-                e.preventDefault();
-                let formData = new FormData(this);
-                $.ajaxSetup({
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    }
-                });
-                $.post({
-                    url: '{{route('admin.report.store-sales-report-search')}}',
-                    data: formData,
-                    cache: false,
-                    contentType: false,
-                    processData: false,
-                    beforeSend: function () {
-                        $('#loading').show();
-                    },
-                    success: function (data) {
-                        $('#set-rows').html(data.view);
-                        // $('#countItems').html(data.count);
-                        $('.page-area').hide();
-                    },
-                    complete: function () {
-                        $('#loading').hide();
-                    },
-                });
-            });
-            // v2.8.1 end
         </script>
     @endpush

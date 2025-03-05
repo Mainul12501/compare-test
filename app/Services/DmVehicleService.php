@@ -11,8 +11,6 @@ class DmVehicleService
             "extra_charges" => $request->extra_charges,
             "starting_coverage_area" => $request->starting_coverage_area,
             "maximum_coverage_area" => $request->maximum_coverage_area,
-            "minimum_weight" => $request->minimum_weight,   // v2.8.1
-            "maximum_weight" => $request->maximum_weight,   // v2.8.1
         ];
     }
 
@@ -23,8 +21,6 @@ class DmVehicleService
             "extra_charges" => $request->extra_charges,
             "starting_coverage_area" => $request->starting_coverage_area,
             "maximum_coverage_area" => $request->maximum_coverage_area,
-            "minimum_weight" => $request->minimum_weight,   // v2.8.1
-            "maximum_weight" => $request->maximum_weight,   // v2.8.1
         ];
     }
 

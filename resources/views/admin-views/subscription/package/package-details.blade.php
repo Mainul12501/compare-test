@@ -95,6 +95,7 @@ active
                 </div>
             </div>
         </div>
+
         <div class="card-body pt-0">
             <div class="__bg-F8F9FC-card __plan-details">
                 <div class="d-flex flex-wrap flex-md-nowrap justify-content-between __plan-details-top">
@@ -114,10 +115,10 @@ active
                         <div class="d-flex align-items-center gap-2">
                             <img src="{{asset('/public/assets/admin/img/subscription-plan/check.png')}}" alt="">
                             @if ( $subscriptionackage->max_order == 'unlimited' )
-                                <span class="form-check-label text-dark">{{ $subscriptionackage->module_type == 'rental' ? translate('messages.unlimited_trips') : translate('messages.unlimited_orders') }}</span>
+                            <span class="form-check-label text-dark">{{ $subscriptionackage->module_type == 'rental' ? translate('messages.unlimited_trips') : translate('messages.unlimited_orders') }}</span>
                             @else
                             <span class="form-check-label text-dark"> {{ $subscriptionackage->max_order }} {{
-                                $subscriptionackage->module_type == 'rental' ? translate('messages.trips') : translate('messages.Orders') }}</span>
+                                  $subscriptionackage->module_type == 'rental' ? translate('messages.trips') : translate('messages.Orders') }}</span>
                             @endif
                         </div>
                     </div>
@@ -164,11 +165,11 @@ active
                         <div class="d-flex align-items-center gap-2">
                             <img src="{{asset('/public/assets/admin/img/subscription-plan/check.png')}}" alt="">
                             @if ( $subscriptionackage->max_product == 'unlimited' )
-                                <span class="form-check-label text-dark">{{  $subscriptionackage->module_type == 'rental' ? translate('messages.unlimited_Upload') : translate('messages.unlimited_item_Upload')
+                            <span class="form-check-label text-dark">{{  $subscriptionackage->module_type == 'rental' ? translate('messages.unlimited_Upload') : translate('messages.unlimited_item_Upload')
                                 }}</span>
                             @else
                             <span class="form-check-label text-dark"> {{ $subscriptionackage->max_product }} {{
-                                $subscriptionackage->module_type == 'rental' ? translate('messages.Vehicle_Upload') : translate('messages.product_Upload') }}</span>
+                               $subscriptionackage->module_type == 'rental' ? translate('messages.Vehicle_Upload') : translate('messages.product_Upload') }}</span>
                             @endif
                         </div>
                     </div>

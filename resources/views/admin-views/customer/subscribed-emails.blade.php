@@ -178,36 +178,4 @@
 
     </div>
 @endsection
-{{--v2.8.1 code start--}}
-@push('script_2')
-    <script type="text/javascript">
-        "use strict";
-        $('#search-form').on('submit', function () {
-            let formData = new FormData(this);
-            $.ajaxSetup({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                }
-            });
-            $.post({
-                url: '{{ url('admin/customer/subscriber-search') }}',
-                data: formData,
-                cache: false,
-                contentType: false,
-                processData: false,
-                beforeSend: function () {
-                    $('#loading').show();
-                },
-                success: function (data) {
-                    $('#set-rows').html(data.view);
-                    $('.card-footer').hide();
-                    $('#count').html(data.count);
-                },
-                complete: function () {
-                    $('#loading').hide();
-                },
-            });
-        });
-    </script>
-@endpush
-{{--v2.8.1 code end--}}
+

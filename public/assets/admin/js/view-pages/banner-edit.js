@@ -2,9 +2,11 @@
 function getRequest(route, id) {
     $.get({
         url: route,
-        dataType: 'json',
+        dataType: "json",
         success: function (data) {
-            $('#' + id).empty().append(data.options);
+            $("#" + id)
+                .empty()
+                .append(data.options);
         },
     });
 }
@@ -13,38 +15,32 @@ function readURL(input) {
         var reader = new FileReader();
 
         reader.onload = function (e) {
-            $('#viewer').attr('src', e.target.result);
-        }
+            $("#viewer").attr("src", e.target.result);
+        };
         reader.readAsDataURL(input.files[0]);
     }
 }
-$('#banner_type').on('change', function () {
+$("#banner_type").on("change", function () {
     let order_type = $(this).val();
     banner_type_change(order_type);
-})
+});
 function banner_type_change(order_type) {
-    if(order_type=='item_wise')
-    {
-        $('#store_wise').hide();
-        $('#item_wise').show();
-        $('#default').hide();
-    }
-    else if(order_type=='store_wise')
-    {
-        $('#store_wise').show();
-        $('#item_wise').hide();
-        $('#default').hide();
-    }
-    else if(order_type=='default')
-    {
-        $('#default').show();
-        $('#store_wise').hide();
-        $('#item_wise').hide();
-    }
-    else{
-        $('#item_wise').hide();
-        $('#store_wise').hide();
-        $('#default').hide();
+    if (order_type == "item_wise") {
+        $("#store_wise").hide();
+        $("#item_wise").show();
+        $("#default").hide();
+    } else if (order_type == "store_wise") {
+        $("#store_wise").removeClass("d-none").show();
+        $("#item_wise").hide();
+        $("#default").hide();
+    } else if (order_type == "default") {
+        $("#default").removeClass("d-none").show();
+        $("#store_wise").hide();
+        $("#item_wise").hide();
+    } else {
+        $("#item_wise").hide();
+        $("#store_wise").hide();
+        $("#default").hide();
     }
 }
 
@@ -52,6 +48,6 @@ $("#customFileEg1").change(function () {
     readURL(this);
 });
 
-$('#reset_btn').click(function(){
+$("#reset_btn").click(function () {
     location.reload(true);
-})
+});

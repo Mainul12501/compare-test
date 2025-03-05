@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\Mail;
 
 class LoyaltyPointController extends Controller
 {
-    // v2.8.1 checked
     public function point_transfer(Request $request)
     {
         $validator = Validator::make($request->all(), [

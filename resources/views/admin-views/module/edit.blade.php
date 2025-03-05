@@ -114,23 +114,23 @@
                                     <div class="card">
                                         <div class="card-body p-0">
                                             <div class="module-radio-group">
-                                                @foreach (config('module.module_type') as $key)
-                                                    @if($key != 'rental'  )
-                                                        <label class="form-check form--check">
-                                                            <input class="form-check-input" disabled type="radio" name="module_type" value="{{$key}}" {{$key==$module->module_type?'checked':''}}>
-                                                            <span class="form-check-label">
+                                            @foreach (config('module.module_type') as $key)
+                                            @if($key != 'rental'  )
+                                            <label class="form-check form--check">
+                                                <input class="form-check-input" disabled type="radio" name="module_type" value="{{$key}}" {{$key==$module->module_type?'checked':''}}>
+                                                <span class="form-check-label">
                                                     {{translate($key)}}
                                                 </span>
-                                                        </label>
-                                                    @elseif($key == 'rental' && addon_published_status('Rental')  )
-                                                        <label class="form-check form--check">
-                                                            <input class="form-check-input" disabled type="radio" name="module_type" value="{{$key}}" {{$key==$module->module_type?'checked':''}}>
-                                                            <span class="form-check-label">
+                                            </label>
+                                            @elseif($key == 'rental' && addon_published_status('Rental')  )
+                                            <label class="form-check form--check">
+                                                <input class="form-check-input" disabled type="radio" name="module_type" value="{{$key}}" {{$key==$module->module_type?'checked':''}}>
+                                                <span class="form-check-label">
                                                     {{translate($key)}}
                                                 </span>
-                                                        </label>
-                                                    @endif
-                                                @endforeach
+                                            </label>
+                                            @endif
+                                            @endforeach
                                             </div>
                                         </div>
                                     </div>
@@ -155,7 +155,7 @@
                                                     alt="image" />
                                                     <div class="icon-file-group">
                                                         <div class="icon-file">
-                                                            <input type="file" name="icon" id="customFileEg1" class="custom-file-input" accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*">
+                                                            <input type="file" name="icon" id="customFileEg1" class="custom-file-input" accept=".webp, .jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*">
                                                             <i class="tio-edit"></i>
                                                         </div>
                                                     </div>
@@ -173,7 +173,7 @@
                                                     alt="image" />
                                                     <div class="icon-file-group">
                                                         <div class="icon-file">
-                                                            <input type="file" name="thumbnail" id="customFileEg2" class="custom-file-input" accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*">
+                                                            <input type="file" name="thumbnail" id="customFileEg2" class="custom-file-input" accept=".webp, .jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*">
                                                             <i class="tio-edit"></i>
                                                         </div>
                                                     </div>

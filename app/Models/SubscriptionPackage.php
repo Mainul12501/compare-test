@@ -29,6 +29,17 @@ class SubscriptionPackage extends Model
         'max_order'=>'string',
         'max_product'=>'string',
     ];
+
+    /**
+     * @param $query
+     * @param $status
+     * @return void
+     */
+    public function scopeOfStatus($query, $status): void
+    {
+        $query->where('status', '=', $status);
+    }
+
     public function transactions()
     {
         return $this->hasMany(SubscriptionTransaction::class, 'package_id');

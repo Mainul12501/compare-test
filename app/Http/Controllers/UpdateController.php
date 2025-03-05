@@ -24,7 +24,6 @@ use Illuminate\Support\Facades\Artisan;
 
 class UpdateController extends Controller
 {
-    // v2.8.1 checked
     use ActivationClass;
 
     public function update_software_index()
@@ -42,7 +41,7 @@ class UpdateController extends Controller
         Helpers::setEnvironmentValue('BUYER_USERNAME', $request['username']);
         Helpers::setEnvironmentValue('PURCHASE_CODE', $request['purchase_key']);
         Helpers::setEnvironmentValue('APP_MODE', 'live');
-        Helpers::setEnvironmentValue('SOFTWARE_VERSION', '2.12');
+        Helpers::setEnvironmentValue('SOFTWARE_VERSION', '3.0');
         Helpers::setEnvironmentValue('REACT_APP_KEY', '45370351');
         Helpers::setEnvironmentValue('APP_NAME', '6amMart' . time());
 
@@ -109,8 +108,8 @@ class UpdateController extends Controller
         //version 2.2.0
         Helpers::insert_data_settings_key('admin_login_url', 'login_admin' ,'admin');
         Helpers::insert_data_settings_key('admin_employee_login_url', 'login_admin_employee' ,'admin-employee');
-        Helpers::insert_data_settings_key('store_login_url', 'login_store' ,'store');
-        Helpers::insert_data_settings_key('store_employee_login_url', 'login_store_employee' ,'store-employee');
+        Helpers::insert_data_settings_key('store_login_url', 'login_store' ,'vendor');
+        Helpers::insert_data_settings_key('store_employee_login_url', 'login_store_employee' ,'vendor-employee');
 
         Helpers::insert_business_settings_key('subscription_business_model', '0');
         Helpers::insert_business_settings_key('commission_business_model', '1');
@@ -208,6 +207,16 @@ class UpdateController extends Controller
         ->update([
             'store_id' => DB::raw("JSON_UNQUOTE(JSON_EXTRACT(data, '$[0]'))")
         ]);
+
+        $twoFactor = Setting::where(['key_name' => '2factor', 'settings_type' => 'sms_config'])->first();
+        if ($twoFactor && $twoFactor->live_values) {
+            $liveValues = is_array($twoFactor->live_values) ? $twoFactor->live_values : json_decode($twoFactor->live_values, true);
+            $liveValues['otp_template'] = $liveValues['otp_template'] ?? 'Your OTP is: #OTP#';
+            Setting::where(['key_name' => '2factor', 'settings_type' => 'sms_config'])->update([
+                'live_values' => json_encode($liveValues),
+                'test_values' => json_encode($liveValues),
+            ]);
+        }
 
         $data = DataSetting::where('type', 'login_admin')->pluck('value')->first();
         return redirect('/login/'.$data);
@@ -392,6 +401,7 @@ class UpdateController extends Controller
                     $additional_data = [
                         'status' => data_get($decoded_value,'status',null),
                         'api_key' => data_get($decoded_value,'api_key',null),
+                        'otp_template' => data_get($decoded_value,'otp_template','Your OTP is: #OTP#'),
                     ];
                 } elseif ($key == 'msg91_sms') {
                     $sms_gateway='msg91';

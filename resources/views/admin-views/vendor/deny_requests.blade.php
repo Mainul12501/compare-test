@@ -38,9 +38,6 @@
                             <li class="nav-item">
                                 <a class="nav-link active" href="{{ route('admin.store.deny-requests') }}"  aria-disabled="true">{{translate('messages.denied_stores')}}</a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('admin.store.pending-method-requests') }}"  aria-disabled="true">{{translate('messages.Disbursement Requests')}}</a>
-                            </li>
                         </ul>
                         <!-- End Nav -->
                     </div>
@@ -87,7 +84,6 @@
                         <th class="border-0">{{translate('messages.owner_information')}}</th>
                         <th class="border-0">{{translate('messages.zone')}}</th>
                         <th class="text-uppercase border-0">{{translate('messages.status')}}</th>
-                        <th class="text-uppercase border-0">{{translate('messages.Reason')}}</th> <!--v2.8.1-->
                         <th class="border-0">{{translate('messages.action')}}</th>
                     </tr>
                     </thead>
@@ -139,7 +135,7 @@
                                     <span class="badge badge-soft-danger">{{translate('messages.pending')}}</span>
                                 @endif
                             </td>
-                            <td>{{ $store->reason ?? '' }}</td> <!--v2.8.1-->
+
                             <td>
                                 @if($store->vendor->status == 0)
                                     <a class="btn action-btn btn--primary btn-outline-primary float-right mr-2 request_alert" data-toggle="tooltip" data-placement="top"

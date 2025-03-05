@@ -293,7 +293,7 @@
                                             @php($item = is_array($item)?$item:['img'=>$item,'storage'=>'public'])
                                             <div>
                                                 <button class="btn w-100 px-0" data-toggle="modal"
-                                                        data-target="#imagemodal{{ $key }}"
+                                                        data-target="#prescriptionimagemodal{{ $key }}"
                                                         title="{{ translate('messages.order_attachment') }}">
                                                     <div class="gallary-card ml-auto">
                                                         <img  src="{{\App\CentralLogics\Helpers::get_full_url('order', $item['img'], $item['storage']??'public') }}"
@@ -302,7 +302,7 @@
                                                     </div>
                                                 </button>
                                             </div>
-                                            <div class="modal fade" id="imagemodal{{ $key }}" tabindex="-1"
+                                            <div class="modal fade" id="prescriptionimagemodal{{ $key }}" tabindex="-1"
                                                  role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                                                 <div class="modal-dialog">
                                                     <div class="modal-content">
@@ -314,7 +314,7 @@
                                                                     aria-hidden="true">&times;</span><span
                                                                     class="sr-only">{{ translate('messages.cancel') }}</span></button>
                                                         </div>
-                                                        <div class="modal-body">
+                                                        <div class="modal-body scroll-bar">
                                                             <img  src="{{\App\CentralLogics\Helpers::get_full_url('order', $item['img'], $item['storage']??'public') }}"
                                                                   class="initial--22 w-100">
                                                         </div>
@@ -505,7 +505,11 @@
                                                 if (!$editing) {
                                                     $detail->item = json_decode($detail->item_details, true);
                                                 }
-                                                $product = \App\Models\Item::where(['id' => $detail->item['id']])->first();
+                                                $product = \App\Models\Item::where(['id' => data_get($detail->item,'id')])->first();
+                                                        if(!$product){
+                                                            $detail->item = json_decode($detail->item_details, true);
+                                                        }
+
                                                 ?>
 
                                             <tr>
@@ -525,7 +529,7 @@
                                                                         class="avatar-status avatar-lg-status avatar-status-dark"><i
                                                                             class="tio-edit"></i></span>
                                                                 <img class="img-fluid rounded aspect-ratio-1 onerror-image"
-                                                                     src="{{ $product->image_full_url }}"
+                                                                     src="{{ $product?->image_full_url ??asset('public/assets/admin/img/100x100/2.png') }}"
                                                                      data-onerror-image="{{ asset('public/assets/admin/img/100x100/2.png') }}"
                                                                      alt="Image Description">
                                                             </div>
@@ -533,7 +537,7 @@
                                                             <a class="avatar avatar-xl mr-3"
                                                                href="{{ route('admin.item.view', [$detail->item['id'],'module_id' => $order->module_id]) }}">
                                                                 <img class="img-fluid rounded aspect-ratio-1 onerror-image"
-                                                                     src="{{ $product->image_full_url }}"
+                                                                     src="{{ $product?->image_full_url ?? asset('public/assets/admin/img/100x100/2.png') }}"
                                                                      data-onerror-image="{{ asset('public/assets/admin/img/100x100/2.png') }}"
                                                                      alt="Image Description">
                                                             </a>
@@ -660,20 +664,20 @@
                                                                     <span
                                                                         class="avatar-status avatar-lg-status avatar-status-dark"><i
                                                                             class="tio-edit"></i></span>
-                                                                <img class="img-fluid rounded onerror-image"
-                                                                     src="{{ $campaign?->image_full_url ?? asset('public/assets/admin/img/900x400/img1.jpg') }}"
-                                                                     data-onerror-image="{{ asset('public/assets/admin/img/160x160/img2.jpg') }}"
-                                                                     alt="Image Description">
-                                                            </div>
-                                                        @else
-                                                            <a class="avatar avatar-xl mr-3"
-                                                               href="{{ route('admin.campaign.view', ['item', $detail->campaign['id']]) }}">
-                                                                <img class="img-fluid rounded onerror-image"
-                                                                     src="{{ $campaign?->image_full_url ?? asset('public/assets/admin/img/900x400/img1.jpg') }}"
-                                                                     data-onerror-image="{{ asset('public/assets/admin/img/160x160/img2.jpg') }}"
-                                                                     alt="Image Description">
-                                                            </a>
-                                                        @endif
+                                                                    <img class="img-fluid rounded onerror-image"
+                                                                        src="{{ $campaign?->image_full_url ?? asset('public/assets/admin/img/900x400/img1.jpg') }}"
+                                                                        data-onerror-image="{{ asset('public/assets/admin/img/160x160/img2.jpg') }}"
+                                                                        alt="Image Description">
+                                                                </div>
+                                                            @else
+                                                                <a class="avatar avatar-xl mr-3"
+                                                                    href="{{ route('admin.campaign.view', ['item', $detail->campaign['id']]) }}">
+                                                                    <img class="img-fluid rounded onerror-image"
+                                                                        src="{{ $campaign?->image_full_url ?? asset('public/assets/admin/img/900x400/img1.jpg') }}"
+                                                                        data-onerror-image="{{ asset('public/assets/admin/img/160x160/img2.jpg') }}"
+                                                                        alt="Image Description">
+                                                                </a>
+                                                            @endif
 
                                                         <div class="media-body">
                                                             <div>
@@ -886,7 +890,7 @@
                                                 {{ \App\CentralLogics\Helpers::format_currency($total_tax_amount) }}
                                             </dd>
                                         @endif
-                                        <dt class="col-6">{{ translate('messages.delivery_fee') }}  {{"( " . $order->weight . "kg)"}} :</dt>
+                                        <dt class="col-6">{{ translate('messages.delivery_fee') }}:</dt>
                                         <dd class="col-6">
                                             + {{ \App\CentralLogics\Helpers::format_currency($del_c) }}
                                             <hr>
@@ -907,20 +911,6 @@
                                             + {{ \App\CentralLogics\Helpers::format_currency($extra_packaging_amount) }}
                                         </dd>
                                     @endif
-                                    {{--                                        v2.8.1 start--}}
-                                    @if($parcel_order)
-                                        <dt class="col-6">{{ translate('messages.weight') }}</dt>
-                                        <dd class="col-6">
-                                            {{$order->weight . " kg"}}</dd>
-                                    @endif
-{{--                                        vmw modification start--}}
-                                        <dt class="col-6">{{ translate('messages.VMW Info (Height*Width*Length)') }}</dt>
-                                        <dd class="col-6">
-                                            {{$order->vmw_height . " cm ".$order->vmw_width . " cm ".$order->vmw_length . " cm"}}</dd>
-{{--                                        vmw modification end--}}
-
-
-                                    {{--                                        v2.8.1 end--}}
 
                                     <dt class="col-6">{{ translate('messages.total') }}:</dt>
                                     <dd class="col-6">
@@ -1142,7 +1132,7 @@
                                             (($refund && $refund->value == true) || $order->order_status == 'refund_requested') &&
                                                 $order->payment_status == 'paid' &&
                                                 $order->order_status != 'refunded')
-                                            <button class="btn btn--primary btn--sm  route-alert-refund-accept"
+                                            <button class="btn btn--primary btn--sm route-alert"
                                                     data-url="{{ route('admin.order.status', ['id' => $order['id'],'order_status' => 'refunded',
                                             ]) }}" data-message="{{ translate('messages.you_want_to_refund_this_order', ['amount' => $refund_amount . ' ' . \App\CentralLogics\Helpers::currency_code()]) }}" data-title="{{ translate('messages.are_you_sure_want_to_refund') }}"
                                             ><i
@@ -1262,61 +1252,6 @@
                                     </div>
                                 @endif
                             @endif
-                            {{--                            v2.8.1 start--}}
-                            <!-- Modal -->
-                            <div class="modal fade" id="thirdPartyModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                <div class="modal-dialog modal-dialog-centered">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="exampleModalLabel">{{translate('messages.Third_party_company')}}</h5>
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                <span aria-hidden="true">&times;</span>
-                                            </button>
-                                        </div>
-                                        <form action="{{route('admin.order.third-party-company')}}">
-                                            @csrf
-                                            <div class="modal-body">
-                                                <div class="card-body">
-                                                    <div class="row g-3 my-0">
-                                                        <div class="col-md-12">
-                                                            <div class="form-group mb-0">
-                                                                <label class="input-label" for="order_id">{{translate('messages.order_id')}}</label>
-                                                                <input readonly type="number" name="order_id" id="order_id" class="form-control" placeholder="{{translate('messages.order_id')}}" value={{$order->id}}>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-12">
-                                                            <div class="form-group mb-0">
-                                                                <label class="input-label" for="company_name">{{translate('messages.company_name')}}</label>
-                                                                <input type="text" name="company_name" id="company_name" class="form-control" placeholder="{{translate('messages.company_name')}} {{ $order->delivery_company?->tracking_url }} " value="{{ $order->delivery_company?->company_name }}">
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-12">
-                                                            <div class="form-group mb-0">
-                                                                <label class="input-label" for="tracking_url">{{translate('messages.tracking_URL')}}</label>
-                                                                <input type="text" name="tracking_url" id="tracking_url" class="form-control" placeholder="https://www.example.com" value="{{$order->delivery_company?->tracking_url}}">
-
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-12">
-                                                            <div class="form-group mb-0">
-                                                                <label class="input-label" for="serial_number">{{translate('messages.serial_number')}}</label>
-                                                                <input type="text" name="serial_number" id="serial_number" class="form-control" placeholder="{{translate('messages.serial_number')}}" value="{{ $order->delivery_company?->serial_number }}">
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                                <button type="submit" class="btn btn--primary">Submit</button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                            {{--                            v2.8.1 end--}}
                         </div>
                     </div>
                 @endif
@@ -1455,18 +1390,18 @@
                                            href="tel:{{ $receiver_details['contact_person_number'] }}">
                                             {{ $receiver_details['contact_person_number'] }}</a>
                                             @if (data_get($receiver_details,'floor') != '')
-                                        <span class="name">{{ translate('Floor') }}</span> <span
-                                            class="info">{{ data_get($receiver_details,'floor', translate('messages.N/A'))  }}</span>
-                                    @endif
-                                    @if ( data_get($receiver_details,'house') != '')
-                                        <span class="name">{{ translate('House') }}</span> <span
-                                            class="info">{{data_get($receiver_details,'house', translate('messages.N/A')) }}</span>
-                                    @endif
+                                                <span class="name">{{ translate('Floor') }}</span> <span
+                                                class="info">{{ data_get($receiver_details,'floor', translate('messages.N/A'))  }}</span>
+                                            @endif
+                                            @if ( data_get($receiver_details,'house') != '')
+                                                    <span class="name">{{ translate('House') }}</span> <span
+                                                    class="info">{{data_get($receiver_details,'house', translate('messages.N/A')) }}</span>
+                                            @endif
 
-                                    @if ( data_get($receiver_details,'road') != '')
-                                        <span class="name">{{ translate('Road') }}</span> <span
-                                            class="info">{{ data_get($receiver_details,'road', translate('messages.N/A')) }}</span>
-                                    @endif
+                                            @if ( data_get($receiver_details,'road') != '')
+                                                    <span class="name">{{ translate('Road') }}</span> <span
+                                                    class="info">{{ data_get($receiver_details,'road', translate('messages.N/A')) }}</span>
+                                            @endif
 
                                         <hr class="w-100">
 
@@ -1508,19 +1443,19 @@
                                     <span class="name">{{ translate('messages.contact') }}</span>
                                     <a class="deco-none info" href="tel:{{ data_get($address,'contact_person_number', translate('messages.N/A'))  }}">
                                         {{ data_get($address,'contact_person_number', translate('messages.N/A')) }}</a>
-                                    @if ( data_get($address,'house') != '')
-                                        <span class="name">{{ translate('House') }}</span> <span
-                                            class="info">{{data_get($address,'house', translate('messages.N/A')) }}</span>
-                                    @endif
-                                    @if (data_get($address,'floor') != '')
-                                        <span class="name">{{ translate('Floor') }}</span> <span
-                                            class="info">{{ data_get($address,'floor', translate('messages.N/A'))  }}</span>
-                                    @endif
+                                            @if ( data_get($address,'house') != '')
+                                                <span class="name">{{ translate('House') }}</span> <span
+                                                class="info">{{data_get($address,'house', translate('messages.N/A')) }}</span>
+                                            @endif
+                                            @if (data_get($address,'floor') != '')
+                                                <span class="name">{{ translate('Floor') }}</span> <span
+                                                class="info">{{ data_get($address,'floor', translate('messages.N/A'))  }}</span>
+                                            @endif
 
-                                    @if ( data_get($address,'road') != '')
-                                        <span class="name">{{ translate('Road') }}</span> <span
-                                            class="info">{{ data_get($address,'road', translate('messages.N/A')) }}</span>
-                                    @endif
+                                            @if ( data_get($address,'road') != '')
+                                                <span class="name">{{ translate('Road') }}</span> <span
+                                                class="info">{{ data_get($address,'road', translate('messages.N/A')) }}</span>
+                                            @endif
 
                                     <hr class="w-100">
                                     <div>
@@ -1538,29 +1473,6 @@
                                 </div>
                             @endif
                         @endif
-                        {{--                        v2.8.1 start--}}
-                        @if ($order->third_party==true)
-
-                            <hr>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <h5 class="card-title">
-                                <span class="card-header-icon">
-                                    <i class="tio-shop"></i>
-                                </span>
-                                    <span>{{ translate($parcel_order ? 'messages.sender' : 'messages.Third_party_company_info') }}</span>
-                                </h5>
-                            </div>
-
-                            <div class="pt-3">
-                                <div class="pt-2" >{{translate("messages.company_name:")}} <span class="text-dark">{{$order->delivery_company?->company_name}}</span>  </div>
-                                <div class="pt-2" >{{translate("messages.tracking_URL:")}}
-                                    <a href="{{$order->delivery_company?->tracking_url}}" class=""><span class="badge badge-soft-success mt-3 mb-3">{{ translate('messages.click') }}</span></a>
-                                </div>
-                                <div class="pt-2">{{translate("messages.serial_number:")}}  <span class="text-dark">{{$order->delivery_company?->serial_number}}</span> </div>
-                            </div>
-
-                        @endif
-                        {{--                        v2.8.1 end--}}
                     </div>
                 </div>
                 <!-- Customer Card -->
@@ -1634,11 +1546,7 @@
                                 <span class="card-header-icon">
                                     <i class="tio-user"></i>
                                 </span>
-                                @if ($order->parcel_company)
-                                    <span>{{ translate('messages.company_information') }}</span>
-                                @else
-                                    <span>{{ translate('messages.store_information') }}</span>
-                                @endif
+                                <span>{{ translate('messages.store_information') }}</span>
                             </h5>
                             <a class="media align-items-center deco-none resturant--information-single"
                                href="{{ route('admin.store.view', [$order->store['id'],'module_id' => $order->module_id]) }}">
@@ -1695,11 +1603,10 @@
                         <input type="hidden" name="order_id" value="{{ $order->id }}">
                         <input type="text" class="form-control" name="admin_note" value="{{ old('admin_note') }}"
                                placeholder="Fake Order">
-
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">{{  translate('close') }}</button>
-                            <button type="submit" class="btn btn-danger">{{ translate('messages.Confirm_Order Rejection') }} </button>
-                        </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">{{  translate('close') }}</button>
+                    <button type="submit" class="btn btn-danger">{{ translate('messages.Confirm_Order Rejection') }} </button>
                     </form>
                 </div>
             </div>
@@ -1933,7 +1840,6 @@
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-md-5 my-2">
-                            @if(count($deliveryMen) > 0)
                             <ul class="list-group overflow-auto initial--23">
                                 @foreach ($deliveryMen as $dm)
                                     <li class="list-group-item">
@@ -1949,15 +1855,6 @@
                                     </li>
                                 @endforeach
                             </ul>
-                            @else
-                                <ul class="list-group overflow-auto initial--23">
-                                    <li class="list-group-item">
-                                        <span class="dm_list" role='button'>
-                                            No Deliveryman Available for this Order
-                                        </span>
-                                    </li>
-                                </ul>
-                            @endif
                         </div>
                         <div class="col-md-7 modal_body_map">
                             <div class="location-map" id="dmassign-map">
@@ -2114,11 +2011,10 @@
                             <input type="hidden" name="id" value="{{ $order->id }}">
                             <input type="text" required class="form-control" name="note" value="{{ old('note') }}"
                                    placeholder="{{ translate('transaction_id_mismatched') }}">
-
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">{{  translate('close') }}</button>
-                                <button type="submit" class="btn btn--danger btn-outline-danger">{{ translate('messages.Confirm_Rejection') }} </button>
-                            </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">{{  translate('close') }}</button>
+                        <button type="submit" class="btn btn--danger btn-outline-danger">{{ translate('messages.Confirm_Rejection') }} </button>
                         </form>
                     </div>
                 </div>
@@ -2603,48 +2499,6 @@
                     }
                 });
             });
-            // v2.8.1 start
-            $('.route-alert-refund-accept').on('click', function () {
-                // Assuming $reasons is properly populated and contains reasons
-
-                // Create a select dropdown with options using map()
-                var selectOptions = '';
-                selectOptions   += `<option value="with-dm" selected>With Delivery Charge</option>`;
-                selectOptions   += `<option value="without-dm" >With Out Delivery Charge</option>`;
-
-
-                // Generate the Swal modal with the select dropdown
-                Swal.fire({
-                    title: '{{ translate('messages.are_you_sure') }}',
-                    text: '{{ translate('messages.Approve this refund request ?') }}',
-                    type: 'warning',
-                    html: `<select class="form-control js-select2-custom mx-1" name="reason" id="reason">${selectOptions}</select>`,
-                    showCancelButton: true,
-                    cancelButtonColor: 'default',
-                    confirmButtonColor: '#FC6A57',
-                    cancelButtonText: '{{ translate('messages.no') }}',
-                    confirmButtonText: '{{ translate('messages.yes') }}',
-                    reverseButtons: true,
-                    onOpen: function () {
-                        // Initialize select2 after the modal is opened
-                        $('.js-select2-custom').select2({
-                            minimumResultsForSearch: 5,
-                            width: '100%',
-                            placeholder: "Select A Method",
-                            language: "en",
-                        });
-                    }
-                }).then((result) => {
-                    if (result.value) {
-                        // On confirmation, get the selected reason and redirect
-                        var reason = $('#reason').val();
-
-                        // Redirect the user to the generated URL
-                        window.location.href = $(this).attr('data-url')+'&method='+reason;
-                    }
-                });
-            });
-            // v2.8.1 end
         });
     </script>
     <script>

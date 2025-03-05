@@ -59,16 +59,10 @@
                                     </div>
                                     <div class="col-md-3 col-12">
                                         <div class="form-floating">
-                                            <label>
-                                                <span>{{ translate('messages.field_name')}}</span>
-                                                <span class="form-label-secondary text-danger " data-toggle="tooltip" data-placement="right" data-original-title="Recommended structure is multi_word. No special character and dot(.)">
-                                                    <img src="http://127.0.0.1:8000/public/assets/admin/img/info-circle.svg" alt="Customer verification toggle">
-                                                </span>
-
-                                                <span
-                                                    class="input-label-secondary text-danger">*</span></label>
+                                            <label>{{ translate('messages.field_name')}} <span
+                                            class="input-label-secondary text-danger">*</span></label>
                                             <input type="text" class="form-control" name="field_name[]"
-                                                   placeholder="{{ translate('messages.Ex:_Account_name')}} " value="" required>
+                                                    placeholder="{{ translate('messages.Ex:_Account_name')}} " value="" required>
                                         </div>
                                     </div>
                                     <div class="col-md-3 col-12">
@@ -136,9 +130,7 @@
                                 </div>
                                 <div class="col-md-3 col-12">
                                     <div class="form-floating">
-                                        <label>{{ translate('messages.field_name')}}<span class="form-label-secondary text-danger " data-toggle="tooltip" data-placement="right" data-original-title="Recommended structure is multi_word. No special character and dot(.)">
-                                                    <img src="http://127.0.0.1:8000/public/assets/admin/img/info-circle.svg" alt="Customer verification toggle">
-                                                </span> <span
+                                        <label>{{ translate('messages.field_name')}} <span
                                             class="input-label-secondary text-danger">*</span></label>
                                         <input type="text" class="form-control" name="field_name[]"
                                             placeholder="{{ translate('messages.Ex:_Bank')}}" value="" required>

@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Validator;
 
 class AdvertisementController extends Controller
 {
-    // v2.8.1 checked
+
     public function index(Request $request)
     {
         $store_id = $request?->vendor?->stores[0]?->id;

@@ -18,7 +18,7 @@
 
                     {{ translate('zone' )}} - {{ $data['zone']??translate('all') }}
                     <br>
-                        {{ (isset($data['module_type']) && $data['module_type'] == 'rental')?translate('provider'):translate('vendor')}} - {{ $data['store']??translate('all') }}
+                    {{ (isset($data['module_type']) && $data['module_type'] == 'rental')?translate('provider'):translate('vendor')}} - {{ $data['store']??translate('all') }}
                     @if (!isset($data['type']) )
                     <br>
                     {{ translate('customer' )}} - {{ $data['customer']??translate('all') }}
@@ -45,7 +45,7 @@
         <tr>
             <th>{{ translate('sl') }}</th>
             @if (isset($data['module_type']))
-                <th>{{$data['module_type'] == 'rental'? translate('trip_id') : translate('messages.order_id') }}</th>
+            <th>{{$data['module_type'] == 'rental'? translate('trip_id') : translate('messages.order_id') }}</th>
             @elseif(addon_published_status('Rental'))
                 <th>{{ translate('messages.order_id') }}</th>
                 <th>{{ translate('trip_id') }}</th>

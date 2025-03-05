@@ -19,7 +19,6 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use App\Traits\ReportFilter;
-
 use Modules\Rental\Entities\Trips;
 use Modules\Rental\Entities\TripTransaction;
 use Modules\Rental\Entities\Vehicle;
@@ -67,6 +66,7 @@ use Modules\Rental\Entities\VehicleReview;
  * @property int $order_count
  * @property int $total_order
  * @property int $module_id
+ * @property string $pickup_zone_id
  * @property int $order_place_to_schedule_interval
  * @property bool $featured
  * @property float $per_km_shipping_charge
@@ -79,6 +79,7 @@ use Modules\Rental\Entities\VehicleReview;
  * @property string|null $meta_image
  * @property bool $announcement
  * @property string|null $announcement_message
+ * @property string|null $comment
  */
 
 class Store extends Model
@@ -124,6 +125,7 @@ class Store extends Model
         'order_count',
         'total_order',
         'module_id',
+        'pickup_zone_id',
         'order_place_to_schedule_interval',
         'featured',
         'per_km_shipping_charge',
@@ -136,6 +138,7 @@ class Store extends Model
         'meta_image',
         'announcement',
         'announcement_message',
+        'comment',
     ];
 
     /**
@@ -176,7 +179,6 @@ class Store extends Model
         'announcement'=>'integer',
         'rating_count'=>'integer',
         'reviews_comments_count'=>'integer',
-        'per_kg_charge'=>'float',   // v2.8.1
         'package_id'=>'integer',
         'distance' => 'float',
     ];
@@ -267,6 +269,10 @@ class Store extends Model
         }
         return 0;
     }
+    public function getModuleTypeAttribute(): mixed
+    {
+        return $this->module?->module_type;
+    }
     public function getProductUploaadCheckAttribute(): mixed
     {
         if( $this->store_business_model == 'subscription' && isset($this->store_sub) ){
@@ -320,6 +326,14 @@ class Store extends Model
         }
 
         return Helpers::get_full_url('store',$value,'public');
+    }
+
+    /**
+     * @return BelongsTo
+     */
+    public function package(): BelongsTo
+    {
+        return $this->belongsTo(SubscriptionPackage::class,'package_id');
     }
 
     /**
@@ -431,6 +445,8 @@ class Store extends Model
     {
         return $this->hasMany(Trips::class, 'provider_id');
     }
+
+
     public function todays_trip_earning()
     {
         return $this->hasMany(TripTransaction::class, 'provider_id')->whereDate('created_at',now());
@@ -446,6 +462,7 @@ class Store extends Model
         return $this->hasMany(TripTransaction::class, 'provider_id')->whereMonth('created_at', date('m'))->whereYear('created_at', date('Y'));
     }
 
+
     /**
      * @return HasOne
      */
@@ -460,6 +477,12 @@ class Store extends Model
     public function zone(): BelongsTo
     {
         return $this->belongsTo(Zone::class);
+    }
+
+
+    public function getPickupZones()
+    {
+        return Zone::whereIn('id', json_decode($this->pickup_zone_id))->get();
     }
 
     /**
@@ -525,7 +548,7 @@ class Store extends Model
      */
     public function getRatingAttribute($value): array
     {
-        $ratings = json_decode($value, true);
+        $ratings = $value ? json_decode($value, true) : [];
         $rating5 = $ratings?$ratings[5]:0;
         $rating4 = $ratings?$ratings[4]:0;
         $rating3 = $ratings?$ratings[3]:0;
@@ -560,13 +583,13 @@ class Store extends Model
         return $query->where('module_id', $module_id);
     }
 
-
     public function scopeWithModuleType($query, $moduleType)
     {
         return $query->whereHas('module', function ($q) use ($moduleType) {
             $q->where('module_type', $moduleType);
         });
     }
+
 
     /**
      * @param $query
@@ -665,14 +688,16 @@ class Store extends Model
         });
 
         static::retrieved(function () {
+            // Helpers::disableStoreForOrderCancellation();
             $current_date = date('Y-m-d');
-            $check_daily_subscription_validity_check= BusinessSetting::where('key', 'check_daily_subscription_validity_check')->first();
+            $check_daily_subscription_validity_check=  Helpers::getSettingsDataFromConfig(settings: 'check_daily_subscription_validity_check');
             if(!$check_daily_subscription_validity_check){
                 Helpers::insert_business_settings_key('check_daily_subscription_validity_check', $current_date);
                 $check_daily_subscription_validity_check= BusinessSetting::where('key', 'check_daily_subscription_validity_check')->first();
             }
 
             if($check_daily_subscription_validity_check && $check_daily_subscription_validity_check?->value != $current_date){
+
                 Store::whereHas('store_subs',function ($query)use($current_date){
                     $query->where('status',1)->whereDate('expiry_date', '<=', $current_date);
                 })->update(['status' => 0,
@@ -753,20 +778,6 @@ class Store extends Model
         return $this->morphMany(Storage::class, 'data');
     }
 
-    // v2.8.1 code starts
-    public function scopeIsStore($query): mixed
-    {
-        return $query->where('store_type', 'store');
-    }
-    public function scopeCompany($query): mixed
-    {
-        return $query->where(['store_type' => 'company','self_parcel_delivery' => 1]);
-    }
-    public function disbursmentWithdrawalMethods()
-    {
-        return $this->hasMany(DisbursementWithdrawalMethod::class);
-    }
-    // v2.8.1 code ends
 
     /**
      * @return void
@@ -778,12 +789,6 @@ class Store extends Model
             $store->slug = $store->generateSlug($store->name);
             $store->save();
         });
-        static::deleting(function ($store){ // v2.8.1
-            if (!empty($store->disbursmentWithdrawalMethods))   // v2.8.1
-            {
-                $store->disbursmentWithdrawalMethods->each->delete();   // v2.8.1
-            }
-        }); // v2.8.1
         static::saved(function ($model) {
             if($model->isDirty('logo')){
                 $value = Helpers::getDisk();
@@ -836,6 +841,7 @@ class Store extends Model
         return $this->hasOne(StoreConfig::class);
     }
 
+
     /**
      * Get all of the comments for the Store
      *
@@ -854,6 +860,8 @@ class Store extends Model
     {
         return $this->hasMany(VehicleDriver::class,'provider_id');
     }
+
+
 
         /**
      * @param $query

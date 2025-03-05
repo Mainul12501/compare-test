@@ -24,7 +24,6 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class EmployeeController extends BaseController
 {
-    // v2.8.1 checked
     public function __construct(
         protected EmployeeRepositoryInterface $employeeRepo,
         protected CustomRoleRepositoryInterface $roleRepo,

@@ -17,7 +17,6 @@ use App\Http\Requests\Admin\AdvertisementUpdateRequest;
 
 class AdvertisementController extends Controller
 {
-    // v2.8.1 checked
     /**
      * Display a listing of the resource.
      */

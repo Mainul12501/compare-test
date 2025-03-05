@@ -10,7 +10,6 @@ use Brian2694\Toastr\Facades\Toastr;
 
 class WithdrawalMethodController extends Controller
 {
-    // v2.8.1 checked
     protected WithdrawalMethod $withdrawal_method;
 
     public function __construct(WithdrawalMethod $withdrawal_method)

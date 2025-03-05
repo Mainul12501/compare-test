@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Discount extends Model
 {
     use HasFactory;
-    
+
     protected $fillable = [
         'start_date','end_date','start_time','end_time','min_purchase','max_discount','discount','discount_type','store_id',
     ];

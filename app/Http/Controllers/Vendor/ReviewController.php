@@ -12,7 +12,6 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class ReviewController extends Controller
 {
-    // v2.8.1 checked
     public function index(Request $request)
     {
         $key = explode(' ', $request['search']);

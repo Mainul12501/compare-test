@@ -10,22 +10,17 @@ use Illuminate\Routing\Redirector;
 use Illuminate\Contracts\View\View;
 use App\Http\Controllers\Controller;
 use Brian2694\Toastr\Facades\Toastr;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Contracts\View\Factory;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Contracts\Foundation\Application;
-use App\CentralLogics\SMS_module;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
-use Modules\Gateways\Traits\SmsGateway;
 
 class AddonController extends Controller
 {
-    // v2.8.1 checked
     public function __construct(){
         if (is_dir('Modules\Gateways\Traits') && trait_exists('Modules\Gateways\Traits\SmsGateway')) {
             $this->extendWithSmsGatewayTrait();
@@ -97,6 +92,10 @@ class AddonController extends Controller
 
     public function activation(Request $request): Redirector|RedirectResponse|Application
     {
+        if (env('APP_MODE') == 'demo') {
+            Toastr::info(translate('messages.update_option_is_disable_for_demo'));
+            return back();
+        }
         $remove = ["http://", "https://", "www."];
         $url = str_replace($remove, "", url('/'));
         $full_data = include($request['path'] . '/Addon/info.php');
@@ -178,6 +177,10 @@ class AddonController extends Controller
     }
 
     public function delete_theme(Request $request){
+        if (env('APP_MODE') == 'demo') {
+            Toastr::info(translate('messages.update_option_is_disable_for_demo'));
+            return back();
+        }
         $path = $request->path;
 
         $full_path = base_path($path);

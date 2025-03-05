@@ -45,9 +45,10 @@ class ConfigController extends Controller
     {
         $key = ['currency_code', 'cash_on_delivery', 'digital_payment', 'default_location', 'free_delivery_over', 'business_name', 'logo', 'address', 'phone', 'email_address', 'country', 'currency_symbol_position', 'app_minimum_version_android', 'app_url_android', 'app_minimum_version_ios', 'app_url_ios', 'app_url_android_store', 'app_minimum_version_ios_store', 'app_url_ios_store', 'app_minimum_version_ios_deliveryman', 'app_url_ios_deliveryman', 'app_minimum_version_android_deliveryman', 'app_minimum_version_android_store', 'app_url_android_deliveryman', 'customer_verification', 'schedule_order', 'order_delivery_verification', 'per_km_shipping_charge', 'minimum_shipping_charge', 'show_dm_earning', 'canceled_by_deliveryman', 'canceled_by_store', 'timeformat', 'toggle_veg_non_veg', 'toggle_dm_registration', 'toggle_store_registration', 'schedule_order_slot_duration', 'parcel_per_km_shipping_charge', 'parcel_minimum_shipping_charge', 'web_app_landing_page_settings', 'footer_text', 'landing_page_links', 'loyalty_point_exchange_rate', 'loyalty_point_item_purchase_point', 'loyalty_point_status', 'loyalty_point_minimum_point', 'wallet_status', 'dm_tips_status', 'ref_earning_status', 'ref_earning_exchange_rate', 'refund_active_status', 'refund', 'cancelation', 'shipping_policy', 'prescription_order_status', 'tax_included', 'icon', 'cookies_text', 'home_delivery_status', 'takeaway_status', 'additional_charge', 'additional_charge_status', 'additional_charge_name', 'dm_picture_upload_status', 'partial_payment_status', 'partial_payment_method', 'add_fund_status', 'offline_payment_status', 'websocket_url', 'websocket_port', 'websocket_status', 'guest_checkout_status', 'disbursement_type', 'restaurant_disbursement_waiting_time', 'dm_disbursement_waiting_time', 'min_amount_to_pay_store', 'min_amount_to_pay_dm', 'admin_commission',
             'new_customer_discount_status', 'new_customer_discount_amount', 'new_customer_discount_amount_type', 'new_customer_discount_amount_validity', 'new_customer_discount_validity_type', 'store_review_reply', 'subscription_business_model', 'commission_business_model', 'subscription_deadline_warning_days', 'subscription_deadline_warning_message', 'subscription_free_trial_days', 'subscription_free_trial_type', 'subscription_free_trial_status', 'country_picker_status', 'firebase_otp_verification', 'manual_login_status','otp_login_status','social_login_status','google_login_status','facebook_login_status','apple_login_status','email_verification_status','phone_verification_status'
-
-
         ];
+        
+        $vehicle_distance_min=0;
+        $vehicle_hourly_min=0;
 
         $drivemondExternalSetting = false;
 //        if (Helpers::checkSelfExternalConfiguration()) {
@@ -66,6 +67,8 @@ class ConfigController extends Controller
 //            }
 //
 //        }
+
+
 
         $cacheKey = 'business_settings_config_keys';
         $settings = Cache::rememberForever($cacheKey, function () use ($key) {
@@ -161,9 +164,6 @@ class ConfigController extends Controller
             'plugin_payment_gateways' => (boolean)($published_status ? true : false),
             'default_payment_gateways' => (boolean)($published_status ? false : true)
         );
-        $awsUrl = config('filesystems.disks.s3.url');   // v2.8.1
-        $awsBucket = config('filesystems.disks.s3.bucket'); // v2.8.1
-        $awsBaseURL = rtrim($awsUrl, '/').'/'.ltrim($awsBucket.'/');    // v2.8.1
 
         if (data_get($settings, 'subscription_free_trial_type') == 'year') {
             $trial_period = data_get($settings, 'subscription_free_trial_days') > 0 ? data_get($settings, 'subscription_free_trial_days') / 365 : 0;
@@ -183,7 +183,6 @@ class ConfigController extends Controller
                 return Vehicle::where('hourly_price' ,'>','0')->min('hourly_price');
             });
         }
-
         return response()->json([
             'business_name' => $settings['business_name'],
             // 'business_open_time' => $settings['business_open_time'],
@@ -195,56 +194,6 @@ class ConfigController extends Controller
             'email' => $settings['email_address'],
             // 'store_location_coverage' => Branch::where(['id'=>1])->first(['longitude','latitude','coverage']),
             // 'minimum_order_value' => (float)$settings['minimum_order_value'],
-
-            'base_urls' => [    // v2.8.1
-                'item_image_url' => asset('storage/app/public/product'),    // v2.8.1
-                'refund_image_url' => asset('storage/app/public/refund'),   // v2.8.1
-                'customer_image_url' => asset('storage/app/public/profile'),    // v2.8.1
-                'banner_image_url' => asset('storage/app/public/banner'),   // v2.8.1
-                'category_image_url' => asset('storage/app/public/category'),   // v2.8.1
-                'brand_image_url' => asset('storage/app/public/brand'), // v2.8.1
-                'review_image_url' => asset('storage/app/public/review'),   // v2.8.1
-                'notification_image_url' => asset('storage/app/public/notification'),   // v2.8.1
-                'store_image_url' => asset('storage/app/public/store'), // v2.8.1
-                'vendor_image_url' => asset('storage/app/public/vendor'),   // v2.8.1
-                'store_cover_photo_url' => asset('storage/app/public/store/cover'), // v2.8.1
-                'delivery_man_image_url' => asset('storage/app/public/delivery-man'),   // v2.8.1
-                'chat_image_url' => asset('storage/app/public/conversation'),   // v2.8.1
-                'campaign_image_url' => asset('storage/app/public/campaign'),   // v2.8.1
-                'business_logo_url' => asset('storage/app/public/business'),    // v2.8.1
-                'order_attachment_url' => asset('storage/app/public/order'),    // v2.8.1
-                'module_image_url' => asset('storage/app/public/module'),   // v2.8.1
-                'parcel_category_image_url' => asset('storage/app/public/parcel_category'), // v2.8.1
-                'landing_page_image_url' => asset('public/assets/landing/image'),   // v2.8.1
-                'react_landing_page_images' => asset('storage/app/public/react_landing') ,  // v2.8.1
-                'react_landing_page_feature_images' => asset('storage/app/public/react_landing/feature') ,  // v2.8.1
-                'gateway_image_url' => asset('storage/app/public/payment_modules/gateway_image'),   // v2.8.1
-            ],  // v2.8.1
-            's3_base_urls' => [     // v2.8.1
-                'item_image_url' => $awsBaseURL.'product',      // v2.8.1
-                'refund_image_url' => $awsBaseURL.'refund',     // v2.8.1
-                'customer_image_url' => $awsBaseURL.'profile',      // v2.8.1
-                'banner_image_url' => $awsBaseURL.'banner',     // v2.8.1
-                'category_image_url' => $awsBaseURL.'category',     // v2.8.1
-                'brand_image_url' => $awsBaseURL.'brand',       // v2.8.1
-                'review_image_url' => $awsBaseURL.'review',     // v2.8.1
-                'notification_image_url' => $awsBaseURL.'notification',     // v2.8.1
-                'store_image_url' => $awsBaseURL.'store',       // v2.8.1
-                'vendor_image_url' => $awsBaseURL.'vendor',     // v2.8.1
-                'store_cover_photo_url' => $awsBaseURL.'store/cover',       // v2.8.1
-                'delivery_man_image_url' => $awsBaseURL.'delivery-man',     // v2.8.1
-                'chat_image_url' => $awsBaseURL.'conversation',     // v2.8.1
-                'campaign_image_url' => $awsBaseURL.'campaign',     // v2.8.1
-                'business_logo_url' => $awsBaseURL.'business',      // v2.8.1
-                'order_attachment_url' => $awsBaseURL.'order',      // v2.8.1
-                'module_image_url' => $awsBaseURL.'module',     // v2.8.1
-                'parcel_category_image_url' => $awsBaseURL.'parcel_category',       // v2.8.1
-                'landing_page_image_url' => $awsBaseURL.'landing/image',        // v2.8.1
-                'react_landing_page_images' => $awsBaseURL.'react_landing',     // v2.8.1
-                'react_landing_page_feature_images' => $awsBaseURL.'react_landing/feature',     // v2.8.1
-                'gateway_image_url' => $awsBaseURL.'payment_modules/gateway_image',     // v2.8.1
-            ],      // v2.8.1
-
             'country' => $settings['country'],
             'default_location' => ['lat' => $default_location ? $default_location['lat'] : '23.757989', 'lng' => $default_location ? $default_location['lng'] : '90.360587'],
             'currency_symbol' => $currency_symbol,
@@ -334,8 +283,6 @@ class ConfigController extends Controller
             'dm_disbursement_waiting_time' => (int)(isset($settings['dm_disbursement_waiting_time']) ? $settings['dm_disbursement_waiting_time'] : 0),
             'min_amount_to_pay_store' => (float)(isset($settings['min_amount_to_pay_store']) ? $settings['min_amount_to_pay_store'] : 0),
             'min_amount_to_pay_dm' => (float)(isset($settings['min_amount_to_pay_dm']) ? $settings['min_amount_to_pay_dm'] : 0),
-            'dm_agreement' => (boolean) (isset($settings['dm_agreement']) ?1  : 0), // v2.8.1
-            'store_agreement' => (boolean) (isset($settings['store_agreement']) ?1 : 0),    // v2.8.1
             'new_customer_discount_status' => (int)(isset($settings['new_customer_discount_status']) ? $settings['new_customer_discount_status'] : 0),
             'new_customer_discount_amount' => (float)(isset($settings['new_customer_discount_amount']) ? $settings['new_customer_discount_amount'] : 0),
             'new_customer_discount_amount_type' => (isset($settings['new_customer_discount_amount_type']) ? $settings['new_customer_discount_amount_type'] : 'amount'),
@@ -367,6 +314,8 @@ class ConfigController extends Controller
                 'phone_verification_status' => (int)(isset($settings['phone_verification_status']) ? $settings['phone_verification_status'] : 0),
             ],
 
+            'vehicle_distance_min' =>(float) $vehicle_distance_min?? 0,
+            'vehicle_hourly_min' => (float) $vehicle_hourly_min?? 0,
         ]);
     }
 
@@ -436,12 +385,28 @@ class ConfigController extends Controller
             'origin_lng' => 'required',
             'destination_lat' => 'required',
             'destination_lng' => 'required',
+            'mode' => 'nullable|in:driving,walking',
         ]);
 
         if ($validator->errors()->count() > 0) {
             return response()->json(['errors' => Helpers::error_processor($validator)], 403);
         }
-        $response = Http::get('https://maps.googleapis.com/maps/api/distancematrix/json?origins=' . $request['origin_lat'] . ',' . $request['origin_lng'] . '&destinations=' . $request['destination_lat'] . ',' . $request['destination_lng'] . '&key=' . $this->map_api_key . '&mode=walking');
+        // $response = Http::get('https://maps.googleapis.com/maps/api/distancematrix/json?origins=' . $request['origin_lat'] . ',' . $request['origin_lng'] . '&destinations=' . $request['destination_lat'] . ',' . $request['destination_lng'] . '&key=' . $this->map_api_key . '&mode=walking');
+
+        $originLat = $request['origin_lat'] ?? null;
+        $originLng = $request['origin_lng'] ?? null;
+        $destinationLat = $request['destination_lat'] ?? null;
+        $destinationLng = $request['destination_lng'] ?? null;
+        $mode = $request['mode'] ?? 'walking';
+        $apiUrl = 'https://maps.googleapis.com/maps/api/distancematrix/json';
+        $queryParams = [
+            'origins' => "$originLat,$originLng",
+            'destinations' => "$destinationLat,$destinationLng",
+            'key' => $this->map_api_key,
+            'mode' => $mode
+        ];
+
+        $response = Http::get($apiUrl, $queryParams);
         return $response->json();
     }
 
@@ -496,17 +461,15 @@ class ConfigController extends Controller
             ]);
     }
 
-    public function extra_charge_2_12(Request $request)
+    public function extra_charge(Request $request)
     {
         $validator = Validator::make($request->all(), [
-//            'distance' => 'required',
-            'weight' => 'required',     // v2.8.1
+            'distance' => 'required',
         ]);
         if ($validator->errors()->count() > 0) {
             return response()->json(['errors' => Helpers::error_processor($validator)], 403);
         }
         $distance_data = $request->distance ?? 1;
-        $weight = $request->weight ?? 1;    // v2.8.1
         $data = DmVehicle::active()
             ->where(function ($query) use ($distance_data) {
                 $query->where('starting_coverage_area', '<=', $distance_data)->where('maximum_coverage_area', '>=', $distance_data)
@@ -518,27 +481,6 @@ class ConfigController extends Controller
         $extra_charges = (float)(isset($data) ? $data->extra_charges : 0);
         return response()->json($extra_charges, 200);
     }
-    // v2.8.1 full function
-    public function extra_charge(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'weight' => 'required',
-        ]);
-        if ($validator->errors()->count() > 0) {
-            return response()->json(['errors' => Helpers::error_processor($validator)], 403);
-        }
-        $weight = $request->weight ?? 1;
-        $data = DmVehicle::active()
-            ->where(function ($query) use ($weight) {
-                $query->where('minimum_weight', '<=', $weight)->where('maximum_weight', '>=', $weight)
-                    ->orWhere(function ($query) use ($weight) {
-                        $query->where('minimum_weight', '>=', $weight);
-                    });
-            })->orderBy('minimum_weight')->first();
-
-        $extra_charges = (float) (isset($data) ? $data->extra_charges  : 0);
-        return response()->json($extra_charges,200);
-    }
 
     public function get_vehicles(Request $request)
     {
@@ -548,7 +490,7 @@ class ConfigController extends Controller
 
     public function react_landing_page()
     {
-        $datas = DataSetting::with('translations')->where('type', 'react_landing_page')->get();
+        $datas = DataSetting::with('translations')->whereIn('type', ['react_landing_page' ,'module_home_page_data','module_vendor_registration_data'])->get();
         $data = [];
         foreach ($datas as $key => $value) {
             if (count($value->translations) > 0) {
@@ -658,6 +600,22 @@ class ConfigController extends Controller
                 'available_zone_image' => (isset($settings['available_zone_image'])) ? $settings['available_zone_image'] : null,
                 'available_zone_image_full_url' => Helpers::get_full_url('available_zone_image', (isset($settings['available_zone_image'])) ? $settings['available_zone_image'] : null, (isset($settings['available_zone_image_storage'])) ? $settings['available_zone_image_storage'] : 'public'),
                 'available_zone_list' => $zones,
+
+
+
+                'module_home_page_data_title' => (isset($settings['module_home_page_data_title'])) ? $settings['module_home_page_data_title'] : null,
+                'module_home_page_data_sub_title' => (isset($settings['module_home_page_data_sub_title'])) ? $settings['module_home_page_data_sub_title'] : null,
+                'module_home_page_data_image' => isset($settings['module_home_page_data_image'])?
+
+                Helpers::get_full_url('react_landing', $settings['module_home_page_data_image']?? '', $settings['module_home_page_data_image_storage']?? 'public','upload_image_1' ) : '',
+
+                'module_vendor_registration_data_title' => (isset($settings['module_vendor_registration_data_title'])) ? $settings['module_vendor_registration_data_title'] : null,
+                'module_vendor_registration_data_sub_title' => (isset($settings['module_vendor_registration_data_sub_title'])) ? $settings['module_vendor_registration_data_sub_title'] : null,
+                'module_vendor_registration_data_button_title' => (isset($settings['module_vendor_registration_data_button_title'])) ? $settings['module_vendor_registration_data_button_title'] : null,
+                'module_vendor_registration_data_image' =>
+                isset($settings['module_vendor_registration_data_image'])?
+                Helpers::get_full_url('react_landing', $settings['module_vendor_registration_data_image']?? '', $settings['module_vendor_registration_data_image_storage']?? 'public','upload_image_1' ) : '',
+
             ]);
     }
 
@@ -828,4 +786,19 @@ class ConfigController extends Controller
         return $data;
     }
 
+    public function direction_api(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'origin_lat' => 'required',
+            'origin_lng' => 'required',
+            'destination_lat' => 'required',
+            'destination_lng' => 'required',
+        ]);
+
+        if ($validator->errors()->count() > 0) {
+            return response()->json(['errors' => Helpers::error_processor($validator)], 403);
+        }
+        $response = Http::get('https://maps.googleapis.com/maps/api/directions/json?origin=' . $request['origin_lat'] . ',' . $request['origin_lng'] . '&destination=' . $request['destination_lat'] . ',' . $request['destination_lng'] . '&key=' . $this->map_api_key . '&mode=driving');
+        return $response->json();
+    }
 }

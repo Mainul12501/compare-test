@@ -15,7 +15,6 @@ use Illuminate\Support\Facades\Validator;
 
 class ConversationController extends Controller
 {
-    // v2.8.1 checked
     public function list(Request $request)
     {
         $conversations = Conversation::with(['sender', 'receiver', 'last_message'])->WhereUserType('admin');

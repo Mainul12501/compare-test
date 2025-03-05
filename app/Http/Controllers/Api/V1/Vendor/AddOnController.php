@@ -12,7 +12,6 @@ use App\Models\Translation;
 
 class AddOnController extends Controller
 {
-    // v2.8.1 checked
     public function list(Request $request)
     {
         $vendor = $request['vendor'];

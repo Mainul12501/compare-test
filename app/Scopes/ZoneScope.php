@@ -38,6 +38,9 @@ class ZoneScope implements Scope
                         return $query->where('zone_id', auth('admin')->user()->zone_id);
                     });
                     break;
+                case 'App\Models\OrderTransaction':
+                    $builder->where('zone_id', auth('admin')->user()->zone_id);
+                    break;
 
                 case 'App\Models\Store':
                     $builder->where('zone_id', auth('admin')->user()->zone_id);

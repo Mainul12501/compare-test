@@ -10,11 +10,12 @@ use App\Models\Store;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
+
 class Vendor extends Authenticatable
 {
     use Notifiable;
 
-    protected $fillable = ['remember_token'];
+    protected $guarded = ['id'];
 
     protected $casts = [
         'created_at' => 'datetime',
@@ -39,6 +40,12 @@ class Vendor extends Authenticatable
 
         return Helpers::get_full_url('vendor',$value,'public');
     }
+
+    public function scopeOfStatus($query, $status): void
+    {
+        $query->where('status', '=', $status);
+    }
+
     public function order_transaction()
     {
         return $this->hasMany(OrderTransaction::class);
@@ -82,6 +89,10 @@ class Vendor extends Authenticatable
     public function stores()
     {
         return $this->hasMany(Store::class);
+    }
+    public function store()
+    {
+        return $this->hasOne(Store::class);
     }
     public function withdrawrequests()
     {

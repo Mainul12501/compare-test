@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Validator;
 
 class ExternalConfigurationController extends Controller
 {
-    // v2.8.1 checked
     public function getConfiguration()
     {
         $name = BusinessSetting::where('key', 'business_name')->first();

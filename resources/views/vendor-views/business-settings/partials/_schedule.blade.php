@@ -5,7 +5,7 @@ foreach ($store->schedules as $schedule)
     $data[$schedule->day][]=['id'=>$schedule->id,'start_time'=>$schedule->opening_time, 'end_time'=>$schedule->closing_time];
 }
 ?>
-<div class="schedule-item">
+<div class="schedule-item p-20px py-0">
     <span class="btn">{{translate('messages.monday')}} :</span>
     <div class="schedult-date-content">
         @if(isset($data['1']) && count($data['1']))
@@ -41,7 +41,7 @@ foreach ($store->schedules as $schedule)
     </div>
 </div>
 
-<div class="schedule-item">
+<div class="schedule-item p-20px py-0">
     <span class="btn">{{translate('messages.tuesday')}} :</span>
     <div class="schedult-date-content">
         @if(isset($data['2']) && count($data['2']))
@@ -77,7 +77,7 @@ foreach ($store->schedules as $schedule)
     </div>
 </div>
 
-<div class="schedule-item">
+<div class="schedule-item p-20px py-0">
     <span class="btn">{{translate('messages.wednesday')}} :</span>
     <div class="schedult-date-content">
         @if(isset($data['3']) && count($data['3']))
@@ -113,7 +113,7 @@ foreach ($store->schedules as $schedule)
     </div>
 </div>
 
-<div class="schedule-item">
+<div class="schedule-item p-20px py-0">
     <span class="btn">{{translate('messages.thursday')}} :</span>
     <div class="schedult-date-content">
         @if(isset($data['4']) && count($data['4']))
@@ -149,7 +149,7 @@ foreach ($store->schedules as $schedule)
     </div>
 </div>
 
-<div class="schedule-item">
+<div class="schedule-item p-20px py-0">
     <span class="btn">{{translate('messages.friday')}} :</span>
     <div class="schedult-date-content">
         @if(isset($data['5']) && count($data['5']))
@@ -185,7 +185,7 @@ foreach ($store->schedules as $schedule)
     </div>
 </div>
 
-<div class="schedule-item">
+<div class="schedule-item p-20px py-0">
     <span class="btn">{{translate('messages.saturday')}} :</span>
     <div class="schedult-date-content">
         @if(isset($data['6']) && count($data['6']))
@@ -221,7 +221,7 @@ foreach ($store->schedules as $schedule)
     </div>
 </div>
 
-<div class="schedule-item">
+<div class="schedule-item p-20px py-0">
     <span class="btn">{{translate('messages.sunday')}} :</span>
     <div class="schedult-date-content">
         @if(isset($data['0']) && count($data['0']))

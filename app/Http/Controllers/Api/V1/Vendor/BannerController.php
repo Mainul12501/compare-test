@@ -3,15 +3,14 @@
 namespace App\Http\Controllers\Api\V1\Vendor;
 
 use App\Models\Banner;
+use App\Models\Translation;
 use Illuminate\Http\Request;
 use App\CentralLogics\Helpers;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class BannerController extends Controller
 {
-    // v2.8.1 checked
     public function list(Request $request)
     {
         $vendor = $request['vendor'];
@@ -25,7 +24,7 @@ class BannerController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'title' => 'required',
-            'image' => 'required|mimes:jpg,jpeg,png,bmp,tiff|max:2048',
+            'image' => 'required|mimes:webp,jpg,jpeg,png,bmp,tiff|max:2048',
         ]);
 
         if ($validator->fails()) {
@@ -34,8 +33,11 @@ class BannerController extends Controller
 
         $vendor = $request['vendor'];
 
+
+        $data = json_decode($request->translations, true);
+
         $banner = new Banner;
-        $banner->title = $request->title;
+        $banner->title = $data[0]['value'];
         $banner->type = 'store_wise';
         $banner->zone_id = $vendor->stores[0]->zone_id;
         $banner->image = Helpers::upload('banner/', 'png', $request->file('image'));
@@ -44,6 +46,17 @@ class BannerController extends Controller
         $banner->default_link = $request->default_link;
         $banner->created_by = 'store';
         $banner->save();
+
+
+        foreach ($data as $key=>$item) {
+            Translation::updateOrInsert(
+                ['translationable_type' => Banner::class,
+                    'translationable_id' => $banner->id,
+                    'locale' => $item['locale'],
+                    'key' => $item['key']],
+                ['value' => $item['value']]
+            );
+        }
 
         return response()->json(['message' => translate('messages.banner_added_successfully')], 200);
     }
@@ -61,12 +74,24 @@ class BannerController extends Controller
             return response()->json(['errors' => Helpers::error_processor($validator)], 403);
         }
 
-        $vendor = $request['vendor'];
+
+        $data = json_decode($request->translations, true);
+
         $banner = Banner::find($request->id);
-        $banner->title = $request->title;
+        $banner->title = $data[0]['value'];
         $banner->image = $request->has('image') ? Helpers::update('banner/', $banner->image, 'png', $request->file('image')) : $banner->image;
         $banner->default_link = $request->default_link;
         $banner->save();
+
+        foreach ($data as $key=>$item) {
+            Translation::updateOrInsert(
+                ['translationable_type' => Banner::class,
+                    'translationable_id' => $banner->id,
+                    'locale' => $item['locale'],
+                    'key' => $item['key']],
+                ['value' => $item['value']]
+            );
+        }
 
         return response()->json(['message' => translate('messages.banner_updated_successfully')], 200);
     }

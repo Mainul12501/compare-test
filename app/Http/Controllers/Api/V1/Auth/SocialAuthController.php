@@ -22,7 +22,6 @@ use Modules\Gateways\Traits\SmsGateway;
 
 class SocialAuthController extends Controller
 {
-    // v2.8.1 checked
     public function social_register(Request $request)
     {
         $validator = Validator::make($request->all(), [

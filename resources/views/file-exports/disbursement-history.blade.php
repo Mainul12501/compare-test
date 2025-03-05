@@ -12,7 +12,7 @@
                 <th></th>
                 <th>
                     @if($data['type'] == 'store')
-                        {{ translate('Store') }} - {{ $data['store'] }}
+                        {{ translate($data['is_provider'] ? 'Provider' : 'Store') }} - {{ $data['store'] }}
                     @else
                         {{ translate('Delivery_man') }} - {{ $data['delivery_man'] }}
                     @endif

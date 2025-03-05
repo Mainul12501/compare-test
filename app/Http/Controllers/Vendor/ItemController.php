@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Vendor;
 
-use DateTime;
 use Carbon\Carbon;
 use App\Models\Tag;
 use App\Models\Item;
@@ -14,12 +13,10 @@ use App\Models\Nutrition;
 use App\Scopes\StoreScope;
 use App\Models\GenericName;
 use App\Models\TempProduct;
-use App\Models\Translation;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\FlashSaleItem;
 use App\CentralLogics\Helpers;
-use App\Models\BusinessSetting;
 use App\Models\CommonCondition;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
@@ -28,7 +25,6 @@ use App\Models\PharmacyItemDetails;
 use App\Http\Controllers\Controller;
 use App\Models\EcommerceItemDetails;
 use Brian2694\Toastr\Facades\Toastr;
-use Illuminate\Support\Facades\File;
 use Rap2hpoutre\FastExcel\FastExcel;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -77,17 +73,13 @@ class ItemController extends Controller
             'description.*' => 'max:1000',
             'description.0' => 'required',
             'discount' => 'required|numeric|min:0',
-            'weight' =>'required_if:module_type,ecommerce', // v2.8.1
-//            vmw weight modification
-            'vmw_height' => 'required',
-            'vmw_width' => 'required',
-            'vmw_length' => 'required',
         ], [
             'name.0.required' => translate('messages.item_default_name_required'),
             'description.0.required' => translate('messages.item_default_description_required'),
             'category_id.required' => translate('messages.category_required'),
             'description.*.max' => translate('messages.description_length_warning'),
         ]);
+
         if ($request['discount_type'] == 'percent') {
             $dis = ($request['price'] / 100) * $request['discount'];
         } else {
@@ -263,7 +255,7 @@ class ItemController extends Controller
         $food->category_id = $request->sub_category_id?$request->sub_category_id:$request->category_id;
         $food->category_ids = json_encode($category);
         $food->description = $request->description[array_search('default', $request->lang)];
-
+        $food->unit_id = $request?->unit;
         $choice_options = [];
         if ($request->has('choice')) {
             foreach ($request->choice_no as $key => $no) {
@@ -380,14 +372,7 @@ class ItemController extends Controller
         if($module_type == 'grocery'){
             $food->organic = $request->organic ?? 0;
         }
-        $vmw_weight = ($request->vmw_height * $request->vmw_width * $request->vmw_length) / 5000;
-        $food->weight = max($request->weight, $vmw_weight);  // vmw weight modification
-        $food->vmw_height = $request->vmw_height;   // vmw weight modification
-        $food->vmw_width = $request->vmw_width;   // vmw weight modification
-        $food->vmw_length = $request->vmw_length;   // vmw weight modification
-        $food->static_weight = $request->weight;   // vmw weight modification
         $food->is_halal = $request->is_halal ?? 0;
-
         $food->save();
         $food->tags()->sync($tag_ids);
         $food->nutritions()->sync($nutrition_ids);
@@ -423,6 +408,8 @@ class ItemController extends Controller
             $food->save();
             return response()->json(['product_approval' => translate('messages.The_product_will_be_published_once_it_receives_approval_from_the_admin.')], 200);
         }
+
+
         return response()->json(['success' => translate('messages.product_added_successfully')], 200);
     }
 
@@ -441,10 +428,7 @@ class ItemController extends Controller
             Toastr::warning(translate('messages.permission_denied'));
             return back();
         }
-//        if(Helpers::get_store_data()->product_uploaad_check !== null && Helpers::get_store_data()->product_uploaad_check >= 0 && $request->status == 1 ){   // v2.8.1
-//            Toastr::warning(translate('Your_current_package_doesnot_allow_to_activate_more_then_allocated_items_in_your_package') );    // v2.8.1
-//            return back();  // v2.8.1
-//        }   // v2.8.1
+
 
         $temp_product= false;
         if($request->temp_product){
@@ -511,14 +495,6 @@ class ItemController extends Controller
             ]);
         }
 
-        if(Helpers::get_store_data()->product_uploaad_check !== null && Helpers::get_store_data()->product_uploaad_check >= 0 && $request->status == 1 ){   // v2.8.1
-            return response()->json([   // v2.8.1
-                'errors'=>[ // v2.8.1
-                    ['code'=>'unauthorized', 'message'=>translate('messages.Your_current_package_doesnot_allow_to_activate_more_then_allocated_items_in_your_package')] // v2.8.1
-                ]   // v2.8.1
-            ]); // v2.8.1
-        }   // v2.8.1
-
 
         $validator = Validator::make($request->all(), [
             'name' => 'array',
@@ -529,11 +505,6 @@ class ItemController extends Controller
             'description.*' => 'max:1000',
             'description.0' => 'required',
             'discount' => 'required|numeric|min:0',
-            'weight' =>'required_if:module_type,ecommerce', // v2.8.1
-//            vmw height modification
-            'vmw_height' => 'required',
-            'vmw_width' => 'required',
-            'vmw_length' => 'required',
         ], [
             'name.0.required' => translate('messages.item_default_name_required'),
             'description.0.required' => translate('messages.item_default_description_required'),
@@ -607,7 +578,7 @@ class ItemController extends Controller
 
         $p = Item::find($id);
         $p->name = $request->name[array_search('default', $request->lang)];
-
+        $p->unit_id = $request?->unit;
         $category = [];
         if ($request->category_id != null) {
             array_push($category, [
@@ -740,12 +711,6 @@ class ItemController extends Controller
         $p->add_ons = $request->has('addon_ids') ? json_encode($request->addon_ids) : json_encode([]);
         $p->stock = $request->current_stock??0;
         $p->organic = $request->organic ?? 0;
-        $vmw_weight = ($request->vmw_height * $request->vmw_width * $request->vmw_length) / 5000;
-        $p->weight = max($request->weight, $vmw_weight);  // v2.8.1
-        $p->vmw_height = $request->vmw_height;   // vmw weight modification
-        $p->vmw_width = $request->vmw_width;   // vmw weight modification
-        $p->vmw_length = $request->vmw_length;   // vmw weight modification
-        $p->static_weight = $request->weight;   // vmw weight modification
         $p->is_halal = $request->is_halal ?? 0;
 
 
@@ -1068,7 +1033,10 @@ class ItemController extends Controller
                         Toastr::error(translate('messages.Discount_must_be_greater_then_0').' '.$collection['Id']);
                         return back();
                     }
-
+                    if (data_get($collection,'Image') != "" &&  strlen(data_get($collection,'Image')) > 30 ) {
+                        Toastr::error(translate('messages.Image_name_must_be_in_30_char._on_id') . ' ' . $collection['Id']);
+                        return back();
+                    }
                     try{
                         $t1= Carbon::parse($collection['AvailableTimeStarts']);
                         $t2= Carbon::parse($collection['AvailableTimeEnds']) ;
@@ -1158,7 +1126,7 @@ class ItemController extends Controller
                 }
             }catch(\Exception $e){
                 info(["line___{$e->getLine()}",$e->getMessage()]);
-                Toastr::error(translate('messages.failed_to_import_data'));
+                Toastr::error($e->getMessage());
                 return back();
             }
             try{
@@ -1180,10 +1148,7 @@ class ItemController extends Controller
                                 return back();
                             }
                         }
-                        else{   // v2.8.1
-                            Toastr::error(translate('messages.you_have_reached_the_maximum_limit_of_item'));    // v2.8.1
-                            return back();  // v2.8.1
-                        }   // v2.8.1
+
 
                         if ($store_sub->max_product != "unlimited" && $store_sub->max_product > 0 ) {
                             $total_all_items= Item::where('store_id', $store->id)->count();
@@ -1233,7 +1198,7 @@ class ItemController extends Controller
             {
                 DB::rollBack();
                 info(["line___{$e->getLine()}",$e->getMessage()]);
-                Toastr::error(translate('messages.failed_to_import_data'));
+                Toastr::error($e->getMessage());
                 return back();
             }
 
@@ -1261,7 +1226,10 @@ class ItemController extends Controller
                     Toastr::error(translate('messages.Discount_must_be_less_then_100').' '.$collection['Id']);
                     return back();
                 }
-
+                if (data_get($collection,'Image') != "" &&  strlen(data_get($collection,'Image')) > 30 ) {
+                    Toastr::error(translate('messages.Image_name_must_be_in_30_char._on_id') . ' ' . $collection['Id']);
+                    return back();
+                }
                 try{
                     $t1= Carbon::parse($collection['AvailableTimeStarts']);
                     $t2= Carbon::parse($collection['AvailableTimeEnds']) ;
@@ -1352,7 +1320,7 @@ class ItemController extends Controller
             }
         }catch(\Exception $e){
             info(["line___{$e->getLine()}",$e->getMessage()]);
-            Toastr::error(translate('messages.failed_to_import_data'));
+            Toastr::error($e->getMessage());
             return back();
         }
         try{
@@ -1399,7 +1367,7 @@ class ItemController extends Controller
         {
             DB::rollBack();
             info(["line___{$e->getLine()}",$e->getMessage()]);
-            Toastr::error(translate('messages.failed_to_import_data'));
+            Toastr::error($e->getMessage());
             return back();
         }
 
@@ -1689,13 +1657,6 @@ class ItemController extends Controller
         $temp_item->veg = $data->veg ?? 0;
         $temp_item->organic = $data->organic ?? 0;
         $temp_item->is_halal = $request->is_halal ?? 0;
-
-        $temp_item->weight = $data->weight ?? 0;
-        $temp_item->vmw_height = $data->vmw_height ?? 0;        // vmw modification
-        $temp_item->vmw_width = $data->vmw_width ?? 0;      // vmw modification
-        $temp_item->vmw_length = $data->vmw_length ?? 0;        // vmw modification
-        $temp_item->static_weight = $data->static_weight ?? 0;      // vmw modification
-
         $temp_item->basic =  $data->basic ?? 0;
         $temp_item->common_condition_id =  $data->common_condition_id;
         $temp_item->brand_id =  $request->brand_id ?? 0;

@@ -11,7 +11,6 @@ use App\Models\Setting;
 
 class SMSModuleController extends Controller
 {
-    // v2.8.1 checked
     public function sms_index()
     {
         $published_status = addon_published_status('Gateways');
@@ -68,6 +67,7 @@ class SMSModuleController extends Controller
             $additional_data = [
                 'status' => $request['status'],
                 'api_key' => $request['api_key'],
+                'otp_template' => $request['otp_template'] ?? 'Your OTP is: #OTP#',
             ];
         } elseif ($module == 'msg91') {
             $additional_data = [

@@ -25,7 +25,6 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class NotificationController extends BaseController
 {
-    // v2.8.1 checked
     use NotificationTrait;
     public function __construct(
         protected NotificationRepositoryInterface $notificationRepo,

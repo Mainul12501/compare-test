@@ -8,7 +8,7 @@ use App\Http\Controllers\Controller;
 
 class HomeController extends Controller
 {
-    // v2.8.1 checked
+
     public function terms_and_conditions(Request $request)
     {
         $current_language = $request->header('X-localization') ?? 'en';

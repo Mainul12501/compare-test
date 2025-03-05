@@ -276,7 +276,7 @@
                                 <div class="form-floating mb-2" >
                                     <label for="exampleFormControlInput1"
                                            class="form-label">{{translate('logo')}}</label>
-                                    <input type="file" class="form-control logo" name="gateway_image" data-id="{{$payment->key_name}}" id="{{$payment->key_name}}-image" accept=".jpg, .png, .jpeg|image/*">
+                                    <input type="file" class="form-control logo" name="gateway_image" data-id="{{$payment->key_name}}" id="{{$payment->key_name}}-image" accept=".webp, .jpg, .png, .jpeg|image/*">
                                 </div>
 
                                 <div class="text-right mt-2 "  >

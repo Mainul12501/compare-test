@@ -100,12 +100,6 @@
                                         <span>{{ $order->customer?->phone}}</span>
                                     </h5>
                                 @endif
-{{--                                v2.8.1 code start--}}
-                                <h5 class="text-break d-flex">
-                                    <span class="word-nobreak">{{ translate('messages.address') }}</span> <span>:</span>
-                                    <span>{{ isset($order->delivery_address) ? json_decode($order->delivery_address, true)['address'] : '' }}</span>
-                                </h5>
-{{--                                v2.8.1 code end--}}
                             </div>
                         @endif
                     </div>

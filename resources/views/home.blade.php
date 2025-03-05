@@ -811,7 +811,7 @@
 
 
     <!-- ==== Earn Money Section Starts Here ==== -->
-    <section class="earn-money-section">
+    <section class="earn-money-section z-2">
         <div class="container">
             <div class="section-header wow fadeInUp">
                 <h2 class="title">
@@ -827,7 +827,7 @@
             <div class="earn-item wow fadeInUp">
                 <div class="earn-item-img"
                     style="background: url({{ \App\CentralLogics\Helpers::get_full_url('earning', isset($landing_data['earning_seller_image']) ? $landing_data['earning_seller_image'] : null, isset($landing_data['earning_seller_image_storage']) ? $landing_data['earning_seller_image_storage'] : 'public') }}) no-repeat center center / cover;">
-                    <div class="position-relative dropdown text-capitalize">
+                    <div class="position-relative dropdown text-capitalize z-2">
 
 
 
@@ -896,7 +896,7 @@
             <div class="earn-item wow fadeInUp">
                 <div class="earn-item-img"
                     style="background: url({{ \App\CentralLogics\Helpers::get_full_url('earning', isset($landing_data['earning_delivery_image']) ? $landing_data['earning_delivery_image'] : null, isset($landing_data['earning_delivery_image_storage']) ? $landing_data['earning_delivery_image_storage'] : 'public') }}) no-repeat center center / cover;">
-                    <div class="position-relative dropdown text-capitalize">
+                    <div class="position-relative dropdown text-capitalize z-2">
 
                         @if (isset($join_as_dm['playstore_url_status']) &&
                                 $join_as_dm['playstore_url_status'] == '1' &&
@@ -1745,7 +1745,7 @@
     @if (isset($counter) && $counter['status'] == '1')
         <section class="counter-section  mb--186px">
             <div class="container">
-                <div class="counter-wrapper">
+                <div class="counter-wrapper position-relative">
                     <div class="contact-wrapper-inner">
                         <div class="left-side">
                             <div class="counter-item wow fadeInUp">

@@ -256,7 +256,7 @@
     $('.update_quantity').on('click', function (){
         let val = $(this).data('id');
         $.get({
-            url: '{{url('/')}}/store-panel/item/get-variations?id='+val,
+            url: '{{url('/')}}/vendor-panel/item/get-variations?id='+val,
             dataType: 'json',
             success: function (data) {
                console.log(data);

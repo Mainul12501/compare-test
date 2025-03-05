@@ -40,25 +40,23 @@
                                     </div>
                                 </td>
                                 <td>
-                                    @if(isset($item_admin_data))
-                                        @if ($item_admin_data->push_notification_status == 'disable')
-                                            <span class="badge badge-pill badge--info pr-6">  {{ translate('messages.N/A') }}</span>
-                                        @elseif($item_admin_data->push_notification_status == 'inactive')
-                                            <label class="toggle-switch toggle-switch-sm" data-toggle="tooltip" title="{{ translate('This_notification_turned_off_by_admin.')  }}">
-                                                <input type="checkbox"
-                                                       class="status toggle-switch-input dynamic-checkbox"  disabled>
-                                                <span class="toggle-switch-label text">
+                                    @if ($item_admin_data->push_notification_status == 'disable')
+                                        <span class="badge badge-pill badge--info pr-6">  {{ translate('messages.N/A') }}</span>
+                                    @elseif($item_admin_data->push_notification_status == 'inactive')
+                                        <label class="toggle-switch toggle-switch-sm" data-toggle="tooltip" title="{{ translate('This_notification_turned_off_by_admin.')  }}">
+                                            <input type="checkbox"
+                                                    class="status toggle-switch-input dynamic-checkbox"  disabled>
+                                            <span class="toggle-switch-label text">
                                                 <span class="toggle-switch-indicator"></span>
                                             </span>
-                                            </label>
-                                        @endif
+                                        </label>
                                     @else
 
                                         <label class="toggle-switch toggle-switch-sm" data-toggle="tooltip"  @if ($item->push_notification_status  == 'active')
                                             title="{{ translate('Turn_Off_push_notification_for') .' '.translate($item->title)  }}"
-                                               @else
-                                                   title="{{ translate('Turn_On_push_notification_for') .' '.translate($item->title)  }}"
-                                            @endif >
+                                        @else
+                                            title="{{ translate('Turn_On_push_notification_for') .' '.translate($item->title)  }}"
+                                        @endif >
                                             <input type="checkbox"
                                                    id="push_notification_{{$item->key}}"
                                                    data-id="push_notification_{{$item->key}}"
@@ -73,25 +71,23 @@
                                 </td>
 
                                 <td>
-                                    @if(isset($item_admin_data))
-                                        @if ($item_admin_data->mail_status == 'disable')
-                                            <span class="badge badge-pill badge--info pr-6">  {{ translate('messages.N/A') }}</span>
-                                        @elseif($item_admin_data->mail_status == 'inactive')
-                                            <label class="toggle-switch toggle-switch-sm" data-toggle="tooltip" title="{{ translate('This_mail_turned_off_by_admin') }}">
-                                                <input type="checkbox"
-                                                       class="status toggle-switch-input dynamic-checkbox"  disabled>
-                                                <span class="toggle-switch-label text">
+                                    @if ($item_admin_data->mail_status == 'disable')
+                                        <span class="badge badge-pill badge--info pr-6">  {{ translate('messages.N/A') }}</span>
+                                    @elseif($item_admin_data->mail_status == 'inactive')
+                                        <label class="toggle-switch toggle-switch-sm" data-toggle="tooltip" title="{{ translate('This_mail_turned_off_by_admin') }}">
+                                            <input type="checkbox"
+                                                   class="status toggle-switch-input dynamic-checkbox"  disabled>
+                                            <span class="toggle-switch-label text">
                                                 <span class="toggle-switch-indicator"></span>
                                             </span>
-                                            </label>
-                                        @endif
+                                        </label>
                                     @else
 
                                         <label class="toggle-switch toggle-switch-sm" data-toggle="tooltip"
-                                               @if ($item->mail_status  == 'active')
-                                                   data-toggle="tooltip" title="{{ translate('Turn_Off_Mail_for') .' '.translate($item->title)  }}"
-                                               @else
-                                                   data-toggle="tooltip" title="{{ translate('Turn_On_Mail_for') .' '.translate($item->title)  }}"
+                                        @if ($item->mail_status  == 'active')
+                                            data-toggle="tooltip" title="{{ translate('Turn_Off_Mail_for') .' '.translate($item->title)  }}"
+                                            @else
+                                            data-toggle="tooltip" title="{{ translate('Turn_On_Mail_for') .' '.translate($item->title)  }}"
                                             @endif>
 
                                             <input type="checkbox" data-type="toggle"
@@ -108,24 +104,22 @@
                                 </td>
 
                                 <td class="text-center">
-                                    @if(isset($item_admin_data))
-                                        @if ($item_admin_data->sms_status == 'disable')
-                                            <span class="badge badge-pill badge--info">  {{ translate('messages.N/A') }}</span>
-                                        @elseif($item_admin_data->sms_status == 'inactive')
-                                            <label class="toggle-switch toggle-switch-sm" data-toggle="tooltip" title="{{ translate('This_sms_turned_off_by_admin')  }}">
-                                                <input type="checkbox"
-                                                       class="status toggle-switch-input dynamic-checkbox"  disabled>
-                                                <span class="toggle-switch-label text">
+                                    @if ($item_admin_data->sms_status == 'disable')
+                                        <span class="badge badge-pill badge--info">  {{ translate('messages.N/A') }}</span>
+                                    @elseif($item_admin_data->sms_status == 'inactive')
+                                        <label class="toggle-switch toggle-switch-sm" data-toggle="tooltip" title="{{ translate('This_sms_turned_off_by_admin')  }}">
+                                            <input type="checkbox"
+                                                   class="status toggle-switch-input dynamic-checkbox"  disabled>
+                                            <span class="toggle-switch-label text">
                                                 <span class="toggle-switch-indicator"></span>
                                             </span>
-                                            </label>
-                                        @endif
+                                        </label>
                                     @else
 
                                         <label class="toggle-switch toggle-switch-sm" data-toggle="tooltip"    @if ($item->mail_status  == 'active')
                                             data-toggle="tooltip" title="{{ translate('Turn_Off_Mail_for') .' '.translate($item->title)  }}"
-                                               @else
-                                                   data-toggle="tooltip" title="{{ translate('Turn_On_Mail_for') .' '.translate($item->title)  }}"
+                                            @else
+                                            data-toggle="tooltip" title="{{ translate('Turn_On_Mail_for') .' '.translate($item->title)  }}"
                                             @endif>
                                             <input type="checkbox"
                                                    id="SMS_{{ $item->key }}"

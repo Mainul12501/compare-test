@@ -23,7 +23,6 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class ModuleController extends BaseController
 {
-    // v2.8.1 checked
     public function __construct(
         protected ModuleRepositoryInterface $moduleRepo,
         protected ModuleService $moduleService,

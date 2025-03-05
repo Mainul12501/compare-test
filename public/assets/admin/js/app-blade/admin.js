@@ -455,46 +455,122 @@ $.fn.select2DynamicDisplay = function () {
 $(".multiple-select2").select2DynamicDisplay();
 
 $(function () {
-
-    $('.date-range-picker').daterangepicker({
+    $(".date-range-picker").daterangepicker({
         // "timePicker": true,
         ranges: {
-            'Today': [moment(), moment()],
-            'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-            'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-            'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-            'This Month': [moment().startOf('month'), moment().endOf('month')],
-            'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+            Today: [moment(), moment()],
+            Yesterday: [
+                moment().subtract(1, "days"),
+                moment().subtract(1, "days"),
+            ],
+            "Last 7 Days": [moment().subtract(6, "days"), moment()],
+            "Last 30 Days": [moment().subtract(29, "days"), moment()],
+            "This Month": [moment().startOf("month"), moment().endOf("month")],
+            "Last Month": [
+                moment().subtract(1, "month").startOf("month"),
+                moment().subtract(1, "month").endOf("month"),
+            ],
         },
         maxDate: moment(),
         startDate: $(this).data("startDate"),
-        endDate:$(this).data("endDate"),
+        endDate: $(this).data("endDate"),
         autoUpdateInput: false,
         locale: {
-            cancelLabel: 'Clear'
+            cancelLabel: "Clear",
         },
-        "alwaysShowCalendars": true,
-
+        alwaysShowCalendars: true,
     });
 
-    $('.date-range-picker').attr('placeholder', "Select date");
+    $(".date-range-picker").attr("placeholder", "Select date");
 
-    $('.date-range-picker').on('apply.daterangepicker', function(ev, picker) {
-        $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
+    $(".date-range-picker").on("apply.daterangepicker", function (ev, picker) {
+        $(this).val(
+            picker.startDate.format("MM/DD/YYYY") +
+                " - " +
+                picker.endDate.format("MM/DD/YYYY")
+        );
     });
 
-    $('.date-range-picker').on('cancel.daterangepicker', function(ev, picker) {
-        $(this).val('');
+    $(".date-range-picker").on("cancel.daterangepicker", function (ev, picker) {
+        $(this).val("");
         picker.setStartDate(moment()); // Reset the start date
         picker.setEndDate(moment());
     });
 
-    $('.date-range-picker').on('show.daterangepicker', function(ev, picker) {
-        let title = $(this).data('title') || 'Select a Date';
-        if (!$('.daterangepicker .calendar-title').length) {
-            $('.daterangepicker').prepend(`<div class=" text-center mb-2 mt-4 calendar-title"> ${title}  </div>`);
+    $(".date-range-picker").on("show.daterangepicker", function (ev, picker) {
+        let title = $(this).data("title") || "Select a Date";
+        if (!$(".daterangepicker .calendar-title").length) {
+            $(".daterangepicker").prepend(
+                `<div class=" text-center mb-2 mt-4 calendar-title"> ${title}  </div>`
+            );
         } else {
-            $('.daterangepicker .calendar-title').text(title);
+            $(".daterangepicker .calendar-title").text(title);
         }
     });
+});
+
+$(document).ready(function () {
+    // --- select2 dropdown icon add
+    $("select.js-select2-custom, select.multiple-select2")
+        .on("select2:open", function () {
+            setTimeout(() => {
+                $(this)
+                    .next(".select2")
+                    .find(".select2-selection--multiple")
+                    .addClass("custom-select");
+            }, 10);
+        })
+        .trigger("select2:open")
+        .select2("close");
+});
+
+function initializeTooltipWithHoverContent() {
+    let activeTooltip = null;
+    $('[data-toggle="tooltip"][data-html="true"]')
+        .tooltip({
+            html: true,
+            trigger: "manual",
+        })
+        .on("mouseenter", function () {
+            let _this = this;
+            if (activeTooltip && activeTooltip !== _this) {
+                $(activeTooltip).tooltip("dispose");
+            }
+            activeTooltip = _this;
+            $(_this).tooltip("show");
+            let tooltipElement = $(".tooltip");
+            tooltipElement.off("mouseenter mouseleave").on({
+                mouseenter: function () {
+                    $(activeTooltip)
+                        .tooltip("dispose")
+                        .tooltip({
+                            html: true,
+                            trigger: "manual",
+                        })
+                        .tooltip("show");
+                },
+                mouseleave: function () {
+                    setTimeout(function () {
+                        if (!$(".tooltip:hover").length) {
+                            $(activeTooltip).tooltip("dispose");
+                            activeTooltip = null;
+                        }
+                    }, 200);
+                },
+            });
+        })
+        .on("mouseleave", function () {
+            let _this = this;
+            setTimeout(function () {
+                if (!$(".tooltip:hover").length) {
+                    $(_this).tooltip("dispose");
+                    if (activeTooltip === _this) {
+                        activeTooltip = null;
+                    }
+                }
+            }, 200);
+        });
+}
+$(document).ready(function () {
+    initializeTooltipWithHoverContent();
 });

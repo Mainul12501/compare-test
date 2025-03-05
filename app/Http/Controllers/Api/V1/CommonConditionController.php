@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\Validator;
 
 class CommonConditionController extends Controller
 {
-    // v2.8.1 checked
     public function get_conditions(Request $request,$search=null)
     {
         try {

@@ -740,96 +740,6 @@ class ReportController extends Controller
         return $items;
     }
 
-    public function stock_report(Request $request)
-    {
-        $zone_id = $request->query('zone_id', isset(auth('admin')->user()->zone_id) ? auth('admin')->user()->zone_id : 'all');
-        $store_id = $request->query('store_id', 'all');
-        $zone = is_numeric($zone_id) ? Zone::findOrFail($zone_id) : null;
-        $store = is_numeric($store_id) ? Store::findOrFail($store_id) : null;
-        $stock_modules = array_keys(array_filter(config('module'), function ($var) {
-            if (isset($var['stock']) && $var['stock']) return $var;
-        }));
-        $key = isset($request['search']) ? explode(' ', $request['search']) : [];
-
-        $items = Item::withoutGlobalScope(StoreScope::class)
-        ->with(['store', 'store.zone'])->whereHas('store.module', function ($query) use ($stock_modules) {
-            $query->where('module_type', Config::get('module.current_module_type'));
-        })
-            ->when($request->query('module_id', null), function ($query) use ($request) {
-                return $query->module($request->query('module_id'));
-            })
-            ->when(isset($zone), function ($query) use ($zone) {
-                return $query->whereIn('store_id', $zone->stores->pluck('id'));
-            })
-            ->when(isset($store), function ($query) use ($store) {
-                return $query->where('store_id', $store->id);
-            })
-            ->when(count($key), function ($query) use ($key) {
-                return $query->where(function ($q) use ($key) {
-                    foreach ($key as $value) {
-                        $q->orWhere('name', 'like', "%{$value}%");
-                    }
-                });
-            })
-            ->whereHas('store.StoreConfig', function ($query) {
-                $query->whereColumn('items.stock', '<=', 'store_configs.minimum_stock_for_warning')->orwhere('items.stock', 0);
-            })
-            ->orderBy('stock')
-            ->paginate(config('default_pagination'))->withQueryString();
-
-        return view('admin-views.report.stock-report', compact('zone', 'store', 'items'));
-    }
-
-    public function stock_wise_export(Request $request)
-    {
-        $zone_id = $request->query('zone_id', isset(auth('admin')->user()->zone_id) ? auth('admin')->user()->zone_id : 'all');
-        $store_id = $request->query('store_id', 'all');
-        $zone = is_numeric($zone_id) ? Zone::findOrFail($zone_id) : null;
-        $store = is_numeric($store_id) ? Store::findOrFail($store_id) : null;
-        $stock_modules = array_keys(array_filter(config('module'), function ($var) {
-            if (isset($var['stock']) && $var['stock']) return $var;
-        }));
-        $key = isset($request['search']) ? explode(' ', $request['search']) : [];
-
-        $items = Item::withoutGlobalScope(StoreScope::class)->whereHas('store.module', function ($query) use ($stock_modules) {
-            $query->whereIn('module_type', $stock_modules);
-        })
-            ->when($request->query('module_id', null), function ($query) use ($request) {
-                return $query->module($request->query('module_id'));
-            })
-            ->when(isset($zone), function ($query) use ($zone) {
-                return $query->whereIn('store_id', $zone->stores->pluck('id'));
-            })
-            ->when(isset($store), function ($query) use ($store) {
-                return $query->where('store_id', $store->id);
-            })
-            ->when(count($key), function ($query) use ($key) {
-                return $query->where(function ($q) use ($key) {
-                    foreach ($key as $value) {
-                        $q->orWhere('name', 'like', "%{$value}%");
-                    }
-                });
-            })
-            ->whereHas('store.StoreConfig', function ($query) {
-                $query->whereColumn('items.stock', '<=', 'store_configs.minimum_stock_for_warning')->orwhere('items.stock', 0);
-            })
-            ->orderBy('stock')
-            ->get();
-
-        $data = [
-            'items'=>$items,
-            'search'=>$request->search??null,
-            'zone'=>is_numeric($zone_id)?Helpers::get_zones_name($zone_id):null,
-            'store'=>is_numeric($store_id)?Helpers::get_stores_name($store_id):null,
-        ];
-
-        if ($request->type == 'excel') {
-            return Excel::download(new LimitedStockReportExport($data), 'StockReport.xlsx');
-        } else if ($request->type == 'csv') {
-            return Excel::download(new LimitedStockReportExport($data), 'StockReport.csv');
-        }
-    }
-
     public function order_transaction()
     {
         $order_transactions = OrderTransaction::latest()->paginate(config('default_pagination'));
@@ -970,46 +880,6 @@ class ReportController extends Controller
         return response()->json([
             'count' => count($items),
             'view' => view('admin-views.report.partials._item_table', compact('items'))->render()
-        ]);
-    }
-
-    public function stock_search(Request $request)
-    {
-        $key = explode(' ', $request['search']);
-
-        $zone_id = $request->query('zone_id', isset(auth('admin')->user()->zone_id) ? auth('admin')->user()->zone_id : 'all');
-        $store_id = $request->query('store_id', 'all');
-        $zone = is_numeric($zone_id) ? Zone::findOrFail($zone_id) : null;
-        $store = is_numeric($store_id) ? Store::findOrFail($store_id) : null;
-        $stock_modules = array_keys(array_filter(config('module'), function ($var) {
-            if (isset($var['stock']) && $var['stock']) return $var;
-        }));
-        $key = isset($request['search']) ? explode(' ', $request['search']) : [];
-
-        $items = Item::withoutGlobalScope(StoreScope::class)->whereHas('store.module', function ($query) use ($stock_modules) {
-            $query->whereIn('module_type', $stock_modules);
-        })
-            ->when($request->query('module_id', null), function ($query) use ($request) {
-                return $query->module($request->query('module_id'));
-            })
-            ->when(isset($zone), function ($query) use ($zone) {
-                return $query->whereIn('store_id', $zone->stores->pluck('id'));
-            })
-            ->when(isset($store), function ($query) use ($store) {
-                return $query->where('store_id', $store->id);
-            })
-            ->when(count($key), function ($query) use ($key) {
-                return $query->where(function ($q) use ($key) {
-                    foreach ($key as $value) {
-                        $q->orWhere('name', 'like', "%{$value}%");
-                    }
-                });
-            })
-            ->limit(25)->get();
-
-        return response()->json([
-            'count' => count($items),
-            'view' => view('admin-views.report.partials._stock_table', compact('items'))->render()
         ]);
     }
 
@@ -1578,41 +1448,6 @@ class ReportController extends Controller
         }
 
         return view('admin-views.report.store-sales-report', compact('zone', 'store', 'items', 'orders', 'data', 'label', 'filter'));
-    }
-
-    // v2.8.1 full function
-    public function store_sales_search(Request $request)
-    {
-        $key = explode(' ', $request['search']);
-
-        $from = session('from_date');
-        $to = session('to_date');
-
-        $zone_id = $request->query('zone_id', isset(auth('admin')->user()->zone_id) ? auth('admin')->user()->zone_id : 'all');
-        $store_id = $request->query('store_id', 'all');
-        $zone = is_numeric($zone_id) ? Zone::findOrFail($zone_id) : null;
-        $store = is_numeric($store_id) ? Store::findOrFail($store_id) : null;
-        $items = \App\Models\Item::withoutGlobalScope(StoreScope::class)->with('orders')->withCount([
-            'orders' => function ($query) use ($from, $to) {
-                $query->whereBetween('created_at', [$from . ' 00:00:00', $to . ' 23:59:29']);
-            },
-        ])
-            ->when(isset($zone), function ($query) use ($zone) {
-                return $query->whereIn('store_id', $zone->stores->pluck('id'));
-            })
-            ->when(isset($store), function ($query) use ($store) {
-                return $query->where('store_id', $store->id);
-            })->where(function ($q) use ($key) {
-                foreach ($key as $value) {
-                    $q->orWhere('name', 'like', "%{$value}%");
-                }
-            })
-            ->limit(25)->get();
-
-        return response()->json([
-            'count' => count($items),
-            'view' => view('admin-views.report.partials._store_sale_table', compact('items'))->render()
-        ]);
     }
 
 

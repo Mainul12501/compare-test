@@ -92,7 +92,7 @@
 
                             <input type="file" name="image" class="js-file-attach avatar-uploader-input"
                                    id="customFileEg1"
-                                   accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*">
+                                   accept=".webp, .jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*">
                             <label class="avatar-uploader-trigger" for="customFileEg1">
                                 <i class="tio-edit avatar-uploader-icon shadow-soft"></i>
                             </label>

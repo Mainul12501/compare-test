@@ -260,11 +260,11 @@
                             </a>
 
                             <a href="javascript:"
-                                class="btn data-deny py-2 {{ $deliveryMan->status ? 'btn--danger' : 'btn-success' }} align-items-center d-flex"
+                                class="btn request-alert py-2 {{ $deliveryMan->status ? 'btn--danger' : 'btn-success' }} align-items-center d-flex"
                                 data-url="{{ route('admin.users.delivery-man.status', [$deliveryMan['id'], $deliveryMan->status ? 0 : 1]) }}"
                                 data-message="{{ $deliveryMan->status ? translate('messages.you_want_to_suspend_this_deliveryman') : translate('messages.you_want_to_unsuspend_this_deliveryman') }}">
                                 {{ $deliveryMan->status ? translate('messages.suspend_this_delivery_man') : translate('messages.unsuspend_this_delivery_man') }}
-                            </a> <!--v2.8.1-->
+                            </a>
                         <div class="hs-unfold">
                             <div class="dropdown">
                                 <button class="btn btn--primary dropdown-toggle" type="button" id="dropdownMenuButton"
@@ -289,13 +289,6 @@
 
                 </div>
 @endif
-{{--                v2.8.1 code start--}}
-                    @if(($deliveryMan->application_status == 'denied') || ($deliveryMan['status'] == 0))
-                        <div class="mb-3">
-                            <span class="text-danger">Reason: {{ $deliveryMan->reason }}</span>
-                        </div>
-                    @endif
-{{--                v2.8.1 code end--}}
                 <div class="d-flex flex-column flex-md-row align-items-center gap-3 border rounded p-3">
                     <div class="d-flex gap-3">
                         <img class="rounded" data-onerror-image="{{ asset('public/assets/admin/img/160x160/img1.jpg') }}"
@@ -514,12 +507,6 @@
                             <div>{{ translate('messages.identification_number') }}</div>:
                             <div>{{ $deliveryMan->identity_number }}</div>
                         </div>
-{{--                        v2.8.1 code start--}}
-                        <div class="key-val-list-item d-flex gap-3">
-                            <div>{{ translate('messages.Joining Request Date') }}</div>:
-                            <div>{{ $deliveryMan->created_at->format('d-M-Y') ?? 'No Data Available' }}</div>
-                        </div>
-{{--                        v2.8.1 code end--}}
                     </div>
                     @if ($deliveryMan->application_status == 'pending')
                         <div class="col-sm-6 col-lg-4">
@@ -535,69 +522,6 @@
                             </div>
                         </div>
                     @endif
-{{--                        v2.8.1 code start--}}
-                        @if( !empty($disbursementWithdrawalMethods) )
-                            <div class="col-sm-6 col-lg-4">
-                                <div class="card h-100">
-                                    <div class="card-header">
-                                        <h5 class="card-title m-0 d-flex align-items-center">
-                        <span class="card-header-icon mr-2">
-                            <i class="tio-crown"></i>
-                        </span>
-                                            <span class="ml-1">{{translate('messages.Active Disbursement')}}</span>
-                                        </h5>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="resturant--info-address">
-                                            <ul class="address-info address-info-2 list-unstyled list-unstyled-py-3 text-dark">
-                                                @php($hasDefault = false)
-                                                @php($defaultRowId = 0)
-                                                @foreach($disbursementWithdrawalMethods as $disbursementWithdrawalMethod)
-                                                    @if($disbursementWithdrawalMethod->is_default == 1)
-                                                        @php($hasDefault = true)
-                                                        @php($defaultRowId = $disbursementWithdrawalMethod->id)
-                                                        <li>
-{{--                                                            <span>  <strong>{{translate('messages.Store_Name')}}</span></strong>  <span>:</span> &nbsp; {{ translate($disbursementWithdrawalMethod->store_name ?? 'Unknown') }}--}}
-                                                            <span>  <strong>{{translate('messages.Delivery-man Name')}}</span></strong>  <span>:</span> &nbsp; {{ translate($disbursementWithdrawalMethod->store_name ?? 'No Name has been set yet.') }}
-                                                        </li>
-                                                        <li>
-                                                            <span>  <strong>{{translate('messages.Withdrawal_Method')}}</span></strong>  <span>:</span> &nbsp; {{ translate($disbursementWithdrawalMethod->method_name ?? '') }}
-                                                        </li>
-                                                        @if(!empty($disbursementWithdrawalMethod->method_fields))
-                                                            @foreach(json_decode($disbursementWithdrawalMethod->method_fields) as $key => $field)
-                                                                <li>
-                                                                    <span><strong>{{translate($key)}}</strong></span> <span>:</span> &nbsp; {{ $field ?? '' }}
-                                                                </li>
-                                                            @endforeach
-                                                        @endif
-                                                    @endif
-                                                @endforeach
-                                            </ul>
-                                        </div>
-                                        <div class="row mt-3">
-                                            @if($hasDefault)
-                                                <div class="col-md-6">
-                                                    <button class="btn text-white text-capitalize bg--title btn-primary btn-sm " id=""
-                                                            type="button" onclick="showDefaultRowModel({{$defaultRowId}})"
-                                                            title="Collect Cash">{{ translate('messages.Change DWM Info') }}
-                                                    </button>
-                                                </div>
-                                            @endif
-                                                @if(count($disbursementWithdrawalMethods) > 1)
-                                                    <div class="col-md-6">
-                                                        <button class="btn text-white text-capitalize bg--title btn-sm " id="collect_cash"
-                                                                type="button" data-toggle="modal" data-target="#checkPendingRequest"
-                                                                title="Collect Cash">{{ translate('messages.Check Pending Request') }}
-                                                        </button>
-                                                    </div>
-                                                @endif
-                                        </div>
-
-                                    </div>
-                                </div>
-                            </div>
-                        @endif
-{{--                        v2.8.1 code end--}}
                     <div class=" {{ $deliveryMan->application_status == 'pending' ? 'col-12' : 'col-6' }} ">
                         @if ($deliveryMan->application_status == 'pending')
                             <h5 class="mb-3 mt-5">{{ translate('messages.Identity_Image') }}</h5>
@@ -884,147 +808,9 @@
     @endif
 
     </div>
-
-{{--    v2.8.1 code start--}}
-    <div class="modal fade" id="checkPendingRequest" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">{{translate('messages.Check Pending Request')}}</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div>
-                        <table class="table">
-                            <thead>
-                            <tr>
-                                <th>SL</th>
-                                <th>Payment Method Name</th>
-                                <th>Payment Info</th>
-                                <th>Default</th>
-                                <th>Pending Status</th>
-                                <th>Action</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            @foreach($disbursementWithdrawalMethods as $key => $value)
-                                <tr>
-                                    <td>{{ $loop->iteration }}</td>
-                                    <td>{{ $value->method_name }}</td>
-                                    <td>
-                                        @foreach(json_decode($value->method_fields) as $index => $val)
-                                            <p><b class="text-uppercase">{{ $index }}:</b> {{ $val }}</p>
-                                        @endforeach
-                                    </td>
-                                    <td>{{ $value->is_default == 1 ? 'Yes' : 'No' }}</td>
-                                    <td>{{ $value->pending_status == 1 ? 'Yes' : 'No' }}</td>
-                                    <td>
-                                        <div class="d-flex">
-                                            @if($value->pending_status == 1)
-                                                <a class="btn btn-sm btn--warning btn-outline-success action-btn acc-dis-wit-met" href="javascript:" data-url="{{ route('admin.accept-dis-wid-met', ['id' => $value->id, 'req_from' =>  'dm']) }}" title="Accept" data-message="Want to accept this ? This will remove previous data.">
-                                                    <i class="tio-checkmark-square-outlined"></i>
-                                                </a>
-                                            @endif
-                                            @if($value->is_default != 1)
-                                                <form action="{{ route('admin.delete-dis-wid-met', ['id' => $value->id]) }}" method="post">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm btn--danger btn-outline-danger action-btn del-dis-wit-met ml-1" href="javascript:" data-url="" title="Delete" data-message="Want to delete this item ?">
-                                                        <i class="tio-delete-outlined"></i>
-                                                    </button>
-                                                </form>
-                                            @endif
-                                        </div>
-                                    </td>
-                                </tr>
-                            @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="modal fade" id="chnageDWMinfo" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">{{translate('messages.Change DWM Info')}}</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div>
-                        <form action="{{ route('change-default-dwm-data') }}" method="post">
-                            @csrf
-                            <input type="hidden" name="disbursement_withdrawal_method_id" id="disbursementWithdrawalMethodId">
-                            <input type="hidden" name="account_key" id="disbursementWithdrawalMethodKey">
-                            <input type="hidden" name="redirect_url" value="{{ url()->current() }}">
-                            <div class="row">
-                                <div class="col-12">
-                                    <p class="pb-0">Method Name: <span id="withdrawMethodName"></span></p>
-                                </div>
-                            </div>
-                            <div class="row mt-2">
-                                <div class="col-md-6">
-                                    <p class="pb-0">
-                                        <span >Account Name</span> :
-                                        <span id=""><input type="text" id="accountName" class="" name="account_name"></span>
-                                    </p>
-                                </div>
-                                <div class="col-md-6">
-                                    <p class="pb-0">
-                                        <span id="accountNumberKey"></span> :
-                                        <span id=""><input type="text" id="accountNumberValue" class="" name="account_number"></span>
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="row mt-2">
-                                <div class="col-12">
-                                    <button type="submit" class="btn btn-sm btn-success">Update</button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-{{--    v2.8.1 code end--}}
 @endsection
 
 @push('script_2')
-    <script>
-        function showDefaultRowModel(id) {
-            if (id == 0)
-            {
-                toastr.error('No Default Disbursement Withdrawal Method Found');
-                return;
-            }
-            $.ajax({
-                url: '/get-default-dwm-data/'+id,
-                method: 'GET',
-                success: function (data) {
-                    if (data)
-                    {
-                        $('#withdrawMethodName').text(data.method_name);
-                        $('#accountNumberKey').text(data.account_key);
-                        $('#disbursementWithdrawalMethodKey').val(data.account_key);
-                        $('#accountNumberValue').val(data.account_value);
-                        $('#disbursementWithdrawalMethodId').val(data.id);
-                        $('#accountName').val(data.store_name);
-                        $('#chnageDWMinfo').modal('show');
-                    }
-                },
-                errors: function (error) {
-                    toastr.error(error);
-                }
-            })
-        }
-    </script>
     <script>
         "use strict";
         $('.request-alert').on('click', function() {
@@ -1051,53 +837,4 @@
             })
         }
     </script>
-{{--    v2.8.1 code start--}}
-    <script>
-        $(document).on('click', '.del-dis-wit-met', function () {
-            event.preventDefault();
-            Swal.fire({
-                title: '{{translate('messages.are_you_sure')}}',
-                text: $(this).attr('data-message'),
-                type: 'warning',
-                showCancelButton: true,
-                cancelButtonColor: 'default',
-                confirmButtonColor: '#FC6A57',
-                cancelButtonText: '{{translate('messages.no')}}',
-                confirmButtonText: '{{translate('messages.yes')}}',
-                reverseButtons: true
-            }).then((result) => {
-                if (result.value) {
-                    $(this).closest('form').submit();
-                }
-            })
-        })
-        $(document).on('click', '.acc-dis-wit-met', function () {
-            request_alert($(this).attr('data-url'), $(this).attr('data-message'))
-        })
-    </script>
-    <script>
-        $('.data-deny').on('click', function(){
-            // let url = $(this).data('url');
-            // let message = $(this).data('message');
-            Swal.fire({
-                title: 'Are you sure',
-                // text: message,
-                type: 'warning',
-                showCancelButton: true,
-                cancelButtonColor: 'default',
-                confirmButtonColor: '#FC6A57',
-                cancelButtonText: 'No',
-                confirmButtonText: 'Yes',
-                reverseButtons: true,
-                html: `<p>Tell us why you want to suspend this delivery man.</p><textarea name="reason" class="form-control" id="denyReason" cols="30" rows="3"></textarea>`
-            }).then((result) => {
-                if (result.value) {
-                    let url = $(this).data('url')+'?reason='+$('#denyReason').val();
-                    // console.log(url);
-                    location.href = url;
-                }
-            })
-        })
-    </script>
-{{--    v2.8.1 code end--}}
 @endpush

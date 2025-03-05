@@ -27,7 +27,7 @@
             <div class="col-lg-12">
                 <div class="card">
                     <div class="card-body" id="form_data">
-                        <form id="cashback-submit" action="{{route('admin.cashback.store')}}" method="POST">
+                        <form id="cashback-submit" action="{{route('admin.users.cashback.store')}}" method="POST">
                             @csrf
                             <div class="row">
                                 <div class="col-12">
@@ -243,7 +243,7 @@
                                     <td class="text-center">{{ $bonus['total_used']  }}</td>
                                     <td>
                                         <label class="toggle-switch toggle-switch-sm" for="bonusCheckbox{{$bonus->id}}">
-                                            <input type="checkbox" data-url="{{route('admin.cashback.status',[$bonus['id'],$bonus->status?0:1])}}" class="toggle-switch-input redirect-url" id="bonusCheckbox{{$bonus->id}}" {{$bonus->status?'checked':''}}>
+                                            <input type="checkbox" data-url="{{route('admin.users.cashback.status',[$bonus['id'],$bonus->status?0:1])}}" class="toggle-switch-input redirect-url" id="bonusCheckbox{{$bonus->id}}" {{$bonus->status?'checked':''}}>
                                             <span class="toggle-switch-label">
                                                 <span class="toggle-switch-indicator"></span>
                                             </span>
@@ -252,13 +252,13 @@
                                     <td>
                                         <div class="btn--container justify-content-center">
 
-                                            <a class="btn action-btn btn--primary btn-outline-primary" href="{{route('admin.cashback.update',[$bonus['id']])}}" title="{{translate('messages.edit_cashback')}}"><i class="tio-edit"></i>
+                                            <a class="btn action-btn btn--primary btn-outline-primary" href="{{route('admin.users.cashback.update',[$bonus['id']])}}" title="{{translate('messages.edit_cashback')}}"><i class="tio-edit"></i>
                                             </a>
                                             {{-- <a class="btn action-btn btn--primary btn-outline-primary edit_cashback" data-id="{{$bonus['id']}}"  href="javascript:;" title="{{translate('messages.edit_cashback')}}"><i class="tio-edit"></i>
                                             </a> --}}
                                             <a class="btn action-btn btn--danger btn-outline-danger form-alert" href="javascript:" data-id="bonus-{{$bonus['id']}}" data-message="{{ translate('Want_to_delete_this_Cashback_?') }}" title="{{translate('messages.delete_bonus')}}"><i class="tio-delete-outlined"></i>
                                             </a>
-                                            <form action="{{route('admin.cashback.delete',[$bonus['id']])}}"
+                                            <form action="{{route('admin.users.cashback.delete',[$bonus['id']])}}"
                                             method="post" id="bonus-{{$bonus['id']}}">
                                                 @csrf @method('delete')
                                             </form>
@@ -350,7 +350,7 @@
 
 //     $('.edit_cashback').on('click', function (e) {
 
-//     let url = "{{ route('admin.cashback.update', ['id']) }}";
+//     let url = "{{ route('admin.users.cashback.update', ['id']) }}";
 //         url = url.replace('id', $(this).data("id"));
 //     e.preventDefault();
 //     $.ajaxSetup({

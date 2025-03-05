@@ -16,7 +16,6 @@ use Illuminate\Support\Facades\Validator;
 
 class POSController extends Controller
 {
-    // v2.8.1 checked
     public function place_order(Request $request)
     {
         $validator = Validator::make($request->all(), [

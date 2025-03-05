@@ -31,15 +31,6 @@ class DeliveryMan extends Authenticatable
     ];
 
     protected $appends = ['image_full_url','identity_image_full_url'];
-
-    public function store()
-    {
-        return $this->belongsTo(Store::class);
-    }
-    public function disbursementWithdrawMethods()   // v2.8.1
-    {
-        return $this->hasMany(DisbursementWithdrawalMethod::class); // v2.8.1
-    }
     public function total_canceled_orders()
     {
         return $this->hasMany(Order::class)->where('order_status','canceled');
@@ -216,12 +207,6 @@ class DeliveryMan extends Authenticatable
     protected static function boot()
     {
         parent::boot();
-        static::deleting(function ($deliveryMan){   // v2.8.1
-            if (!empty($deliveryMan->disbursementWithdrawMethods))  // v2.8.1
-            {
-                $deliveryMan->disbursementWithdrawMethods->each->delete();  // v2.8.1
-            }
-        }); // v2.8.1
         static::saved(function ($model) {
             if($model->isDirty('image')){
                 $value = Helpers::getDisk();

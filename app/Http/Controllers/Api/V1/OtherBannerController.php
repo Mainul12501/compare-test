@@ -11,7 +11,6 @@ use Illuminate\Http\Request;
 
 class OtherBannerController extends Controller
 {
-    // v2.8.1 checked
     public function get_banners(Request $request)
     {
         $module_id= $request->header('moduleId');

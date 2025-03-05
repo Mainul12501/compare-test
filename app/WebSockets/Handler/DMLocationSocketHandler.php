@@ -15,7 +15,7 @@ use BeyondCode\LaravelWebSockets\WebSockets\Exceptions\UnknownAppKey;
 
 class DMLocationSocketHandler implements MessageComponentInterface
 {
-    // v2.8.1 checked
+
     function onMessage(ConnectionInterface $from, MessageInterface $msg)
     {
         $data = json_decode($msg->getPayload(), true);

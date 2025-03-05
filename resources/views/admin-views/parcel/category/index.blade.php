@@ -107,7 +107,7 @@
                             </div>
                             <div class="custom-file">
                                 <input type="file" name="image" id="customFileEg1" class="custom-file-input"
-                                    accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*" required>
+                                    accept=".webp, .jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*" required>
                                 <label class="custom-file-label" for="customFileEg1">{{translate('messages.choose_file')}}</label>
                             </div>
                         </div>
@@ -124,14 +124,6 @@
                             <input type="number" step=".01" min="0" placeholder="{{translate('messages.minimum_shipping_charge')}}" class="form-control" name="parcel_minimum_shipping_charge">
                         </div>
                     </div>
-{{--                        v2.8.1 start--}}
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label class="input-label text-capitalize">{{translate('messages.per_kg_charge')}}</label>
-                                <input type="number" step=".01" min="0" placeholder="{{translate('messages.per_kg_charge')}}" class="form-control" name="parcel_per_kg_charge">
-                            </div>
-                        </div>
-{{--                        v2.8.1 end--}}
                     <div class="col-12">
                         <div class="btn--container justify-content-end">
                             <button type="reset" id="reset_btn" class="btn btn--reset">{{translate('messages.reset')}}</button>
@@ -171,7 +163,6 @@
                                 <th class="border-0 text-center">{{translate('messages.orders_count')}}</th>
                                 <th class="border-0 text-center">{{translate('messages.per_km_shipping_charge')}}</th>
                                 <th class="border-0 text-center">{{translate('messages.minimum_shipping_charge')}}</th>
-                                <th class="border-0 text-center">{{translate('messages.per_kg_charge')}}</th>   <!--v2.8.1-->
                                 <th class="border-0 text-center">{{translate('messages.action')}}</th>
                             </tr>
                         </thead>
@@ -214,13 +205,6 @@
                                         {{$category->parcel_minimum_shipping_charge?\App\CentralLogics\Helpers::format_currency($category->parcel_minimum_shipping_charge): 'N/A'}}
                                     </div>
                                 </td>
-{{--                                v2.8.1 start--}}
-                                <td>
-                                    <div class="text-center">
-                                        {{$category->parcel_per_kg_charge?\App\CentralLogics\Helpers::format_currency($category->parcel_per_kg_charge): 'N/A'}}
-                                    </div>
-                                </td>
-{{--                                v2.8.1 end--}}
                                 <td>
                                     <div class="btn--container justify-content-center">
                                         <a class="btn action-btn btn--primary btn-outline-primary"

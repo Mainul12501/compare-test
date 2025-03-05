@@ -12,7 +12,6 @@ use App\CentralLogics\Helpers;
 
 class ReportController extends Controller
 {
-    // v2.8.1 checked
     public function expense_report(Request $request)
     {
 

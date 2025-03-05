@@ -6,7 +6,11 @@
         $site_direction = session()->has('vendor_site_direction')?session()->get('vendor_site_direction'):'ltr';
     }
     $country=\App\Models\BusinessSetting::where('key','country')->first();
-$countryCode= strtolower($country?$country->value:'auto');
+    $countryCode= strtolower($country?$country->value:'auto');
+
+    $storeId = \App\CentralLogics\Helpers::get_store_id();
+    $store = \App\Models\Store::findOrFail($storeId);
+    $moduleType = $store?->module?->module_type;
 ?>
 {{-- {{ dd($countryCode) }} --}}
 <html dir="{{ $site_direction }}" lang="{{ str_replace('_', '-', app()->getLocale()) }}"  class="{{ $site_direction === 'rtl'?'active':'' }}">
@@ -18,7 +22,7 @@ $countryCode= strtolower($country?$country->value:'auto');
     <!-- Title -->
     <title>@yield('title')</title>
     <!-- Favicon -->
-    @php($logo=\App\Models\BusinessSetting::where(['key'=>'icon'])->first())
+    @php($logo = \App\Models\BusinessSetting::where(['key'=>'icon'])->first())
     <link rel="shortcut icon" href="">
     <link rel="icon" type="image/x-icon" href="{{\App\CentralLogics\Helpers::get_full_url('business', $logo?->value?? '', $logo?->storage[0]?->value ?? 'public','favicon')}}">
     <!-- Font -->
@@ -150,7 +154,8 @@ $countryCode= strtolower($country?$country->value:'auto');
                     <div class="row">
                         <div class="col-12">
                             <div class="text-center">
-                                <h2>
+
+                                <h2 class="update_notification_text">
                                     <i class="tio-shopping-cart-outlined"></i> {{translate('messages.You have new order, Check Please.')}}
                                 </h2>
                                 <hr>
@@ -360,37 +365,6 @@ $countryCode= strtolower($country?$country->value:'auto');
     };
     firebase.initializeApp(firebaseConfig);
     const messaging = firebase.messaging();
-{{--    function startFCM() {--}}
-
-{{--messaging--}}
-{{--    .requestPermission()--}}
-{{--    .then(function () {--}}
-{{--        return messaging.getToken()--}}
-
-{{--    }).then(function (response) {--}}
-{{--        @php($store_id=\App\CentralLogics\Helpers::get_store_id())--}}
-{{--        subscribeTokenToTopic(response, "store_panel_{{$store_id}}_message");--}}
-{{--    }).catch(function (error) {--}}
-{{--        console.log(error);--}}
-{{--    });--}}
-{{--}--}}
-
-{{--@php($key = \App\Models\BusinessSetting::where('key', 'push_notification_key')->first())--}}
-{{--function subscribeTokenToTopic(token, topic) {--}}
-{{--fetch('https://iid.googleapis.com/iid/v1/' + token + '/rel/topics/' + topic, {--}}
-{{--    method: 'POST',--}}
-{{--    headers: new Headers({--}}
-{{--        'Authorization': 'key={{ $key ? $key->value : '' }}'--}}
-{{--    })--}}
-{{--}).then(response => {--}}
-{{--    if (response.status < 200 || response.status >= 400) {--}}
-{{--        throw 'Error subscribing to topic: ' + response.status + ' - ' + response.text();--}}
-{{--    }--}}
-{{--    console.log('Subscribed to "' + topic + '"');--}}
-{{--}).catch(error => {--}}
-{{--    console.error(error);--}}
-{{--})--}}
-{{--}--}}
 
     function startFCM() {
         messaging
@@ -453,7 +427,7 @@ $countryCode= strtolower($country?$country->value:'auto');
         function conversationView() {
             let conversation_id = getUrlParameter('conversation');
             let user_id = getUrlParameter('user');
-            let url= '{{url('/')}}/store-panel/message/view/'+conversation_id+'/' + user_id;
+            let url= '{{url('/')}}/vendor-panel/message/view/'+conversation_id+'/' + user_id;
             $.ajax({
                 url: url,
                 success: function(data) {
@@ -463,37 +437,24 @@ $countryCode= strtolower($country?$country->value:'auto');
         }
         @php($order_notification_type = \App\Models\BusinessSetting::where('key', 'order_notification_type')->first())
         @php($order_notification_type = $order_notification_type ? $order_notification_type->value : 'firebase')
-        @php($store_type = \App\CentralLogics\Helpers::get_store_data()->store_type)    /*v2.8.1*/
-    let order_type = 'all';
-    var parcel_order_type = ''; /*v2.8.1*/
-    var store_type = '{{$store_type}}'; /*v2.8.1*/
-    let is_trip =false;
+        let order_type = 'all';
+        let is_trip =false;
         messaging.onMessage(function (payload) {
             if(payload.data.order_id && payload.data.type === 'new_order'){
                 @if(\App\CentralLogics\Helpers::employee_module_permission_check('order') && $order_notification_type == 'firebase')
                     order_type = payload.data.order_type
-                if(order_type === 'trip'){
-                    document.querySelector('.update_notification_text').textContent = "{{translate('messages.You have new trip, Check Please.')}}";
-                    is_trip= true;
-                }
+                    if(order_type === 'trip'){
+                        document.querySelector('.update_notification_text').textContent = "{{translate('messages.You have new trip, Check Please.')}}";
+                        is_trip= true;
+                    }
                     playAudio();
                     $('#popup-modal').appendTo("body").modal('show');
                 @endif
-            }
-            // v2.8.1 start
-            else if(payload.data.order_id && payload.data.type === 'new_order_parcel' && store_type == "company"){
-                var parcel_order_type = 'parcel';
-                order_type = payload.data.order_type
-                playAudio();
-                $('#popup-modal').appendTo("body").modal('show');
-
-            }
-            // v2.8.1 end
-            else if(payload.data.type === 'message'){
+            }else if(payload.data.type === 'message'){
                 if (window.location.href.includes('message/list?conversation')) {
                     let conversation_id = getUrlParameter('conversation');
                     let user_id = getUrlParameter('user');
-                    let url = '{{url('/')}}/store-panel/message/view/' + conversation_id + '/' + user_id;
+                    let url = '{{url('/')}}/vendor-panel/message/view/' + conversation_id + '/' + user_id;
                     $.ajax({
                         url: url,
                         success: function (data) {
@@ -542,14 +503,11 @@ $countryCode= strtolower($country?$country->value:'auto');
 
         $('.check-order').on('click',function (){
             if(order_type){
-                {{--location.href = '{{url('/')}}/store-panel/order/list/'+order_type;--}}
                 if(is_trip === true){
                     location.href = '{{url('/')}}/vendor-panel/trip?status=all';
-                } else if(store_type == 'company'){
-                    location.href = '{{url('/')}}/store-panel/parcel/orders/all';
-                }
-                else{
-                    location.href = '{{url('/')}}/store-panel/order/list/'+order_type;
+                } else{
+                    location.href = '{{url('/')}}/vendor-panel/order/list/'+order_type;
+
                 }
             }
         });

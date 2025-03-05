@@ -166,14 +166,6 @@ class HomeController extends Controller
     public function terms_and_conditions(Request $request)
     {
         $data = self::get_settings('terms_and_conditions');
-        if ($request->expectsJson()) {  // v2.8.1
-            if($request->hasHeader('X-localization')){  // v2.8.1
-                $current_language = $request->header('X-localization'); // v2.8.1
-                $data = self::get_settings_localization('terms_and_conditions',$current_language);  // v2.8.1
-                return response()->json($data); // v2.8.1
-            }   // v2.8.1
-            return response()->json($data); // v2.8.1
-        }   // v2.8.1
         $config = Helpers::get_business_settings('landing_page');
         $landing_integration_type = Helpers::get_business_data('landing_integration_type');
         $redirect_url = Helpers::get_business_data('landing_page_custom_url');
@@ -193,14 +185,7 @@ class HomeController extends Controller
     {
         $data = self::get_settings('about_us');
         $data_title = self::get_settings('about_title');
-        if ($request->expectsJson()) {  // v2.8.1
-            if($request->hasHeader('X-localization')){  // v2.8.1
-                $current_language = $request->header('X-localization'); // v2.8.1
-                $data = self::get_settings_localization('about_us',$current_language);  // v2.8.1
-                return response()->json($data); // v2.8.1
-            }   // v2.8.1
-            return response()->json($data); // v2.8.1
-        }   // v2.8.1
+
         $config = Helpers::get_business_settings('landing_page');
         $landing_integration_type = Helpers::get_business_data('landing_integration_type');
         $redirect_url = Helpers::get_business_data('landing_page_custom_url');
@@ -283,14 +268,7 @@ class HomeController extends Controller
     public function privacy_policy(Request $request)
     {
         $data = self::get_settings('privacy_policy');
-        if ($request->expectsJson()) {  // v2.8.1
-            if($request->hasHeader('X-localization')){  // v2.8.1
-                $current_language = $request->header('X-localization'); // v2.8.1
-                $data = self::get_settings_localization('privacy_policy',$current_language);    // v2.8.1
-                return response()->json($data); // v2.8.1
-            }   // v2.8.1
-            return response()->json($data); // v2.8.1
-        }   // v2.8.1
+
         $config = Helpers::get_business_settings('landing_page');
         $landing_integration_type = Helpers::get_business_data('landing_integration_type');
         $redirect_url = Helpers::get_business_data('landing_page_custom_url');
@@ -310,14 +288,6 @@ class HomeController extends Controller
     {
         $data = self::get_settings('refund_policy');
         $status = self::get_settings_status('refund_policy_status');
-        if ($request->expectsJson()) {  // v2.8.1
-            if($request->hasHeader('X-localization')){  // v2.8.1
-                $current_language = $request->header('X-localization'); // v2.8.1
-                $data = self::get_settings_localization('refund_policy',$current_language);    // v2.8.1
-                return response()->json($data); // v2.8.1
-            }   // v2.8.1
-            return response()->json($data); // v2.8.1
-        }   // v2.8.1
         abort_if($status == 0, 404);
         $config = Helpers::get_business_settings('landing_page');
         $landing_integration_type = Helpers::get_business_data('landing_integration_type');
@@ -338,14 +308,7 @@ class HomeController extends Controller
     {
         $data = self::get_settings('shipping_policy');
         $status = self::get_settings_status('shipping_policy_status');
-        if ($request->expectsJson()) {  // v2.8.1
-            if($request->hasHeader('X-localization')){  // v2.8.1
-                $current_language = $request->header('X-localization'); // v2.8.1
-                $data = self::get_settings_localization('shipping_policy',$current_language);    // v2.8.1
-                return response()->json($data); // v2.8.1
-            }   // v2.8.1
-            return response()->json($data); // v2.8.1
-        }   // v2.8.1
+
         abort_if($status == 0, 404);
         $config = Helpers::get_business_settings('landing_page');
         $landing_integration_type = Helpers::get_business_data('landing_integration_type');
@@ -366,14 +329,6 @@ class HomeController extends Controller
     {
         $data = self::get_settings('cancellation_policy');
         $status = self::get_settings_status('cancellation_policy_status');
-        if ($request->expectsJson()) {  // v2.8.1
-            if($request->hasHeader('X-localization')){  // v2.8.1
-                $current_language = $request->header('X-localization'); // v2.8.1
-                $data = self::get_settings_localization('cancellation_policy',$current_language);    // v2.8.1
-                return response()->json($data); // v2.8.1
-            }   // v2.8.1
-            return response()->json($data); // v2.8.1
-        }   // v2.8.1
         abort_if($status == 0, 404);
         $config = Helpers::get_business_settings('landing_page');
         $landing_integration_type = Helpers::get_business_data('landing_integration_type');

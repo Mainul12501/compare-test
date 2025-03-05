@@ -9,7 +9,6 @@ use Illuminate\Http\Request;
 
 class ParcelCategoryController extends Controller
 {
-    // v2.8.1 checked
     public function index(Request $request){
         try {
             $parcel_categories = ParcelCategory::

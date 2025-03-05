@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\Validator;
 
 class CouponController extends Controller
 {
-    // v2.8.1 checked
     public function list(Request $request){
         $validator = Validator::make($request->all(), [
             'limit' => 'required',
@@ -54,9 +53,9 @@ class CouponController extends Controller
             return response()->json(['errors' => Helpers::error_processor($validator)], 403);
         }
         $store_id = $request->vendor->stores[0]->id;
-
+        
         $data = json_decode($request->translations, true);
-
+        
         if (count($data) < 1) {
             $validator->getMessageBag()->add('translations', translate('messages.Title in english is required'));
         }
@@ -80,7 +79,7 @@ class CouponController extends Controller
         $coupon->customer_id = json_encode($customer_id);
         $coupon->module_id = $request->vendor->stores[0]->module_id;
         $coupon->save();
-
+       
         foreach ($data as $key=>$i) {
             $data[$key]['translationable_type'] = 'App\Models\Coupon';
             $data[$key]['translationable_id'] = $coupon->id;
@@ -156,9 +155,9 @@ class CouponController extends Controller
         $coupon->discount_type = $request->discount_type ?? '';
         $coupon->customer_id = json_encode($customer_id);
         $coupon->save();
-
+      
         foreach ($data as $key=>$i) {
-
+            
             Translation::updateOrInsert(
                 ['translationable_type'  => 'App\Models\Coupon',
                     'translationable_id'    => $coupon->id,

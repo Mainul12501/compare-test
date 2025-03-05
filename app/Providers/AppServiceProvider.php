@@ -2,7 +2,6 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 use App\Traits\AddonHelper;
 use Illuminate\Pagination\Paginator;
@@ -29,7 +28,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        Schema::defaultStringLength(191);
+
         try
         {
             Config::set('addon_admin_routes',$this->get_addon_admin_routes());

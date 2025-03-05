@@ -16,8 +16,6 @@ class DMVehicle extends Model
         'extra_charges' => 'float',
         'starting_coverage_area' => 'float',
         'maximum_coverage_area' => 'float',
-        'minimum_weight' => 'float',    // v2.8.1
-        'maximum_weight' => 'float',    // v2.8.1
     ];
 
     public function translations()

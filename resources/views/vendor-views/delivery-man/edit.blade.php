@@ -28,7 +28,6 @@
                                 <i class="tio-user"></i> {{translate('messages.general_information')}}
                             </h5>
                         </div>
-                        <input id="store_type"  type="hidden"  name="store_type" class="form-control" value="{{ \App\CentralLogics\Helpers::get_store_data()->store_type}}">    <!--v2.8.1-->
                         <div class="card-body">
                             <div class="row g-3">
                                 <div class="col-sm-6 col-md-4">
@@ -51,19 +50,6 @@
                                             required>
                                     </div>
                                 </div>
-{{--                                v2.8.1--}}
-                                <div class="col-sm-6 col-md-4">
-                                    <div class="form-group m-0">
-                                        <label class="input-label" for="exampleFormControlInput1">{{translate('messages.vehicle')}}</label>
-                                        <select name="vehicle_id" class="form-control js-select2-custom h--45px">
-                                            <option value="" readonly="true" hidden="true">{{ translate('messages.select_vehicle') }}</option>
-                                            @foreach(\App\Models\DMVehicle::where('status',1)->get(['id','type']) as $v)
-                                                <option value="{{$v->id}}" {{$v->id == $delivery_man->vehicle_id?'selected':''}}>{{$v->type}}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div>
-{{--                                v2.8.1--}}
                                 <div class="col-sm-6 col-md-4">
                                     <label class="input-label" for="identity_type">{{translate('messages.identity_type')}}</label>
                                     <select name="identity_type" id="identity_type" class="form-control">
@@ -126,31 +112,12 @@
                             </div>
                             <div class="custom-file mt-3">
                                 <input type="file" name="image" id="customFileEg1" class="custom-file-input read-url"
-                                    accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*">
+                                    accept=".webp, .jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*">
                                 <label class="custom-file-label" for="customFileEg1">{{translate('messages.choose_file')}}</label>
                             </div>
                         </div>
                     </div>
                 </div>
-{{--                v2.8.1 start--}}
-                <div class="col-4 card p-5 mx-5">
-                    <label class="__custom-upload-img">
-                        <label class="form-label">
-                            {{ translate('agreement_document') }}
-                        </label>
-
-                        <div class="text-center">
-                            <img class="img--110 onerror-image" id="agreement_document_view"
-                                 data-onerror-image="{{ asset('public/assets/admin/img/important-file.png') }}"
-                                 src="{{\App\CentralLogics\Helpers::onerror_file_or_image_helper($delivery_man['agreement_document'], asset('storage/app/public/delivery-man/').'/'.$delivery_man['agreement_document'], asset('public/assets/admin/img/important-file.png'), 'delivery-man/') }}"
-                                 alt="agreement_document" />
-                        </div>
-
-                        <input type="file" name="agreement_document" id="agreement_document" class="custom-file-input"
-                               accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff, .pdf, .doc, .docx|image/*, application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document" required>
-                    </label>
-                </div>
-{{--                v2.8.1 END--}}
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-header">
@@ -320,21 +287,4 @@
         });
     </script>
 
-{{--    v2.8.1--}}
-<script>
-    $("#agreement_document").change(function() {
-        var fallbackImageUrl = $("#agreement_document_view").data("onerror-image");
-        $("#agreement_document_view").on("error", function() {
-            $(this).attr("src", fallbackImageUrl);
-        });
-        var file = this.files[0];
-        if (file) {
-            var reader = new FileReader();
-            reader.onload = function(e) {
-                $("#agreement_document_view").attr("src", e.target.result);
-            }
-            reader.readAsDataURL(file);
-        }
-    });
-</script>
 @endpush

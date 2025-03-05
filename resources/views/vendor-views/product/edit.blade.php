@@ -179,7 +179,7 @@
                                 </div>
                                 <div class="custom-file mt-3">
                                     <input type="file" name="image" id="customFileEg1" class="custom-file-input"
-                                            accept=".jpg, .png, .jpeg, .webp , .gif, .bmp, .tif, .tiff|image/*">
+                                            accept=".webp, .jpg, .png, .jpeg, .webp , .gif, .bmp, .tif, .tiff|image/*">
                                     <label class="custom-file-label" for="customFileEg1">{{translate('messages.choose_file')}}</label>
                                 </div>
                             </div>
@@ -203,7 +203,7 @@
                                         <label class="input-label" for="exampleFormControlSelect1">{{translate('messages.category')}}<span
                                                 class="input-label-secondary">*</span></label>
                                         <select name="category_id" id="category-id" class="form-control js-select2-custom get-request"
-                                        data-url="{{url('/')}}/store-panel/item/get-categories?parent_id=" data-id="sub-categories"
+                                        data-url="{{url('/')}}/vendor-panel/item/get-categories?parent_id=" data-id="sub-categories"
                                                >
                                             @foreach($categories as $category)
                                                 <option
@@ -220,7 +220,7 @@
                                         <select name="sub_category_id" id="sub-categories"
                                                 data-id="{{count($product_category)>=2?$product_category[1]->id:''}}"
                                                 class="form-control js-select2-custom get-request"
-                                                data-url="{{url('/')}}/store-panel/item/get-categories?parent_id=" data-id="sub-sub-categories">
+                                                data-url="{{url('/')}}/vendor-panel/item/get-categories?parent_id=" data-id="sub-sub-categories">
 
                                         </select>
                                     </div>
@@ -328,46 +328,10 @@
                                                 placeholder="{{ translate('messages.Ex:') }} 100" required>
                                     </div>
                                 </div>
-{{--                                v2.8.1 start--}}
-                                <div class="col-sm-6 col-lg-4">
-                                    <div class="form-group mb-0">
-                                        <label class="input-label" for="exampleFormControlInput1">{{translate('messages.weight')}}</label>
-                                        <input type="number" value="{{$product->weight}}" min="0.001" max="999999999999.999" name="weight"
-                                               class="form-control" step="0.001"
-                                               placeholder="{{ translate('messages.Ex:') }} 10" required>
-
-                                        <input type="hidden" name="module_type" value="{{ $module_type}}">
-                                    </div>
-                                </div>
-                                {{--                                VM Weight inputs start--}}
-
-                                <div class="col-sm-6 col-lg-4">
-                                    <div class="form-group mb-0">
-                                        <label class="input-label" for="exampleFormControlInput1">{{translate('messages.VMW Height (cm)')}}</label>
-                                        <input type="number" value="{{$product->vmw_height ?? '0'}}" min="0.001" max="999999999999.999" step="0.001" name="vmw_height" class="form-control"
-                                               placeholder="{{ translate('messages.Ex:') }} 10" required>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-lg-4">
-                                    <div class="form-group mb-0">
-                                        <label class="input-label" for="exampleFormControlInput1">{{translate('messages.VMW Width (cm)')}}</label>
-                                        <input type="number" value="{{$product->vmw_width ?? '0'}}" min="0.001" max="999999999999.999" step="0.001" name="vmw_width" class="form-control"
-                                               placeholder="{{ translate('messages.Ex:') }} 10" required>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-lg-4">
-                                    <div class="form-group mb-0">
-                                        <label class="input-label" for="exampleFormControlInput1">{{translate('messages.VMW Length (cm)')}}</label>
-                                        <input type="number" value="{{$product->vmw_length ?? '0'}}" min="0.001" max="999999999999.999" step="0.001" name="vmw_length" class="form-control"
-                                               placeholder="{{ translate('messages.Ex:') }} 10" required>
-                                    </div>
-                                </div>
-                                {{--                                VM Weight inputs end--}}
-                                {{--                                v2.8.1 end--}}
                                 <div class="col-sm-6 col-lg-4">
                                     <div class="form-group mb-0">
                                         <label class="input-label" for="exampleFormControlInput1">{{translate('messages.discount')}}</label>
-                                        <input type="number" min="0" value="{{$product['discount']}}" max="100000"
+                                        <input type="number" min="0" value="{{$product['discount']}}" max="999999999"
                                                 name="discount" class="form-control"
                                                 placeholder="{{ translate('messages.Ex:') }} 100">
                                     </div>
@@ -796,8 +760,8 @@
                 let category = $("#category-id").val();
                 let sub_category = '{{count($product_category)>=2?$product_category[1]->id:''}}';
                 let sub_sub_category ='{{count($product_category)>=3?$product_category[2]->id:''}}';
-                getRequest('{{url('/')}}/store-panel/item/get-categories?parent_id=' + category + '&&sub_category=' + sub_category, 'sub-categories');
-                getRequest('{{url('/')}}/store-panel/item/get-categories?parent_id=' + sub_category + '&&sub_category=' + sub_sub_category, 'sub-sub-categories');
+                getRequest('{{url('/')}}/vendor-panel/item/get-categories?parent_id=' + category + '&&sub_category=' + sub_category, 'sub-categories');
+                getRequest('{{url('/')}}/vendor-panel/item/get-categories?parent_id=' + sub_category + '&&sub_category=' + sub_sub_category, 'sub-sub-categories');
             }, 1000)
         });
 

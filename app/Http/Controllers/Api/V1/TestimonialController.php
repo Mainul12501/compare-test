@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 
 class TestimonialController extends Controller
 {
-    // v2.8.1 checked
     function get_tetimonial_lists()
     {
        $testimonials = \App\Models\BusinessSetting::where(['key'=>'testimonial'])->first();

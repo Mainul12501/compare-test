@@ -1,19 +1,16 @@
 @extends('layouts.landing.app')
-@section('title', translate('messages.store_registration'))
+@section('title', translate('messages.vendor_registration'))
 @push('css_or_js')
     <link rel="stylesheet" href="{{ asset('public/assets/admin/css/toastr.css') }}">
     <link rel="stylesheet" href="{{ asset('public/assets/admin/css/view-pages/vendor-registration.css') }}">
     <link rel="stylesheet" href="{{ asset('public/assets/landing/css/select2.min.css') }}"/>
-
-    <link rel="stylesheet" href="{{ asset('public/assets/admin/css/style.css') }}"> <!--v2.8.1-->
-    <link rel="stylesheet" href="{{asset('/public/assets/admin/css/intlTelInput.css')}}"/>  {{--v2.8.1--}}
 @endpush
 @section('content')
     <section class="m-0 py-5">
         <div class="container">
             <!-- Page Header -->
             <div class="section-header">
-                <h2 class="title mb-2">{{ translate('messages.store') }} <span class="text--base">{{translate('application')}}</span></h2>
+                <h2 class="title mb-2">{{ translate('messages.vendor') }} <span class="text--base">{{translate('application')}}</span></h2>
             </div>
             @php($language=\App\Models\BusinessSetting::where('key','language')->first())
             @php($language = $language->value ?? null)
@@ -69,14 +66,8 @@
                                     fill="#000000" data-original="#000000"></path>
                             </g>
                         </g>
-                    </svg> {{ translate('messages.store_info') }}
+                    </svg> {{ translate('messages.vendor_info') }}
                 </h5>
-                <!--v2.8.1-->
-                @php($store_agreement = \App\Models\BusinessSetting::where('key', 'store_agreement')->first())
-                @if ($store_agreement)
-                    <a href="{{route('re staurant.download-store-agreement')}}" class="text-center mr-3 mb-4 cmn--btn border-0 outline-0"> <strong>{{ translate('messages.download_Agreement') }} </strong> </a>
-                @endif
-                {{--v2.8.1--}}
             </div>
             <div class="card-body p-4">
                 @if($language)
@@ -102,7 +93,7 @@
                                         ({{ translate('messages.Default') }})
                                     </label>
                                     <input type="text" name="name[]" id="default_name" class="form-control __form-control"
-                                        placeholder="{{ translate('messages.store_name') }}" required>
+                                        placeholder="{{ translate('messages.vendor_name') }}" required>
                                 </div>
                             </div>
                             <input type="hidden" name="lang[]" value="default">
@@ -125,7 +116,7 @@
                                     </label>
                                     <input type="text" name="name[]" id="{{ $lang }}_name"
                                         class="form-control __form-control"
-                                        placeholder="{{ translate('messages.store_name') }}">
+                                        placeholder="{{ translate('messages.vendor_name') }}">
                                 </div>
                             </div>
                             <input type="hidden" name="lang[]" value="{{ $lang }}">
@@ -173,9 +164,9 @@
                         <div class="form-group mb-4">
                             <label class="input-label" for="latitude">{{ translate('messages.latitude') }} <span
                                     class="input-label-secondary"
-                                    title="{{ translate('messages.store_lat_lng_warning') }}"><img
+                                    title="{{ translate('messages.vendor_lat_lng_warning') }}"><img
                                         src="{{ asset('/public/assets/admin/img/info-circle.svg') }}"
-                                        alt="{{ translate('messages.store_lat_lng_warning') }}"></span></label>
+                                        alt="{{ translate('messages.vendor_lat_lng_warning') }}"></span></label>
                             <input type="text" id="latitude" name="latitude" class="form-control __form-control"
                                 placeholder="{{ translate('messages.Ex:') }} -94.22213" value="{{ old('latitude') }}"
                                 required readonly>
@@ -183,9 +174,9 @@
                         <div class="form-group">
                             <label class="input-label" for="longitude">{{ translate('messages.longitude') }} <span
                                     class="input-label-secondary"
-                                    title="{{ translate('messages.store_lat_lng_warning') }}"><img
+                                    title="{{ translate('messages.vendor_lat_lng_warning') }}"><img
                                         src="{{ asset('/public/assets/admin/img/info-circle.svg') }}"
-                                        alt="{{ translate('messages.store_lat_lng_warning') }}"></span></label>
+                                        alt="{{ translate('messages.vendor_lat_lng_warning') }}"></span></label>
                             <input type="text" name="longitude" class="form-control __form-control"
                                 placeholder="{{ translate('messages.Ex:') }} 103.344322" id="longitude"
                                 value="{{ old('longitude') }}" required readonly>
@@ -238,14 +229,14 @@
                                         <div class="icon-file">
                                             <input type="file" name="cover_photo" id="coverImageUpload"
                                             class="form-control __form-control"
-                                            accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*">
+                                            accept=".webp, .jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*">
                                             <img src="{{ asset('public/assets/admin/img/pen.png') }}" alt="">
                                         </div>
                                     </div>
                                 </label>
                             </div>
                             <div class="form-group w-140px d-flex flex-column justify-content-between">
-                                <label class="input-label pt-2">{{ translate('messages.store_logo') }}<small class="text-danger">
+                                <label class="input-label pt-2">{{ translate('messages.vendor_logo') }}<small class="text-danger">
                                         * (
                                         {{ translate('messages.ratio') }}
                                         1:1
@@ -257,7 +248,7 @@
                                     <div class="icon-file-group">
                                         <div class="icon-file">
                                             <input type="file" name="logo" id="customFileEg1" class="form-control __form-control"
-                                            accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*" required>
+                                            accept=".webp, .jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*" required>
                                             <img src="{{ asset('public/assets/admin/img/pen.png') }}" alt="">
                                         </div>
                                     </div>
@@ -326,107 +317,6 @@
                 </div>
             </div>
         </div>
-{{--        v2.8.1 start--}}
-        <div class="col-lg-12">
-            <div class="card shadow--card-2">
-                <div class="card-header">
-                    <h5 class="card-title">
-                        <span class="card-header-icon mr-1"><i class="tio-dashboard"></i></span>
-                        <span>{{ translate('messages.additional_information') }}</span>
-                    </h5>
-                </div>
-                <div class="card-body d-flex justify-content-center align-items-center">
-
-                    <div class="row g-12 w-100 d-flex justify-content-start align-items-center">
-
-
-
-                        <div class="col-md-4 col-lg-4 col-sm-12">
-                            <div class="form-group">
-                                <label class="input-label"
-                                       for="tex_id">{{ translate('messages.Tax_Id') }}</label>
-                                <input type="text" id="tax_id"
-                                       name="tax_id" class="form-control __form-control"
-                                       placeholder="{{ translate('messages.Tax_Id') }}"
-                                       value="{{ old('tax_id') }}" required>
-                            </div>
-                        </div>
-
-                        <div class="col-md-4 col-lg-4 col-sm-12">
-                            <div class="form-group">
-                                <label class="input-label"
-                                       for="reg_no">{{ translate('messages.registration_number') }}</label>
-                                <input type="text" id="reg_no"
-                                       name="register_no" class="form-control __form-control"
-                                       placeholder="{{ translate('messages.registration_number') }}"
-                                       value="{{ old('registration_number') }}" required>
-                            </div>
-                        </div>
-
-
-
-                        <div class="col-3 card p-5 mx-5">
-                            <label class="__custom-upload-img">
-                                <label class="form-label">
-                                    {{ translate('tax_document') }}
-                                </label>
-
-                                <div class="text-center">
-                                    <img class="img--110 onerror-image" id="tax_document_view"
-                                         data-onerror-image="{{ asset('public/assets/admin/img/important-file.png') }}"
-                                         src="{{ asset('public/assets/admin/img/important-file-upload.png') }}"
-                                         alt="tax_document" />
-                                </div>
-
-                                <input type="file" name="tax_document" id="tax_document" required
-                                       class="custom-file-input"
-                                       accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff, .pdf, .doc, .docx|image/*, application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document">
-                            </label>
-                        </div>
-                        <div class="col-3 card p-5 mx-5">
-                            <label class="__custom-upload-img">
-                                <label class="form-label">
-                                    {{ translate('registration_document') }}
-                                </label>
-
-                                <div class="text-center">
-                                    <img class="img--110 onerror-image" id="registration_document_view"
-                                         data-onerror-image="{{ asset('public/assets/admin/img/important-file.png') }}"
-                                         src="{{ asset('public/assets/admin/img/important-file-upload.png') }}"
-                                         alt="registration_document" />
-                                </div>
-
-                                <input type="file" name="registration_document" id="registration_document" required
-                                       class="custom-file-input"
-                                       accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff, .pdf, .doc, .docx|image/*, application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document">
-                            </label>
-                        </div>
-                        <div class="col-4 card p-5 mx-5">
-                            <label class="__custom-upload-img">
-                                <label class="form-label">
-                                    {{ translate('agreement/contact document  ') }}
-                                </label>
-
-                                <div class="text-center">
-                                    <img class="img--110 onerror-image" id="agreement_document_view"
-                                         data-onerror-image="{{ asset('public/assets/admin/img/important-file.png') }}"
-                                         src="{{ asset('public/assets/admin/img/important-file-upload.png') }}"
-                                         alt="agreement_document" />
-                                </div>
-
-                                <input type="file" name="agreement_document" id="agreement_document" required
-                                       class="custom-file-input"
-                                       accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff, .pdf, .doc, .docx|image/*, application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document">
-                            </label>
-                        </div>
-
-
-                    </div>
-
-                </div>
-            </div>
-        </div>
-{{--        v2.8.1 end--}}
         <div class="card __card bg-F8F9FC mb-3">
             <div class="card-header">
                 <h5 class="card-title">
@@ -556,76 +446,13 @@
     @endsection
     @push('script_2')
 
-
         <script src="{{ asset('public/assets/admin/js/spartan-multi-image-picker.js') }}"></script>
         <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
         <script
             src="https://maps.googleapis.com/maps/api/js?key={{ \App\Models\BusinessSetting::where('key', 'map_api_key')->first()->value }}&libraries=drawing,places&v=3.45.8">
         </script>
-        {{--        v2.8.1 start--}}
-        <script src="{{asset('public/assets/admin/js/intlTelInputCdn.min.js')}}"></script>
-        <script src="{{asset('public/assets/admin/js/intlTelInputCdn-jquery.min.js')}}"></script>
-        <script>
-            $("#tax_document").change(function() {
-                var fallbackImageUrl = $("#tax_document_view").data("onerror-image");
-                $("#tax_document_view").on("error", function() {
-                    $(this).attr("src", fallbackImageUrl);
-                });
-                var file = this.files[0];
-                if (file) {
-                    var reader = new FileReader();
-                    reader.onload = function(e) {
-                        $("#tax_document_view").attr("src", e.target.result);
-                    }
-                    reader.readAsDataURL(file);
-                }
-            });
-            $("#registration_document").change(function() {
-                var fallbackImageUrl = $("#registration_document_view").data("onerror-image");
-                $("#registration_document_view").on("error", function() {
-                    $(this).attr("src", fallbackImageUrl);
-                });
-                var file = this.files[0];
-                if (file) {
-                    var reader = new FileReader();
-                    reader.onload = function(e) {
-                        $("#registration_document_view").attr("src", e.target.result);
-                    }
-                    reader.readAsDataURL(file);
-                }
-            });
-            $("#agreement_document").change(function() {
-                var fallbackImageUrl = $("#agreement_document_view").data("onerror-image");
-                $("#agreement_document_view").on("error", function() {
-                    $(this).attr("src", fallbackImageUrl);
-                });
-                var file = this.files[0];
-                if (file) {
-                    var reader = new FileReader();
-                    reader.onload = function(e) {
-                        $("#agreement_document_view").attr("src", e.target.result);
-                    }
-                    reader.readAsDataURL(file);
-                }
-            });
-        </script>
-        {{--        v2.8.1 end--}}
         <script type="text/javascript">
             "use strict";
-            // v2.8.1 start
-            @php($country=\App\Models\BusinessSetting::where('key','country')->first())
-            let phone = $("#phone").intlTelInput({
-                utilsScript: "{{asset('public/assets/admin/js/intlTelInputCdn-utils.min.js')}}",
-                autoHideDialCode: true,
-                autoPlaceholder: "ON",
-                dropdownContainer: document.body,
-                formatOnDisplay: true,
-                hiddenInput: "phone",
-                initialCountry: "{{$country?$country->value:auto}}",
-                placeholderNumberType: "MOBILE",
-                separateDialCode: true
-            });
-            // v2.8.1 end
             @php($default_location = \App\Models\BusinessSetting::where('key', 'default_location')->first())
             @php($default_location = $default_location->value ? json_decode($default_location->value, true) : 0)
             let myLatlng = {
@@ -692,7 +519,7 @@
             $(document).ready(function() {
                 $('#module_id').select2({
                     ajax: {
-                        url: '{{url('/')}}/store/get-all-modules/',
+                        url: '{{url('/')}}/vendor/get-all-modules/',
                         data: function (params) {
                             return {
                                 q: params.term, // search term

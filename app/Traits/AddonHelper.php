@@ -10,9 +10,11 @@ trait AddonHelper
         $directories = self::getDirectories($dir);
         $addons = [];
         foreach ($directories as $directory) {
-            $sub_dirs = self::getDirectories('Modules/' . $directory);
-            if (in_array('Addon', $sub_dirs)) {
-                $addons[] = 'Modules/' . $directory;
+            if($directory == 'Gateways'){
+                $sub_dirs = self::getDirectories('Modules/' . $directory);
+                if (in_array('Addon', $sub_dirs)) {
+                    $addons[] = 'Modules/' . $directory;
+                }
             }
         }
 

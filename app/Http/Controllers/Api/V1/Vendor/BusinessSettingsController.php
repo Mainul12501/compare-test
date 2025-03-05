@@ -12,7 +12,7 @@ use App\Models\Translation;
 
 class BusinessSettingsController extends Controller
 {
-    // v2.8.1 checked
+
     public function update_store_setup(Request $request)
     {
         $validator = Validator::make($request->all(), [

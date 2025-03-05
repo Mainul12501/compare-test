@@ -8,7 +8,6 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Validator;
 use App\Traits\Processor;
 use App\Models\PaymentRequest;
-use Firebase\JWT\JWT;
 
 class Paytabs
 {
@@ -68,7 +67,6 @@ class Paytabs
 
 class PaytabsController extends Controller
 {
-    // v2.8.1 checked
     use Processor;
 
     private PaymentRequest $payment;

@@ -55,6 +55,20 @@
                         </a>
                     </li>
                     <!-- End Dashboards -->
+
+                    @if (\App\CentralLogics\Helpers::module_permission_check('cashback'))
+                    <li class="nav-item">
+                        <small class="nav-subtitle" title="{{ translate('messages.Promotion_section') }}">{{ translate('messages.Promotion_management') }}</small>
+                        <small class="tio-more-horizontal nav-subtitle-replacer"></small>
+                    </li>
+                    <li class="navbar-vertical-aside-has-menu {{ Request::is('admin/users/cashback*') ? 'active' : '' }}">
+                        <a class="js-navbar-vertical-aside-menu-link nav-link" href="{{ route('admin.users.cashback.add-new') }}" title="{{ translate('messages.cashback') }}">
+                            <i class="tio-settings-back nav-icon"></i>
+                            <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">{{ translate('messages.cashback') }}</span>
+                        </a>
+                    </li>
+                    @endif
+
                 <!-- DeliveryMan -->
                 @if (\App\CentralLogics\Helpers::module_permission_check('deliveryman'))
                 <li class="nav-item">
@@ -84,16 +98,12 @@
                 <li class="navbar-vertical-aside-has-menu {{ Request::is('admin/users/delivery-man/new') || Request::is('admin/users/delivery-man/deny')  ? 'active' : '' }}">
                     <a class="js-navbar-vertical-aside-menu-link nav-link" href="{{ route('admin.users.delivery-man.new') }}" title="{{ translate('messages.new_delivery_man') }}">
                         <i class="tio-man nav-icon"></i>
-                        @php($newDeliveryManCount = \App\Models\DeliveryMan::where('application_status','pending')->count())
-                        <span class=" text-truncate {{ $newDeliveryManCount > 0 ? 'position-relative overflow-visible' : 'navbar-vertical-aside-mini-mode-hidden-elements' }}">
+                        <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">
                             {{ translate('messages.new_delivery_man') }}
 
                             <span class="badge badge-soft-info badge-pill ml-1">
-                                {{ $newDeliveryManCount }}
+                                {{ \App\Models\DeliveryMan::where('application_status','pending')->count() }}
                             </span>
-                            @if($newDeliveryManCount > 0)
-                                <span class="btn-status btn-status-danger border-0 size-8px"></span>
-                            @endif
                         </span>
                     </a>
                 </li>
@@ -107,20 +117,7 @@
                         </span>
                     </a>
                 </li>
-{{--                    v2.8.1 start--}}
-                        <li class="navbar-vertical-aside-has-menu {{ Request::is('admin/users/delivery-man/dm-pending-disbursement-requests*')  ? 'active' : '' }}">
-                            @php($menuDmDWM = \App\Models\DisbursementWithdrawalMethod::where('delivery_man_id', '!=', null)->where('pending_status', 1)->count() ?? 0)
-                            <a class="js-navbar-vertical-aside-menu-link nav-link" href="{{ route('admin.users.delivery-man.dm-pending-disbursement-requests') }}" title="{{ translate('messages.DM Pending Disbursement Requests') }}">
-                                <i class="tio-filter-list nav-icon"></i>
-                                <span class="{{ $menuDmDWM > 0 ? 'position-relative overflow-visible' : 'navbar-vertical-aside-mini-mode-hidden-elements' }} text-truncate">
-                            {{ translate('messages.DM Pending Disbursement Requests') }}
-                                    @if($menuDmDWM > 0)
-                                        <span class="btn-status btn-status-danger border-0 size-8px"></span>
-                                    @endif
-                        </span>
-                            </a>
-                        </li>
-{{--                    v2.8.1 end--}}
+
                 <li class="navbar-vertical-aside-has-menu {{ Request::is('admin/users/delivery-man/reviews') ? 'active' : '' }}">
                     <a class="js-navbar-vertical-aside-menu-link nav-link" href="{{ route('admin.users.delivery-man.reviews.list') }}" title="{{ translate('messages.reviews') }}">
                         <i class="tio-star-outlined nav-icon"></i>
@@ -150,14 +147,11 @@
                 </li>
 
                 <li class="navbar-vertical-aside-has-menu {{ Request::is('admin/users/customer/wallet*') ? 'active' : '' }}">
-                    @php($menuWalletToBank = \App\Models\WalletToBank::where(['payment_status' => 'pending'])->count() ?? 0)
+
                     <a class="js-navbar-vertical-aside-menu-link nav-link nav-link-toggle" href="javascript:" title="{{ translate('messages.customer_wallet') }}">
                         <i class="tio-wallet nav-icon"></i>
-                        <span class="{{ $menuWalletToBank > 0 ? 'position-relative overflow-visible' : 'navbar-vertical-aside-mini-mode-hidden-elements' }} text-truncate  text-capitalize">
+                        <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate  text-capitalize">
                             {{ translate('messages.customer_wallet') }}
-                            @if($menuWalletToBank > 0)
-                                <span class="btn-status btn-status-danger border-0 size-8px"></span>
-                            @endif
                         </span>
                     </a>
 
@@ -182,21 +176,6 @@
                                 <span class="text-truncate text-capitalize">{{ translate('messages.bonus') }}</span>
                             </a>
                         </li>
-{{--                        v2.8.1 start--}}
-                        <li class="nav-item {{ Request::is('admin/users/customer/wallet/show-wallet-transfer-list*') ? 'active' : '' }}">
-
-                            <a class="nav-link " href="{{ route('admin.users.customer.wallet.show-wallet-transfer-list') }}" title="{{ translate('messages.Bank Transfer Requests') }}">
-                                <span class="tio-circle nav-indicator-icon"></span>
-                                <span class="text-truncate text-capitalize {{ $menuWalletToBank > 0 ? 'position-relative overflow-visible' : 'navbar-vertical-aside-mini-mode-hidden-elements' }}">
-                                    {{ translate('messages.Bank Transfer Requests') }}
-                                    @if($menuWalletToBank > 0)
-                                        <span class="btn-status btn-status-danger border-0 size-8px"></span>
-                                    @endif
-
-                                </span>
-                            </a>
-                        </li>
-{{--                        v2.8.1 end--}}
                     </ul>
                 </li>
 

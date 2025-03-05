@@ -11,10 +11,8 @@ use App\CentralLogics\OrderLogic;
 use App\Models\AccountTransaction;
 use Illuminate\Support\Facades\DB;
 use App\Mail\OrderVerificationMail;
-use Illuminate\Support\Facades\App;
 use App\CentralLogics\CustomerLogic;
 use Illuminate\Support\Facades\Mail;
-use App\Models\SubscriptionTransaction;
 use App\Models\SubscriptionBillingAndRefundHistory;
 use Brian2694\Toastr\Facades\Toastr;
 use Modules\Rental\Entities\Trips;
@@ -156,6 +154,47 @@ if (! function_exists('order_place')) {
     }
 
 }
+
+if (! function_exists('trip_payment_success')) {
+    function trip_payment_success($data) {
+        $trip = Trips::find($data->attribute_id);
+        if($trip->payment_method != 'partial_payment'){
+            $trip->payment_method=$data->payment_method;
+        }
+        $trip->transaction_reference=$data->transaction_ref;
+        $trip->payment_status='paid';
+        $trip->save();
+
+        if( $trip?->provider?->is_valid_subscription == 1 && $trip?->provider?->store_sub?->max_order != "unlimited" && $trip?->provider?->store_sub?->max_order > 0){
+            $trip?->provider?->store_sub?->decrement('max_order' , 1);
+        }
+
+        if ($trip->trip_status == 'completed' && $trip->payment_status == 'paid' && !$trip->trip_transaction) {
+            Helpers::createTransactionForTrip($trip, 'admin');
+        }
+        Helpers::sendTripPaymentNotificationCustomerMain($trip);
+        OrderLogic::update_unpaid_trip_payment(trip_id:$trip->id, payment_method:$data->payment_method);
+    }
+
+}
+
+
+
+if (! function_exists('trip_payment_fail')) {
+    function trip_payment_fail($data) {
+        $trip = Trips::find($data->attribute_id);
+        $trip->trip_status='payment_failed';
+        if($trip->payment_method != 'partial_payment'){
+            $trip->payment_method=$data->payment_method;
+        }
+        $trip->payment_failed=now();
+        $trip->save();
+        return true;
+    }
+}
+
+
+
 if (! function_exists('order_failed')) {
     function order_failed($data) {
         $order = Order::find($data->attribute_id);
@@ -214,6 +253,8 @@ if (!function_exists('addon_published_status')) {
     }
 }
 
+
+
 if (!function_exists('config_settings')) {
     function config_settings($key, $settings_type)
     {
@@ -253,5 +294,13 @@ if (!function_exists('config_settings')) {
             return true;
         }
     }
+
+    if (! function_exists('getPaginationConfig')) {
+        function getPaginationConfig()
+        {
+            return config('default_pagination');
+        }
+    }
+
 
 }

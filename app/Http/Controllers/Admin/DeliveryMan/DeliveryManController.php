@@ -42,9 +42,6 @@ use App\Contracts\Repositories\ConversationRepositoryInterface;
 use App\Enums\ViewPaths\Admin\DeliveryMan as DeliveryManViewPath;
 use App\Contracts\Repositories\OrderTransactionRepositoryInterface;
 use App\Contracts\Repositories\UserNotificationRepositoryInterface;
-use App\Models\DisbursementWithdrawalMethod;
-use Illuminate\Support\Facades\Response;
-use Illuminate\Support\Facades\Storage;
 
 class DeliveryManController extends BaseController
 {
@@ -61,11 +58,7 @@ class DeliveryManController extends BaseController
     )
     {
     }
-    public function pending_method_requests()   // v2.8.1
-    {   // v2.8.1
-        $disbursementWithdrawlMethods = DisbursementWithdrawalMethod::where('pending_status', 1)->where('delivery_man_id', '!=', null)->with('store', 'deliveryMan', 'withdrawalMethod')->paginate(config('default_pagination'));   // v2.8.1
-        return view('admin-views.delivery-man.pending_method_requests', compact('disbursementWithdrawlMethods'));   // v2.8.1
-    }   // v2.8.1
+
     public function index(?Request $request): View|Collection|LengthAwarePaginator|null
     {
         return $this->getListView($request);
@@ -188,7 +181,7 @@ class DeliveryManController extends BaseController
 
     public function updateStatus(Request $request,UserNotificationRepositoryInterface $notificationRepo): RedirectResponse
     {
-        $deliveryMan = $this->deliveryManRepo->update(id: $request['id'] ,data: ['status'=>$request['status'], 'reason' => $request->reason]); // v2.8.1
+        $deliveryMan = $this->deliveryManRepo->update(id: $request['id'] ,data: ['status'=>$request['status']]);
 
 
             if($request['status'] == 0)
@@ -339,20 +332,13 @@ class DeliveryManController extends BaseController
 
     }
 
-    public function getPreview(Request $request, int|string $id, string $tab='info')
+    public function getPreview(Request $request, int|string $id, string $tab='info'): View
     {
-        if (isset($request->req_form) && $request->req_form == 'admin_store')
-        {
-            $deliveryMan = $this->deliveryManRepo->getFirstWhere(params: ['id' => $id], relations: ['reviews']);
-
-        } else {
-            $deliveryMan = $this->deliveryManRepo->getFirstWhere(params: ['type' => 'zone_wise','id' => $id], relations: ['reviews']);
-        }
-        $disbursementWithdrawalMethods = DisbursementWithdrawalMethod::where(['delivery_man_id' => $id])->get();    // v2.8.1
+        $deliveryMan = $this->deliveryManRepo->getFirstWhere(params: ['type' => 'zone_wise','id' => $id], relations: ['reviews']);
         if($tab == 'info')
         {
             $reviews = $this->dmReviewRepo->getListWhere(filters: ['delivery_man_id'=>$id], dataLimit: config('default_pagination'));
-            return view(DeliveryManViewPath::INFO[VIEW], compact('deliveryMan', 'reviews', 'disbursementWithdrawalMethods'));   // v2.8.1
+            return view(DeliveryManViewPath::INFO[VIEW], compact('deliveryMan', 'reviews'));
         }
         else if($tab == 'transaction')
         {
@@ -376,7 +362,6 @@ class DeliveryManController extends BaseController
                     });
                 })
                 ->latest()->paginate(config('default_pagination'));
-            return 'yo';
             return view('admin-views.delivery-man.view.disbursement', compact('deliveryMan','disbursements'));
         }
 
@@ -387,7 +372,7 @@ class DeliveryManController extends BaseController
             $conversations = [];
         }
 
-        return view(DeliveryManViewPath::CONVERSATION[VIEW], compact('conversations','deliveryMan', 'disbursementWithdrawalMethods'));
+        return view(DeliveryManViewPath::CONVERSATION[VIEW], compact('conversations','deliveryMan'));
 
     }
 
@@ -460,7 +445,7 @@ class DeliveryManController extends BaseController
 
     public function updateApplication(Request $request): RedirectResponse
     {
-        $deliveryMan = $this->deliveryManRepo->update(id: $request['id'] ,data: ['application_status'=>$request['status'] , 'reason' => $request->reason]);     // v2.8.1
+        $deliveryMan = $this->deliveryManRepo->update(id: $request['id'] ,data: ['application_status'=>$request['status']]);
         if($request['status'] == 'approved') $this->deliveryManRepo->update(id: $request['id'] ,data: ['status'=>1]);
         try{
             if($request['status']=='approved'){
@@ -510,38 +495,5 @@ class DeliveryManController extends BaseController
         } else if ($request->type == 'csv') {
             return Excel::download(new DisbursementHistoryExport($data), 'Disbursementlist.csv');
         }
-    }
-
-    public function download_document($fileName){   // v2.8.1
-        $path = '/delivery-man/';   // v2.8.1
-        if (Storage::disk('public')->exists($path . $fileName)) {   // v2.8.1
-            return Response::download(storage_path('app/public/delivery-man/' . $fileName));    // v2.8.1
-        }   // v2.8.1
-    }   // v2.8.1
-
-    public function getDefaultDwmData(DisbursementWithdrawalMethod $disbursementWithdrawalMethod): JsonResponse
-    {
-        foreach (json_decode($disbursementWithdrawalMethod['method_fields']) as $key => $field) {
-            $disbursementWithdrawalMethod['account_key']    = $key;
-            $disbursementWithdrawalMethod['account_value']    = $field;
-        }
-        return response()->json($disbursementWithdrawalMethod);
-    }
-
-    public function changeDefaultDwmData(Request $request)
-    {
-        $disbursementWithdrawalMethod = DisbursementWithdrawalMethod::find($request->disbursement_withdrawal_method_id);
-
-        if ($disbursementWithdrawalMethod)
-        {
-            if (isset($request->account_name))
-            {
-                $disbursementWithdrawalMethod->store_name   = $request->account_name;
-            }
-            $disbursementWithdrawalMethod->method_fields	= json_encode([$request->account_key => $request->account_number]);
-            $disbursementWithdrawalMethod->save();
-        }
-        Toastr::success('Default Account data updated successfully');
-        return redirect(url($request->redirect_url));
     }
 }

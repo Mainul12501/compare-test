@@ -7,7 +7,6 @@
 @endpush
 
 @section('content')
-    @php($offline_payments = \App\Models\OfflinePaymentMethod::where('status', 1)->latest()->paginate(config('default_pagination')))
     <div class="content container-fluid">
         <!-- Page Header -->
         <div class="page-header">
@@ -108,19 +107,9 @@
                 <form action="{{ route('vendor.wallet.make_payment') }}" method="POST" class="needs-validation">
                     <div class="modal-body">
                         @csrf
-{{--                        v2.8.1 start--}}
-                        <label for="" class="d-flex align-items-start gap-3 mb-1">
-                            {{ translate('messages.payment_method') }}
-                        </label>
-                        <select name="payment_method" class="form-control" id="payment_method">
-                            <option value="0" disabled>{{ translate('messages.select_payment_type') }}</option>
-                            <option value="offline">{{ translate('messages.Pay_Via_offline') }}</option>
-                            <option value="online">{{ translate('messages.Pay_Via_Online') }}</option>
-                        </select>
-{{--                        v2.8.1 end--}}
                         <input type="hidden" value="{{ \App\CentralLogics\Helpers::get_store_id() }}" name="store_id"/>
                         <input type="hidden" value="{{  abs($wallet->collected_cash) }}" name="amount"/>
-{{--                        <h5 class="mb-5 ">{{ translate('Pay_Via_Online') }} &nbsp; <small>({{ translate('Faster_&_secure_way_to_pay_bill') }})</small></h5>--}}
+                        <h5 class="mb-5 ">{{ translate('Pay_Via_Online') }} &nbsp; <small>({{ translate('Faster_&_secure_way_to_pay_bill') }})</small></h5>
                         <div class="row g-3">
                             @forelse ($data as $item)
                                 <div class="col-sm-6">
@@ -136,23 +125,6 @@
                                 <h1>{{ translate('no_payment_gateway_found') }}</h1>
                             @endforelse
                         </div>
-{{--                        v2.8.1 start--}}
-                        <div class="row g-3 mt-3 offline_payment d-none" id="offline_payment">
-                            @forelse ($offline_payments as $item)
-                                <div class="col-sm-6">
-                                    <div class="d-flex gap-3 align-items-center">
-                                        <input type="radio" required id="{{$item['method_name'] }}" name="payment_gateway" value="{{$item['method_name'] }}">
-                                        <label for="{{$item['method_name'] }}" class="d-flex align-items-center gap-3 mb-0">
-
-                                            {{ $item['method_name'] }}
-                                        </label>
-                                    </div>
-                                </div>
-                            @empty
-                                <h1>{{ translate('no_payment_gateway_found') }}</h1>
-                            @endforelse
-                        </div>
-{{--                        v2.8.1 end--}}
                     </div>
 
                     <div class="modal-footer">

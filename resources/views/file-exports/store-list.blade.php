@@ -56,8 +56,8 @@
             <th>{{ translate('Ratings') }}</th>
             <th>  {{ translate('Owner_Information') }}</th>
             <th>   {{ translate('Address') }}</th>
-            <th> {{ translate('Total_Items') }}</th>
-            <th> {{ translate('Total_Orders') }}</th>
+            <th> {{ translate('Total_'.$isVehicle.'s') }}</th>
+            <th> {{ translate('Total_'.$isTrip.'s') }}</th>
             <th>{{ translate('Featured_?') }}</th>
             <th>{{ translate('Status') }}</th>
         </thead>

@@ -16,7 +16,6 @@ use Illuminate\Validation\Rules\Password;
 
 class VendorPasswordResetController extends Controller
 {
-    // v2.8.1 checked
     public function reset_password_request(Request $request)
     {
         $validator = Validator::make($request->all(), [

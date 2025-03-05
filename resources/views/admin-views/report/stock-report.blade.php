@@ -25,7 +25,7 @@ active
         <!-- Header -->
         <div class="card-header border-0 py-2">
             <div class="search--button-wrapper justify-content-end">
-                <form class="search-form" id="search-form">
+                <form class="search-form">
                     <!-- Search -->
                     <div class="input-group input--group">
                         <input id="datatableSearch" name="search" type="search" class="form-control" placeholder="{{translate('ex_:_search_name')}}" aria-label="{{translate('messages.search_here')}}" value="{{request()->query('search')}}">
@@ -223,35 +223,6 @@ active
             },
         });
     })
-    // v2.8.1 start
-
-    $('#search-form').on('submit', function (e) {
-        e.preventDefault();
-        let formData = new FormData(this);
-        $.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
-        });
-        $.post({
-            url: '{{route('admin.transactions.report.stock-search')}}',
-            data: formData,
-            cache: false,
-            contentType: false,
-            processData: false,
-            beforeSend: function () {
-                $('#loading').show();
-            },
-            success: function (data) {
-                $('#set-rows').html(data.view);
-                $('.page-area').hide();
-            },
-            complete: function () {
-                $('#loading').hide();
-            },
-        });
-    });
-    // v2.8.1 end
 
     function update_qty() {
         let total_qty = 0;

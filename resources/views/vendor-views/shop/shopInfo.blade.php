@@ -3,11 +3,7 @@
     $title = $vendorData?->module_type == 'rental' && addon_published_status('Rental') ? 'Provider' : 'Store';
 @endphp
 @extends('layouts.vendor.app')
-@if(\App\CentralLogics\Helpers::get_store_data()->store_type == 'company')
-    @section('title',translate('messages.company_view'))
-@else
-    @section('title',translate('messages.store_view'))
-@endif
+@section('title',translate('messages.store_view'))
 @push('css_or_js')
     <!-- Custom styles for this page -->
 @endpush
@@ -19,15 +15,11 @@
             <h2 class="page-header-title text-capitalize my-2">
                 <img class="w--26" src="{{asset('/public/assets/admin/img/store.png')}}" alt="public">
                 <span>
-                    @if(\App\CentralLogics\Helpers::get_store_data()->store_type == 'store')
-                        {{translate('messages.my_'.$title.'_info')}}
-                    @else
-                        {{translate('messages.my_company_info')}}
-                    @endif
+                    {{translate('messages.my_'.$title.'_info')}}
                 </span>
             </h2>
             <div class="my-2">
-                <a class="btn btn--primary" href="{{route('vendor.shop.edit')}}"><i class="tio-edit"></i>{{translate(\App\CentralLogics\Helpers::get_store_data()->store_type == 'company' ? 'messages.edit_company_information' : 'messages.edit_'.$title.'_information')}}</a>
+                <a class="btn btn--primary" href="{{route('vendor.shop.edit')}}"><i class="tio-edit"></i>{{translate('messages.edit_'.$title.'_information')}}</a>
             </div>
         </div>
     </div>
@@ -70,12 +62,7 @@
                     <span class="d-block mb-1 pb-1">
                         @if ($shop->store_business_model == 'commission')
 
-{{--                            v2.8.1--}}
-                        <strong>{{translate('messages.admin_commission')}} : @if(\App\CentralLogics\Helpers::get_store_data()->store_type == 'company')
-                                {{ \App\Models\BusinessSetting::where('key','parcel_commission_dm')->first() ? (100 - \App\Models\BusinessSetting::where('key','parcel_commission_dm')->first()->value) :0 }}%
-                            @else
-                                {{(isset($shop->comission)? $shop->comission:\App\Models\BusinessSetting::where('key','admin_commission')->first()->value)}}%
-                            @endif
+                        <strong>{{translate('messages.admin_commission')}} : </strong> {{(isset($shop->comission)? $shop->comission:\App\Models\BusinessSetting::where('key','admin_commission')->first()->value)}}%
                         @elseif(in_array($shop->store_business_model ,['subscription','unsubscribed']))
 
                         <strong>{{translate('Subscription_plan')}} : </strong> {{ $shop?->store_sub_update_application?->package?->package_name}}
@@ -93,7 +80,7 @@
         <div class="card-header">
             <h5 class="card-title toggle-switch toggle-switch-sm d-flex justify-content-between">
                 <span class="card-header-icon mr-1"><i class="tio-dashboard"></i></span>
-                <span>{{translate('Announcement')}}</span><span class="input-label-secondary" data-toggle="tooltip" data-placement="right" data-original-title="{{translate('This_feature_is_for_sharing_important_information_or_announcements_related_to_the_'.$title.'.')}}"><img src="{{asset('/public/assets/admin/img/info-circle.svg')}}" alt="{{translate('messages.This_feature_is_for_sharing_important_information_or_announcements_related_to_the_'.$title.'.')}}"></span>
+                <span>{{translate('Announcement')}}</span><span class="input-label-secondary" data-toggle="tooltip" data-placement="right" data-original-title="{{translate('This_feature_is_for_sharing_important_information_or_announcements_related_to_the_'.$title.'.')}}"><img src="{{asset('/public/assets/admin/img/info-circle.svg')}}" alt="{{translate('messages.This_feature_is_for_sharing_important_information_or_announcements_related_to_the_'.$title)}}"></span>
             </h5>
             <label class="toggle-switch toggle-switch-sm" for="announcement_status">
                 <input class="toggle-switch-input dynamic-checkbox" type="checkbox" id="announcement_status"

@@ -27,6 +27,12 @@
                 </a>
             </li>
             <li class="nav-item">
+                <a class="nav-link {{ Request::is('admin/business-settings/email-setup/user/forgot-password') ? 'active' : '' }}"
+                href="{{ route('admin.business-settings.email-setup', ['user','forgot-password']) }}">
+                    {{translate('Forgot Password')}}
+                </a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link {{ Request::is('admin/business-settings/email-setup/user/order-verification') ? 'active' : '' }}"
                 href="{{ route('admin.business-settings.email-setup', ['user','order-verification']) }}">
                     {{translate('Delivery_Verification')}}
@@ -40,12 +46,7 @@
                 <a class="nav-link {{ Request::is('admin/business-settings/email-setup/user/refund-order') ? 'active' : '' }}"
                 href="{{ route('admin.business-settings.email-setup', ['user','refund-order']) }}">{{translate('messages.refund_order')}}</a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link {{ Request::is('admin/business-settings/email-setup/user/forgot-password') ? 'active' : '' }}"
-                href="{{ route('admin.business-settings.email-setup', ['user','forgot-password']) }}">
-                    {{translate('Forgot Password')}}
-                </a>
-            </li>
+
             <li class="nav-item">
                 <a class="nav-link {{ Request::is('admin/business-settings/email-setup/user/refund-request-deny') ? 'active' : '' }}"
                 href="{{ route('admin.business-settings.email-setup', ['user','refund-request-deny']) }}">

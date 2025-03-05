@@ -36,7 +36,6 @@ class AccountTransactionController extends Controller
                 }
             });
         })->where('type', 'collected' )
-            ->whereNull('company_id')   // v2.8.1
             ->latest()->paginate(config('default_pagination'));
         return view('admin-views.account.index', compact('account_transaction'));
     }

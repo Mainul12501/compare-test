@@ -14,11 +14,10 @@
             <div class="d-flex justify-content-end">
                 <!-- List Dot -->
                 <ul class="list-inline list-separator">
-                    @if(\App\CentralLogics\Helpers::get_store_data()->store_type == 'store')    <!--v2.8.1-->
                     <li class="list-inline-item">
-                        <a class="list-separator-link" href="{{route('vendor.business-settings.store-setup')}}">{{translate('messages.store_settings')}}</a>
+                        <a class="list-separator-link" href="{{route('vendor.business-settings.store-setup')}}">{{translate('messages.'.$title.'_settings')}}</a>
                     </li>
-                    @endif  {{--v2.8.1--}}
+
                     <li class="list-inline-item">
                         <a class="list-separator-link" href="{{route('vendor.shop.view')}}">{{translate('messages.profile')}}</a>
                     </li>

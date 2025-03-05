@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Validator;
 
 class NewsletterController extends Controller
 {
-    // v2.8.1 checked
     // Save newsLetterSubscribe email
     public function index(Request $request)
     {

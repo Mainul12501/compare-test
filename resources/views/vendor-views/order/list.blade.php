@@ -8,7 +8,6 @@
 
 @section('content')
     <div class="content container-fluid">
-        @php($parcel_order = Request::is('store-panel/parcel/orders*'))
         <!-- Page Header -->
         <div class="page-header">
             <h1 class="page-header-title text-capitalize">
@@ -16,11 +15,7 @@
                     <img src="{{asset('public/assets/admin/img/order.png')}}" class="w--26" alt="">
                 </span>
                 <span>
-{{--                    {{translate(str_replace('_',' ',$status))}} {{translate('messages.orders')}}--}}
-                    @if ($parcel_order) {{translate('messages.parcel_orders')}}
-                    @elseif(Request::is('admin/refund/*') ) {{translate('messages.Refund')}}  {{translate(str_replace('_',' ',$status))}}
-                    @else {{translate(str_replace('_',' ',$status))}} {{translate('messages.orders')}}
-                    @endif
+                    {{translate(str_replace('_',' ',$status))}} {{translate('messages.orders')}}
                     <span class="badge badge-soft-dark ml-2">{{$orders->total()}}</span>
                 </span>
             </h1>
@@ -220,7 +215,6 @@
                             <th class="border-0">{{translate('messages.order_date')}}</th>
                             <th class="border-0">{{translate('messages.customer_information')}}</th>
                             <th class="border-0">{{translate('messages.total_amount')}}</th>
-                            <th class="border-0 text-center">{{translate('messages.order_type')}}</th>  <!--v2.8.1-->
                             <th class="border-0 text-center">{{translate('messages.order_status')}}</th>
                             <th class="border-0 text-center">{{translate('messages.actions')}}</th>
                         </tr>
@@ -233,8 +227,7 @@
                                     {{$key+$orders->firstItem()}}
                                 </td>
                                 <td class="table-column-pl-0">
-{{--                                    <a href="{{route('vendor.order.details',['id'=>$order['id']])}}">{{$order['id']}}</a>--}}
-                                    <a href="{{route($parcel_order?'vendor.parcel.order.details':'vendor.order.details',['id'=>$order['id']])}}">{{$order['id']}}</a>
+                                    <a href="{{route('vendor.order.details',['id'=>$order['id']])}}">{{$order['id']}}</a>
                                 </td>
                                 <td>
                                     <div>
@@ -282,19 +275,6 @@
                                         @endif
                                     </div>
                                 </td>
-{{--                                v2.8.1 start--}}
-                                <td class="text-capitalize text-center">
-                                    @if($order->order_type == 'parcel')
-                                        <span class="badge badge-info">
-                                    {{translate('messages.parcel')}}
-                                    </span>
-                                    @else
-                                        <span class="badge badge-soft-info">
-                                        {{translate('messages.store_order')}}
-                                        </span>
-                                    @endif
-                                </td>
-{{--                                v2.8.1 end--}}
                                 <td class="text-capitalize text-center">
                                     @if($order['order_status']=='pending')
                                         <span class="badge badge-soft-info">
@@ -337,19 +317,8 @@
                                 </td>
                                 <td>
                                     <div class="btn--container justify-content-center">
-{{--                                        <a class="btn btn-sm btn--warning btn-outline-warning action-btn" href="{{route('vendor.order.details',['id'=>$order['id']])}}"><i class="tio-visible-outlined"></i></a>--}}
-{{--                                        <a class="btn btn-sm btn--primary btn-outline-primary action-btn" target="_blank" href="{{route('vendor.order.generate-invoice',[$order['id']])}}"><i class="tio-print"></i></a>--}}
-{{--                                        v2.8.1--}}
-                                        @if(\App\CentralLogics\Helpers::get_store_data()->store_type == 'company')
-                                            <a class="ml-2 btn btn-sm btn--warning btn-outline-warning action-btn" href="{{route($parcel_order?'vendor.parcel.order.details':'vendor.order.details',['id'=>$order['id']])}}">
-                                                <i class="tio-invisible"></i>
-                                            </a>
-                                            <a class="btn btn-sm btn--primary btn-outline-primary action-btn" target="_blank" href="{{route('vendor.parcel.generate-invoice',[$order['id']])}}"><i class="tio-print"></i></a>
-                                        @else
-                                            <a class="btn btn-sm btn--warning btn-outline-warning action-btn" href="{{route('vendor.order.details',['id'=>$order['id']])}}"><i class="tio-visible-outlined"></i></a>
-
-                                            <a class="btn btn-sm btn--primary btn-outline-primary action-btn" target="_blank" href="{{route('vendor.order.generate-invoice',[$order['id']])}}"><i class="tio-print"></i></a>
-                                        @endif
+                                        <a class="btn btn-sm btn--warning btn-outline-warning action-btn" href="{{route('vendor.order.details',['id'=>$order['id']])}}"><i class="tio-visible-outlined"></i></a>
+                                        <a class="btn btn-sm btn--primary btn-outline-primary action-btn" target="_blank" href="{{route('vendor.order.generate-invoice',[$order['id']])}}"><i class="tio-print"></i></a>
                                     </div>
                                 </td>
                             </tr>
@@ -394,8 +363,7 @@
                         className: 'd-none',
                         action: function ()
                         {
-{{--                            window.location.href = '{{route("vendor.order.export",['status'=>$status,'file_type'=>'excel','type'=>'order', request()->getQueryString()])}}';--}}
-    window.location.href = '{{isset($parcel_route) ? route("vendor.order.export",['status'=>$status,'file_type'=>'excel','type'=>'order','route_type'=>'parcel', request()->getQueryString()]) : route("vendor.order.export",['status'=>$status,'file_type'=>'excel','type'=>'order', request()->getQueryString()])}}';     /*v2.8.1*/
+                            window.location.href = '{{route("vendor.order.export",['status'=>$status,'file_type'=>'excel','type'=>'order', request()->getQueryString()])}}';
                         }
                     },
                     {

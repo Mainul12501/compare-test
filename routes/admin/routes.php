@@ -125,16 +125,6 @@ Route::group(['namespace' => 'Admin', 'as' => 'admin.'], function () {
             Route::get(Coupon::EXPORT[URI], [CouponController::class, 'exportList'])->name('coupon_export');
         });
 
-        Route::group(['prefix' => 'cashback', 'as' => 'cashback.' , 'middleware' => ['module:cashback']], function () {
-            Route::get(CashBack::INDEX[URI], [CashBackController::class,'index'])->name('add-new');
-            Route::post(CashBack::ADD[URI], [CashBackController::class,'add'])->name('store');
-            Route::get(CashBack::UPDATE[URI].'/{id}', [CashBackController::class,'getUpdateView'])->name('edit');
-            Route::post(CashBack::UPDATE[URI].'/{id}', [CashBackController::class,'update'])->name('update');
-            Route::delete(CashBack::DELETE[URI].'/{id}', [CashBackController::class,'delete'])->name('delete');
-            Route::get(CashBack::UPDATE_STATUS[URI].'/{id}/{status}', [CashBackController::class,'updateStatus'])->name('status');
-            // Route::post(CashBack::SEARCH[URI], [CashBackController::class,'getSearchList'])->name('search');
-        });
-
         Route::group(['prefix' => 'notification', 'as' => 'notification.', 'middleware' => ['module:notification']], function () {
             Route::get(Notification::INDEX[URI], [NotificationController::class, 'index'])->name('add-new');
             Route::post(Notification::ADD[URI], [NotificationController::class, 'add'])->name('store');
@@ -287,6 +277,16 @@ Route::group(['namespace' => 'Admin', 'as' => 'admin.'], function () {
                 });
             });
 
+            Route::group(['prefix' => 'cashback', 'as' => 'cashback.' , 'middleware' => ['module:cashback']], function () {
+                Route::get(CashBack::INDEX[URI], [CashBackController::class,'index'])->name('add-new');
+                Route::post(CashBack::ADD[URI], [CashBackController::class,'add'])->name('store');
+                Route::get(CashBack::UPDATE[URI].'/{id}', [CashBackController::class,'getUpdateView'])->name('edit');
+                Route::post(CashBack::UPDATE[URI].'/{id}', [CashBackController::class,'update'])->name('update');
+                Route::delete(CashBack::DELETE[URI].'/{id}', [CashBackController::class,'delete'])->name('delete');
+                Route::get(CashBack::UPDATE_STATUS[URI].'/{id}/{status}', [CashBackController::class,'updateStatus'])->name('status');
+                // Route::post(CashBack::SEARCH[URI], [CashBackController::class,'getSearchList'])->name('search');
+            });
+
             // delivery man routes
             Route::group(['prefix' => 'delivery-man', 'as' => 'delivery-man.'], function () {
                 Route::get(DeliveryMan::DROPDOWN_LIST[URI], [DeliveryManController::class, 'getDropdownList'])->name('get-deliverymen');
@@ -296,7 +296,6 @@ Route::group(['namespace' => 'Admin', 'as' => 'admin.'], function () {
                     Route::get(DeliveryMan::ADD[URI], [DeliveryManController::class, 'getAddView'])->name('add');
                     Route::post(DeliveryMan::ADD[URI], [DeliveryManController::class, 'add'])->name('store');
                     Route::get(DeliveryMan::LIST[URI], [DeliveryManController::class, 'index'])->name('list');
-                    Route::get('dm-pending-disbursement-requests', [DeliveryManController::class, 'pending_method_requests'])->name('dm-pending-disbursement-requests');    // v2.8.1
                     Route::get(DeliveryMan::NEW[URI], [DeliveryManController::class, 'getNewDeliveryManView'])->name('new');
                     Route::get(DeliveryMan::DENY[URI], [DeliveryManController::class, 'getDeniedDeliveryManView'])->name('deny');
                     Route::get(DeliveryMan::PREVIEW[URI].'/{id}/{tab?}', [DeliveryManController::class, 'getPreview'])->name('preview');

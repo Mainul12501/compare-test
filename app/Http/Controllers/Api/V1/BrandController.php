@@ -2,25 +2,35 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Models\BusinessSetting;
 use App\Models\Item;
+use App\Models\Brand;
 use App\Models\PriorityList;
 use Illuminate\Http\Request;
 use App\CentralLogics\Helpers;
-use App\Models\Brand;
+use App\Models\BusinessSetting;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 
 class BrandController extends Controller
 {
-    // V2.8.1 Checked
     public function get_brands(Request $request,$search=null)
     {
+
         try {
             $brand_default_status = BusinessSetting::where('key', 'brand_default_status')->first()?->value ?? 1;
             $brand_sort_by_general = PriorityList::where('name', 'brand_sort_by_general')->where('type','general')->first()?->value ?? '';
             $key = explode(' ', $search);
-            $brands = Brand::Active()->withCount(['items'])
+
+            $zone_id= $request->header('zoneId');
+            $module_id= $request->header('moduleId');
+
+            $brands = Brand::Active()
+            ->withCount(['items' => function($query) use($zone_id, $module_id) {
+                $query->whereHas('item.store', function($q) use($zone_id, $module_id) {
+                    $q->whereIn('zone_id', json_decode($zone_id, true))
+                    ->where('module_id', $module_id);
+                });
+            }])
             ->when($search, function($query)use($key){
                 $query->where(function ($q) use ($key) {
                     foreach ($key as $value) {

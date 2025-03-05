@@ -265,13 +265,9 @@ class ParcelController extends Controller
             return $query->withCount('orders');
         }])->where(['id' => $id])->ParcelOrder()->first();
         if (isset($order)) {
-           $deliveryMen = DeliveryMan::/*withOutGlobalScope(ZoneScope::class)->where('zone_id',$order->zone_id)->*/where(function($query)use($order){
-                if ($order->module_type	!= 'parcel')
-                    $query->where('vehicle_id', $order->dm_vehicle_id)->orWhereNull('vehicle_id');   // show filtered deliveryman by vehicle
-            })->whereHas('vehicle', function ($query) use ($order) {
-//                return $query->where('maximum_coverage_area','>', $order->distance);
-               return $query->where('maximum_weight', '>=', $order->weight)->where('minimum_weight', '<=', $order->weight)->where('maximum_coverage_area', '>=', $order->distance)->where('starting_coverage_area', '<=', $order->distance);
-            })->available()->active()->with('vehicle')->get();
+            $deliveryMen = DeliveryMan::withOutGlobalScope(ZoneScope::class)->where('zone_id',$order->zone_id)->where(function($query)use($order){
+                $query->where('vehicle_id',$order->dm_vehicle_id)->orWhereNull('vehicle_id');
+        })->available()->active()->get();
             $category = $request->query('category_id', 0);
             $categories = [];
             $products = [];
@@ -298,7 +294,6 @@ class ParcelController extends Controller
             'parcel_per_km_shipping_charge'=>'required|numeric|min:0',
             'parcel_minimum_shipping_charge'=>'required|numeric|min:0',
             'parcel_commission_dm'=>'required|numeric|min:0',
-            'parcel_per_kg_charge'=>'required|numeric|min:0',   // v2.8.1
         ],[
             'parcel_commission_dm.required'=>translate('validation.required',['attribute'=>translate('messages.deliveryman_commission')]),
             'parcel_commission_dm.numeric'=>translate('validation.numeric',['attribute'=>translate('messages.deliveryman_commission')]),
@@ -311,15 +306,10 @@ class ParcelController extends Controller
             'parcel_minimum_shipping_charge.required'=>translate('validation.required',['attribute'=>translate('messages.minimum_shipping_charge')]),
             'parcel_minimum_shipping_charge.numeric'=>translate('validation.numeric',['attribute'=>translate('messages.minimum_shipping_charge')]),
             'parcel_minimum_shipping_charge.min'=>translate('validation.min',['attribute'=>translate('messages.minimum_shipping_charge')]),
-
-            'parcel_per_kg_charge.required'=>translate('validation.required',['attribute'=>translate('messages.per_kg_charge')]),   // v2.8.1
-            'parcel_per_kg_charge.numeric'=>translate('validation.numeric',['attribute'=>translate('messages.per_kg_charge')]), // v2.8.1
-            'parcel_per_kg_charge.min'=>translate('validation.min',['attribute'=>translate('messages.per_kg_charge')]), // v2.8.1
         ]);
         Helpers::businessUpdateOrInsert(['key'=>'parcel_per_km_shipping_charge'],['value'=>$request->parcel_per_km_shipping_charge]);
         Helpers::businessUpdateOrInsert(['key'=>'parcel_minimum_shipping_charge'],['value'=>$request->parcel_minimum_shipping_charge]);
         Helpers::businessUpdateOrInsert(['key'=>'parcel_commission_dm'],['value'=>$request->parcel_commission_dm]);
-        Helpers::businessUpdateOrInsert(['key'=>'parcel_per_kg_charge'],['value'=>$request->parcel_per_kg_charge]); // v2.8.1
 
         Toastr::success(translate('messages.parcel_settings_updated'));
         return back();

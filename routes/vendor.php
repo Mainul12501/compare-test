@@ -89,26 +89,13 @@ Route::group(['namespace' => 'Vendor', 'as' => 'vendor.'], function () {
             Route::delete('delete/{id}', 'DeliveryManController@delete')->name('delete');
             Route::get('get-deliverymen', 'DeliveryManController@get_deliverymen')->name('get-deliverymen');
             Route::post('transation/search', 'DeliveryManController@transaction_search')->name('transaction-search');
-            Route::get('download-document/{fileName}', 'DeliveryManController@download_document')->name('download-document');   // v2.8.1
-            Route::get('withdraw-req-to-dm/{delivery_men}/{type}', 'DeliveryManController@sent_withdraw_req_to_dm')->name('sent-withdraw-req-to-dm');   // cash at hand
 
             Route::group(['prefix' => 'reviews', 'as' => 'reviews.'], function () {
                 Route::get('list', 'DeliveryManController@reviews_list')->name('list');
             });
-            Route::group(['prefix' => 'account-transaction', 'as' => 'account-transaction.', 'middleware' => ['module:collect_cash']], function () {    // v2.8.1
-                Route::get('list', 'AccountTransactionController@index')->name('index');    // v2.8.1
-                Route::post('store', 'AccountTransactionController@store')->name('store');  // v2.8.1
-                Route::get('details/{id}', 'AccountTransactionController@show')->name('view');  // v2.8.1
-                Route::delete('delete/{id}', 'AccountTransactionController@distroy')->name('delete');   // v2.8.1
-                Route::post('search', 'EmployeeController@search')->name('search'); // v2.8.1
-                Route::get('export', 'AccountTransactionController@export_account_transaction')->name('export');    // v2.8.1
-                Route::post('search', 'AccountTransactionController@search_account_transaction')->name('search');   // v2.8.1
-                Route::get('dm-list', 'AccountTransactionController@dm_list')->name('dm_list'); // v2.8.1
-                Route::get('get-account-data/{deliveryman}', 'AccountTransactionController@get_account_data')->name('store-filter');    // v2.8.1
-            }); // v2.8.1
         });
 
-        Route::group(['prefix' => 'employee', 'as' => 'employee.', 'middleware' => ['module:employee' /*,'subscription:employee'*/]], function () {
+        Route::group(['prefix' => 'employee', 'as' => 'employee.', 'middleware' => ['module:employee' ,'subscription:employee']], function () {
             Route::get('add-new', 'EmployeeController@add_new')->name('add-new');
             Route::post('add-new', 'EmployeeController@store');
             Route::get('list', 'EmployeeController@list')->name('list');
@@ -181,22 +168,18 @@ Route::group(['namespace' => 'Vendor', 'as' => 'vendor.'], function () {
             Route::post('request', 'WalletController@w_request')->name('withdraw-request');
             Route::delete('close/{id}', 'WalletController@close_request')->name('close-request');
             Route::get('method-list', 'WalletController@method_list')->name('method-list');
-            Route::/*post*/any('make-collected-cash-payment', 'WalletController@make_payment')->name('make_payment');   // v2.8.1
+            Route::post('make-collected-cash-payment', 'WalletController@make_payment')->name('make_payment');
             Route::post('make-wallet-adjustment', 'WalletController@make_wallet_adjustment')->name('make_wallet_adjustment');
 
             Route::get('wallet-payment-list', 'WalletController@wallet_payment_list')->name('wallet_payment_list');
             Route::get('disbursement-list', 'WalletController@getDisbursementList')->name('getDisbursementList');
-            Route::get('offline-payment-list', 'WalletController@offline_payment_list')->name('offline_payment_list');  // v2.8.1
-            Route::get('offline-payment-recheck', 'WalletController@offline_payment_recheck')->name('offline_payment_recheck'); // v2.8.1
-            Route::post('offline-payment-edit/{id}', 'WalletController@offline_payment_edit')->name('offline_payment_edit');    // v2.8.1
             Route::get('export', 'WalletController@getDisbursementExport')->name('export');
-            Route::post('offline-payment', 'WalletController@offline_payment')->name('offline-payment');    // v2.8.1
+
         });
 
         Route::group(['prefix' => 'withdraw-method', 'as' => 'wallet-method.', 'middleware' => ['module:wallet' ,'subscription:wallet' ]], function () {
             Route::get('/', 'WalletMethodController@index')->name('index');
             Route::post('store/', 'WalletMethodController@store')->name('store');
-            Route::post('store-from-profile', 'WalletMethodController@storeFromProfile')->name('store-from-profile');  // v2.8.1
             Route::get('default/{id}/{default}', 'WalletMethodController@default')->name('default');
             Route::delete('delete/{id}', 'WalletMethodController@delete')->name('delete');
         });
@@ -250,7 +233,7 @@ Route::group(['namespace' => 'Vendor', 'as' => 'vendor.'], function () {
             Route::post('add-order-proof/{id}', 'OrderController@add_order_proof')->name('add-order-proof');
             Route::get('remove-proof-image', 'OrderController@remove_proof_image')->name('remove-proof-image');
             Route::get('export-orders/{file_type}/{status}/{type}', 'OrderController@export_orders')->name('export');
-            Route::get('add-delivery-man/{order_id}/{delivery_man_id}', 'OrderController@add_delivery_man')->name('add-delivery-man');  // v2.8.1
+
         });
 
         Route::group(['prefix' => 'business-settings', 'as' => 'business-settings.', 'middleware' => ['module:store_setup'  ,'subscription:store_setup']], function () {
@@ -282,25 +265,11 @@ Route::group(['namespace' => 'Vendor', 'as' => 'vendor.'], function () {
             Route::post('update-message', 'RestaurantController@update_message')->name('update-message');
         });
 
-        Route::group(['prefix' => 'offline_payment', 'as' => 'offline_payment.', 'middleware' => ['module:offline_payment']], function () { // v2.8.1
-            Route::get('', 'OfflinePaymentController@view')->name('view');  // v2.8.1
-            Route::get('list', 'OfflinePaymentController@list')->name('list');  // v2.8.1
-            Route::post('update', 'OfflinePaymentController@update')->name('update');   // v2.8.1
-            Route::post('update-message', 'OfflinePaymentController@update_message')->name('update-message');   // v2.8.1
-        }); // v2.8.1
-
         Route::group(['prefix' => 'message', 'as' => 'message.', 'middleware' => ['subscription:chat']], function () {
             Route::get('list', 'ConversationController@list')->name('list');
             Route::post('store/{user_id}/{user_type}', 'ConversationController@store')->name('store');
             Route::get('view/{conversation_id}/{user_id}', 'ConversationController@view')->name('view');
         });
-
-        Route::group(['prefix' => 'report', 'as' => 'report.', 'middleware' => ['module:parcel']], function () {    // v2.8.1
-            //parcel report
-            Route::get('parcel-report', 'ReportController@parcel_report')->name('parcel-report');   // v2.8.1
-            Route::get('parcel-export', 'ReportController@parcel_export')->name('parcel-export');   // v2.8.1
-            Route::post('parcel-report-search', 'ReportController@parcel_search')->name('parcel-report-search');    // v2.8.1
-        }); // v2.8.1
 
         Route::group(['prefix' => 'report', 'as' => 'report.', 'middleware' => ['module:report' ,'subscription:report']], function () {
             Route::post('set-date', 'ReportController@set_date')->name('set-date');
@@ -310,25 +279,5 @@ Route::group(['namespace' => 'Vendor', 'as' => 'vendor.'], function () {
             Route::get('disbursement-report', 'ReportController@disbursement_report')->name('disbursement-report');
             Route::get('disbursement-report-export/{type}', 'ReportController@disbursement_report_export')->name('disbursement-report-export');
         });
-
-        Route::group(['prefix' => 'parcel', 'as' => 'parcel.', 'middleware' => ['module:parcel']], function () {    // v2.8.1
-            // Route::group(['prefix' => 'parcel', 'as' => 'parcel.'], function () {
-            Route::get('category/status/{id}/{status}', 'ParcelCategoryController@status')->name('category.status');    // v2.8.1
-            Route::resource('category', 'ParcelCategoryController');    // v2.8.1
-            Route::get('orders/{status}', 'ParcelController@orders')->name('orders');   // v2.8.1
-            Route::get('details/{id}', 'ParcelController@order_details')->name('order.details');    // v2.8.1
-            Route::get('settings', 'ParcelController@settings')->name('settings');  // v2.8.1
-            Route::post('settings', 'ParcelController@update_settings')->name('update.settings');   // v2.8.1
-            Route::get('dispatch/{status}', 'ParcelController@dispatch_list')->name('list');    // v2.8.1
-            Route::post('instruction', 'ParcelController@instruction')->name('instruction');    // v2.8.1
-            Route::get('/instruction/{id}/{status}', 'ParcelController@instruction_status')->name('instruction_status');    // v2.8.1
-            Route::put('instruction_edit/', 'ParcelController@instruction_edit')->name('instruction_edit'); // v2.8.1
-            Route::delete('instruction_delete/{id}', 'ParcelController@instruction_delete')->name('instruction_delete');    // v2.8.1
-            Route::get('offline/payment/list/{status}', 'OrderController@offline_verification_list')->name('offline_verification_list');    // v2.8.1
-            Route::get('third-party-company', 'ParcelController@third_party_company')->name('third-party-company'); // v2.8.1
-            Route::get('status', 'ParcelController@status')->name('status');    // v2.8.1
-            Route::get('generate-invoice/{id}', 'ParcelController@generate_invoice')->name('generate-invoice'); // v2.8.1
-            Route::get('add-delivery-man/{order_id}/{delivery_man_id}', 'ParcelController@add_delivery_man')->name('add-delivery-man'); // v2.8.1
-        }); // v2.8.1
     });
 });

@@ -14,7 +14,6 @@
             </span>
         </h1>
     </div>
-
     <!-- Content Row -->
     <form action="{{route('vendor.employee.update',[$e['id']])}}" method="post" enctype="multipart/form-data" class="js-validate">
         @csrf
@@ -40,8 +39,15 @@
                         </div>
                         <div class="form-group">
                             <label class="input-label " for="phone">{{translate('messages.phone')}}</label>
-                            <input type="number" value="{{$e['phone']}}" required name="phone" class="form-control" id="phone"
-                                    placeholder="{{ translate('messages.Ex:') }} +88017********">
+                            <input type="tel"
+                                   value="{{$e['phone']}}"
+                                   required
+                                   name="phone"
+                                   class="form-control"
+                                   id="phone"
+                                   pattern="^\+?[1-9]\d{1,14}$"
+                                   title="{{ translate('messages.please_enter_valid_phone_number_with_country_code') }}"
+                                   placeholder="{{ translate('messages.Ex:') }} +88017********">
                         </div>
                         <div class="form-group mb-0">
                             <label class="input-label " for="role_id">{{translate('messages.Role')}}</label>
@@ -65,7 +71,7 @@
                                 <div class="text-center mb-auto">
                                     <img class="store-banner onerror-image" id="viewer"
                                          data-onerror-image="{{asset('public/assets/admin/img/160x160/img1.jpg')}}"
-                                         src="{{ $e['image_full_url'] }}"
+                                         src="{{ $e->image_full_url }}"
                                          alt="Employee thumbnail"/>
                                 </div>
 
@@ -73,7 +79,7 @@
                                     <label class="form-label">{{translate('messages.Employee image size max 2 MB')}} <span class="text-danger">*</span></label>
                                     <div class="custom-file">
                                         <input type="file" name="image" id="customFileUpload" class="custom-file-input read-url"
-                                            accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*">
+                                            accept=".webp, .jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*">
                                         <label class="custom-file-label" for="customFileUpload">{{translate('messages.choose_file')}}</label>
                                     </div>
                                 </div>
@@ -104,10 +110,10 @@
                                             <div class="input-group input-group-merge">
                                                 <input type="password" class="js-toggle-password form-control" name="password" id="signupSrPassword" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="{{ translate('messages.Must_contain_at_least_one_number_and_one_uppercase_and_lowercase_letter_and_symbol,_and_at_least_8_or_more_characters') }}"
                                                 placeholder="{{ translate('messages.password_length_placeholder', ['length' => '8+']) }}"
-                                                aria-label="8+ characters required" required
+                                                aria-label="8+ characters required"
                                                 data-msg="Your password is invalid. Please try again."
                                                 data-hs-toggle-password-options='{
-                                                "target": [".js-toggle-password-target-1", ".js-toggle-password-target-2"],
+                                                "target": [".js-toggle-password-target-1"],
                                                 "defaultClass": "tio-hidden-outlined",
                                                 "showClass": "tio-visible-outlined",
                                                 "classChangeTarget": ".js-toggle-passowrd-show-icon-1"
@@ -126,10 +132,10 @@
                                             <div class="input-group input-group-merge">
                                             <input type="password" class="js-toggle-password form-control" name="confirmPassword" id="signupSrConfirmPassword" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="{{ translate('messages.Must_contain_at_least_one_number_and_one_uppercase_and_lowercase_letter_and_symbol,_and_at_least_8_or_more_characters') }}"
                                             placeholder="{{ translate('messages.password_length_placeholder', ['length' => '8+']) }}"
-                                            aria-label="8+ characters required" required
+                                            aria-label="8+ characters required"
                                                     data-msg="Password does not match the confirm password."
                                                     data-hs-toggle-password-options='{
-                                                    "target": [".js-toggle-password-target-1", ".js-toggle-password-target-2"],
+                                                    "target": [".js-toggle-password-target-2"],
                                                     "defaultClass": "tio-hidden-outlined",
                                                     "showClass": "tio-visible-outlined",
                                                     "classChangeTarget": ".js-toggle-passowrd-show-icon-2"
@@ -161,10 +167,27 @@
 @endsection
 
 @push('script_2')
-            <script>
-                "use strict";
-                $('#reset_btn').click(function(){
-                    $('#viewer').attr('src','{{asset('storage/app/public/vendor')}}/{{$e['image']}}');
-                })
-            </script>
+<script>
+    "use strict";
+
+    // Reset button functionality
+    $('#reset_btn').click(function(){
+        $('#viewer').attr('src','{{asset('storage/app/public/vendor')}}/{{$e['image']}}');
+    });
+
+    // Image preview functionality
+    function readURL(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                $('#viewer').attr('src', e.target.result);
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    $("#customFileUpload").change(function() {
+        readURL(this);
+    });
+</script>
 @endpush

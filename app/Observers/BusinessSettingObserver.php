@@ -15,7 +15,7 @@ class BusinessSettingObserver
      */
     public function created(BusinessSetting $businessSetting): void
     {
-        $this->refreshBusinessSettingsCache();
+        $this->refreshBusinessSettingsCache($businessSetting->key);
     }
 
     /**
@@ -23,7 +23,7 @@ class BusinessSettingObserver
      */
     public function updated(BusinessSetting $businessSetting): void
     {
-        $this->refreshBusinessSettingsCache();
+        $this->refreshBusinessSettingsCache($businessSetting->key);
     }
 
     /**
@@ -31,7 +31,7 @@ class BusinessSettingObserver
      */
     public function deleted(BusinessSetting $businessSetting): void
     {
-        $this->refreshBusinessSettingsCache();
+        $this->refreshBusinessSettingsCache($businessSetting->key);
     }
 
     /**
@@ -39,7 +39,7 @@ class BusinessSettingObserver
      */
     public function restored(BusinessSetting $businessSetting): void
     {
-        $this->refreshBusinessSettingsCache();
+        $this->refreshBusinessSettingsCache($businessSetting->key);
     }
 
     /**
@@ -47,10 +47,10 @@ class BusinessSettingObserver
      */
     public function forceDeleted(BusinessSetting $businessSetting): void
     {
-        $this->refreshBusinessSettingsCache();
+        $this->refreshBusinessSettingsCache($businessSetting->key);
     }
 
-    private function refreshBusinessSettingsCache()
+    private function refreshBusinessSettingsCache($config=null)
     {
         $prefix = 'business_settings_';
         $cacheKeys = DB::table('cache')
@@ -64,6 +64,11 @@ class BusinessSettingObserver
         });
         foreach ($sanitizedKeys as $key) {
             Cache::forget($key);
+        }
+
+        $check = ['currency_model', 'currency_symbol_position', 'system_default_currency', 'language', 'company_name', 'decimal_point_settings', 'product_brand', 'digital_product', 'company_email'];
+        if (in_array($config, $check) && session()->has($config)) {
+            session()->forget($config);
         }
     }
 }

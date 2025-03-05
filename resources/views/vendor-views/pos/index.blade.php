@@ -756,6 +756,14 @@
                         event.preventDefault();
                         return;
                 }
+                if($('#paid').val() < $('#total_order_amount').val() ){
+                    toastr.error('{{ translate('This_amount_must_grater_then_order_amount') }}', {
+                            CloseButton: true,
+                            ProgressBar: true
+                        });
+                        event.preventDefault();
+                        return;
+                }
 
             $.ajaxSetup({
                 headers: {

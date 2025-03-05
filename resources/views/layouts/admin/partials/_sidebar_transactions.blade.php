@@ -63,36 +63,24 @@
                     @if (\App\CentralLogics\Helpers::module_permission_check('account'))
                         <li
                             class="navbar-vertical-aside-has-menu {{ Request::is('admin/transactions/store-disbursement*') ? 'active' : '' }}">
-                            @php($menuStoreDis = \App\Models\Disbursement::where('status', 'pending')->where('created_for','store')->count() ?? 0)
                             <a class="js-navbar-vertical-aside-menu-link nav-link"
                                href="{{ route('admin.transactions.store-disbursement.list', ['status' => 'all']) }}"
                                title="{{ translate('messages.store_disbursement') }}">
                                 <i class="tio-wallet-outlined nav-icon"></i>
                                 <span
-                                    class="{{ $menuStoreDis > 0 ? 'position-relative overflow-visible' : 'navbar-vertical-aside-mini-mode-hidden-elements' }} text-truncate">
-                                    {{ translate('messages.store_disbursement') }}
-                                    @if($menuStoreDis > 0)
-                                        <span class="btn-status btn-status-danger border-0 size-8px"></span>
-                                    @endif
-
-                                </span>
+                                    class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">{{ translate('messages.store_disbursement') }}</span>
                             </a>
                         </li>
                     @endif
                     @if (\App\CentralLogics\Helpers::module_permission_check('account'))
                         <li
                             class="navbar-vertical-aside-has-menu {{ Request::is('admin/transactions/dm-disbursement*') ? 'active' : '' }}">
-                            @php($menuDmDis = \App\Models\Disbursement::where('status', 'pending')->where('created_for','delivery_man')->count() ?? 0)
                             <a class="js-navbar-vertical-aside-menu-link nav-link"
                                href="{{ route('admin.transactions.dm-disbursement.list', ['status' => 'all']) }}"
                                title="{{ translate('messages.dm_disbursement') }}">
                                 <i class="tio-saving-outlined nav-icon"></i>
-                                <span class="{{ $menuDmDis > 0 ? 'position-relative overflow-visible' : 'navbar-vertical-aside-mini-mode-hidden-elements' }} text-truncate">
-                                    {{ translate('messages.delivery_man_disbursement') }}
-                                    @if($menuDmDis > 0)
-                                        <span class="btn-status btn-status-danger border-0 size-8px"></span>
-                                    @endif
-                                </span>
+                                <span
+                                    class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">{{ translate('messages.delivery_man_disbursement') }}</span>
                             </a>
                         </li>
                     @endif
@@ -189,58 +177,6 @@
                     </a>
                 </li>
                 @endif
-
-                    {{-- OFFLINE PAYMENT START --}}
-                    {{-- v2.8.1 start --}}
-
-                    <li class="nav-item">
-                        <small class="nav-subtitle" title="{{ translate('messages.business_section') }}">{{ translate('messages.offline_payment') }}</small>
-                        <small class="tio-more-horizontal nav-subtitle-replacer"></small>
-                    </li>
-
-                    <!-- withdraw -->
-                    @if (\App\CentralLogics\Helpers::module_permission_check('withdraw_list'))
-                        <li class="navbar-vertical-aside-has-menu {{ Request::is('admin/transactions/store/offline_payment/list*') ? 'active' : '' }}">
-                            @php($offlineStorePaymentsMenu = \App\Models\OfflinePayments::whereNotNull('store_id')->where('type', 'store')->where('status', 'pending')->count() ?? 0)
-                            <a class="js-navbar-vertical-aside-menu-link nav-link" href="{{ route('admin.transactions.store.offline_payment.store_offline_verification_list', ['all']) }}" title="{{ translate('messages.store_offline_verification_list') }}">
-                                <i class="tio-table nav-icon"></i>
-                                <span class="{{ $offlineStorePaymentsMenu > 0 ? 'position-relative overflow-visible' : 'navbar-vertical-aside-mini-mode-hidden-elements' }} text-truncate">
-                                    {{ translate('messages.store_offline_payment') }}
-                                    @if($offlineStorePaymentsMenu > 0)
-                                        <span class="btn-status btn-status-danger border-0 size-8px"></span>
-                                    @endif
-                                </span>
-                            </a>
-                        </li>
-                        <li class="navbar-vertical-aside-has-menu {{ Request::is('admin/transactions/store/offline_payment/company-list*') ? 'active' : '' }}">
-                            @php($offlineCompanyPaymentsMenu = \App\Models\OfflinePayments::whereNotNull('store_id')->where('type', 'company')->where('status', 'pending')->count() ?? 0)
-                            <a class="js-navbar-vertical-aside-menu-link nav-link" href="{{ route('admin.transactions.store.offline_payment.company_offline_verification_list', ['all']) }}" title="{{ translate('messages.store_offline_verification_list') }}">
-                                <i class="tio-table nav-icon"></i>
-                                <span class="{{ $offlineCompanyPaymentsMenu > 0 ? 'position-relative overflow-visible' : 'navbar-vertical-aside-mini-mode-hidden-elements' }} text-truncate">
-                                    {{ translate('messages.company_offline_payment') }}
-                                    @if($offlineCompanyPaymentsMenu > 0)
-                                        <span class="btn-status btn-status-danger border-0 size-8px"></span>
-                                    @endif
-                                </span>
-                            </a>
-                        </li>
-                        <li class="navbar-vertical-aside-has-menu {{ Request::is('admin/transactions/delivery_man/offline_payment/list*') ? 'active' : '' }}">
-                            @php($offlineDmPaymentsMenu = \App\Models\OfflinePayments::whereNotNull('delivery_man_id')->where('type', 'deliveryman')->where('status', 'pending')->count() ?? 0)
-                            <a class="js-navbar-vertical-aside-menu-link nav-link" href="{{ route('admin.transactions.delivery_man.offline_payment.delivery_man_offline_verification_list', ['all']) }}" title="{{ translate('messages.delivery_man_offline_verification_list') }}">
-                                <i class="tio-table nav-icon"></i>
-                                <span class="{{ $offlineDmPaymentsMenu > 0 ? 'position-relative overflow-visible' : 'navbar-vertical-aside-mini-mode-hidden-elements' }} text-truncate">
-                                    {{ translate('messages.delivery_man_offline_payment') }}
-                                    @if($offlineDmPaymentsMenu > 0)
-                                        <span class="btn-status btn-status-danger border-0 size-8px"></span>
-                                    @endif
-                                </span>
-                            </a>
-                        </li>
-                    @endif
-                    <!-- End Store -->
-                    {{-- v2.8.1 end --}}
-                    {{-- OFFLINE PANYMENT END --}}
-
                     @if (addon_published_status('Rental'))
                         <!-- Rental Report -->
                         @if (\App\CentralLogics\Helpers::module_permission_check('rental_report'))
@@ -278,7 +214,6 @@
                             </li>
                         @endif
                     @endif
-
                 <li class="nav-item py-5">
 
                 </li>

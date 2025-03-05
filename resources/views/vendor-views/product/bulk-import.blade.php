@@ -60,6 +60,7 @@
                     <p>{{ translate('5. For ecommerce item avaliable time start and end will be 00:00:00 and 23:59:59') }}</p>
 
                     <p>{{ translate('6. You can upload your product images in product folder from gallery, and copy image`s path.') }}</p>
+                    <p>{{ translate('7. Image_file_name_must_be_in_30_character') }}</p>
 
                 </div>
                 <div class="text-center pb-4">

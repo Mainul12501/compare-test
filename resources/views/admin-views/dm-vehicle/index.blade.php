@@ -129,28 +129,9 @@
                                         step="0.001" min="0" required name="maximum_coverage_area">
                                 </div>
                             </div>
-                        </div>
-                    </div>
-{{--                    v2.8.11 code start--}}
-                    <div class="col-md-12">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="input-label text-capitalize" for="title">{{translate('messages.minimum_weight')}} ({{ translate('messages.kg') }}) <span class="input-label-secondary" data-toggle="tooltip" data-placement="right" data-original-title="{{translate('This value is the minimum weight for a vehicle in this category to serve an order.')}}"><img src="{{asset('public/assets/admin/img/info-circle.svg')}}" alt="public/img"></span></label>
-                                    <input type="number" id="minimum_weight" class="form-control h--45px" step="0.001" min="0" required name="minimum_weight">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="input-label text-capitalize" for="title">{{translate('messages.maximum_weight')}} ({{ translate('messages.kg') }}) <span class="input-label-secondary" data-toggle="tooltip" data-placement="right" data-original-title="{{translate('This value is the miximum weight for a vehicle in this category to serve an order.
-                                            ')}}"><img src="{{asset('public/assets/admin/img/info-circle.svg')}}" alt="public/img"></span></label>
-                                    <input type="number" id="maximum_weight" class="form-control h--45px" step="0.001" min="0"  required name="maximum_weight">
-                                </div>
-                            </div>
 
                         </div>
                     </div>
-{{--                    v2.8.11 code end--}}
                 </div>
 
                 <div class="btn--container justify-content-end">

@@ -52,7 +52,7 @@ class CashBack extends Model
     {
         return $query->where('status', 1);
     }
-
+    
     public function scopeRental($query): mixed
     {
         return $query->where('is_rental', 1);

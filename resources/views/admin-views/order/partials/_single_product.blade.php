@@ -1,6 +1,6 @@
 <div class="product-card card cursor-pointer quick-view" data-product-id="{{$product->id}}">
     <div class="card-header inline_product clickable p-0">
-        <img class="img--134 onerror-image" src="{{ $product['image_full_url'] ?? '' }}"
+        <img class="img--134 onerror-image" src="{{ $product['image_full_url'] }}"
          data-onerror-image="{{asset('public/assets/admin/img/160x160/img2.jpg')}}">
     </div>
 

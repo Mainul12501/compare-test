@@ -44,11 +44,9 @@
                     </form>
                 </div>
                 &nbsp;
-{{--                v2.8.1 start--}}
-{{--                <div class="p--10px">--}}
-{{--                    <a class="btn btn--primary btn-outline-primary w-100" href="javascript:" data-toggle="modal" data-target="#balance-modal">{{translate('messages.add_new_method')}}</a>--}}
-{{--                </div>--}}
-                {{--                v2.8.1 end--}}
+                <div class="p--10px">
+                    <a class="btn btn--primary btn-outline-primary w-100" href="javascript:" data-toggle="modal" data-target="#balance-modal">{{translate('messages.add_new_method')}}</a>
+                </div>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
@@ -61,12 +59,11 @@
                         <thead class="thead-light">
                         <tr>
                             <th>{{ translate('messages.sl') }}</th>
-                            <th>{{ translate('messages.store_name') }}</th> <!--v2.8.1-->
                             <th>{{translate('messages.payment_method_name')}}</th>
                             <th>{{translate('messages.payment_info')}}</th>
                             <th>{{translate('messages.default')}}</th>
-{{--                            <th class="w-100px text-center">{{translate('messages.action')}}</th>--}} <!--v2.8.1-->
-{{--                        </tr>--}}
+                            <th class="w-100px text-center">{{translate('messages.action')}}</th>
+                        </tr>
                         </thead>
                         <tbody id="set-rows">
                         @foreach($vendor_withdrawal_methods as $k=>$e)
@@ -85,30 +82,29 @@
                                 <td>
                                     <div class="d-flex">
                                         <div>
-{{--                                            <label class="toggle-switch toggle-switch-sm mr-2" data-toggle="tooltip" data-placement="top" title="{{ translate('messages.make_default_method') }}" for="statusCheckbox{{$e->id}}">--}}
-{{--                                                <input type="checkbox" data-url="{{route('vendor.wallet-method.default',[$e['id'],$e->is_default?0:1])}}" class="toggle-switch-input redirect-url" id="statusCheckbox{{$e->id}}" {{$e->is_default?'checked':''}}>--}}
-{{--                                                <span class="toggle-switch-label">--}}
-{{--                                                <span class="toggle-switch-indicator"></span>--}}
-{{--                                            </span>--}}
-{{--                                            </label>--}}
-                                            <span>{{$e->is_default?'Yes':'No'}}</span> <!--v2.8.1-->
+                                            <label class="toggle-switch toggle-switch-sm mr-2" data-toggle="tooltip" data-placement="top" title="{{ translate('messages.make_default_method') }}" for="statusCheckbox{{$e->id}}">
+                                                <input type="checkbox" data-url="{{route('vendor.wallet-method.default',[$e['id'],$e->is_default?0:1])}}" class="toggle-switch-input redirect-url" id="statusCheckbox{{$e->id}}" {{$e->is_default?'checked':''}}>
+                                                <span class="toggle-switch-label">
+                                                <span class="toggle-switch-indicator"></span>
+                                            </span>
+                                            </label>
                                         </div>
                                     </div>
                                 </td>
-{{--                                <td>--}}
+                                <td>
 
-{{--                                    @if (auth('vendor_employee')->id()  != $e['id'])--}}
-{{--                                        <div class="btn--container justify-content-center">--}}
-{{--                                            <a class="btn btn-sm btn--danger btn-outline-danger action-btn form-alert" href="javascript:"--}}
-{{--                                               data-id="employee-{{$e['id']}}" data-message="{{translate('messages.Want_to_delete_this_method_info')}}" title="{{translate('messages.delete_method')}}"><i class="tio-delete-outlined"></i>--}}
-{{--                                            </a>--}}
-{{--                                            <form action="{{route('vendor.wallet-method.delete',[$e['id']])}}"--}}
-{{--                                                  method="post" id="employee-{{$e['id']}}">--}}
-{{--                                                @csrf @method('delete')--}}
-{{--                                            </form>--}}
-{{--                                        </div>--}}
-{{--                                    @endif--}}
-{{--                                </td>--}}
+                                    @if (auth('vendor_employee')->id()  != $e['id'])
+                                        <div class="btn--container justify-content-center">
+                                            <a class="btn btn-sm btn--danger btn-outline-danger action-btn form-alert" href="javascript:"
+                                               data-id="employee-{{$e['id']}}" data-message="{{translate('messages.Want_to_delete_this_method_info')}}" title="{{translate('messages.delete_method')}}"><i class="tio-delete-outlined"></i>
+                                            </a>
+                                            <form action="{{route('vendor.wallet-method.delete',[$e['id']])}}"
+                                                  method="post" id="employee-{{$e['id']}}">
+                                                @csrf @method('delete')
+                                            </form>
+                                        </div>
+                                    @endif
+                                </td>
                             </tr>
                         @endforeach
                         </tbody>

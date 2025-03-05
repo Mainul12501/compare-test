@@ -10,7 +10,6 @@ use MatanYadaev\EloquentSpatial\Objects\Point;
 use Illuminate\Support\Facades\Validator;
 class ZoneController extends Controller
 {
-    // v2.8.1 checked
     public function get_zones()
     {
         $zones= Zone::where('status',1)->get();

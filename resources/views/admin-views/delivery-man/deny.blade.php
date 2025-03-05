@@ -86,7 +86,6 @@
                         <th class="border-0 text-capitalize">{{translate('messages.zone')}}</th>
                         <th class="border-0 text-capitalize">{{translate('messages.job_type')}}</th>
                         <th class="border-0 text-capitalize">{{translate('messages.join_request_date')}}</th>
-                        <th class="border-0 text-capitalize">{{translate('messages.Reason')}}</th>  <!--v2.8.1-->
                         <th class="border-0 text-center text-capitalize">{{translate('messages.action')}}</th>
                     </tr>
                     </thead>
@@ -123,7 +122,6 @@
                                 {{\App\CentralLogics\Helpers::time_date_format($dm->created_at )   }}
 
                             </td>
-                            <td>{{ $dm->reason ?? '' }}</td>    <!--v2.8.1-->
                             <td>
                                 @if($dm->application_status == 'approved')
 

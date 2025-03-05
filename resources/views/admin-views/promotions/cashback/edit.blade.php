@@ -19,7 +19,7 @@
 
         <div class="card">
             <div class="card-body" id="form_data">
-                <form action="{{route('admin.cashback.update',['id'=>$cashback?->id ])}}" method="POST">
+                <form action="{{route('admin.users.cashback.update',['id'=>$cashback?->id ])}}" method="POST">
                     @csrf
                     <div class="row">
                         <div class="col-12">

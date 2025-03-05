@@ -26,7 +26,6 @@ use Illuminate\Support\Facades\Validator;
 
 class CampaignController extends Controller
 {
-    // v2.8.1 checked
     function index($type)
     {
         return view('admin-views.campaign.'.$type.'.index');
@@ -754,7 +753,7 @@ class CampaignController extends Controller
         {
             $campaign = ItemCampaign::withoutGlobalScope('translate')->findOrFail($campaign);
             $temp = $campaign->category;
-            if($temp->position)
+            if($temp?->position)
             {
                 $sub_category = $temp;
                 $category = $temp->parent;

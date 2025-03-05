@@ -1,5 +1,5 @@
 @extends('layouts.landing.app')
-@section('title', translate('messages.store_registration'))
+@section('title', translate('messages.vendor_registration'))
 @push('css_or_js')
     <link rel="stylesheet" href="{{ asset('public/assets/admin/css/toastr.css') }}">
     <link rel="stylesheet" href="{{ asset('public/assets/admin/css/view-pages/vendor-registration.css') }}">
@@ -10,7 +10,7 @@
         <div class="container">
             <!-- Page Header -->
             <div class="section-header">
-                <h2 class="title mb-2">{{ translate('messages.store') }} <span class="text--base">{{translate('application')}}</span></h2>
+                <h2 class="title mb-2">{{ translate('messages.vendor') }} <span class="text--base">{{translate('application')}}</span></h2>
             </div>
 
             <!-- End Page Header -->

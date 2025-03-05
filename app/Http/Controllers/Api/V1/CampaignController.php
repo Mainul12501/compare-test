@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\Validator;
 
 class CampaignController extends Controller
 {
-    // v2.8.1 checked
     public function get_basic_campaigns(Request $request){
         if (!$request->hasHeader('zoneId')) {
             $errors = [];

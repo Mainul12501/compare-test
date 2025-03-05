@@ -1,6 +1,6 @@
 
 <div class="row">
-    <div class="col-lg-12 text-center "><h1 > {{translate('Store_Withdraw_Transactions')}}
+    <div class="col-lg-12 text-center "><h1 > {{translate($data['is_provider'] ? 'provider_Withdraw_Transactions' : 'Store_Withdraw_Transactions')}}
     </h1></div>
     <div class="col-lg-12">
 

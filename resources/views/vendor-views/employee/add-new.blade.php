@@ -36,7 +36,7 @@
                                 <label class="input-label text-capitalize"
                                     for="f_name">{{ translate('messages.first_name') }}</label>
                                 <input type="text" name="f_name" class="form-control" id="f_name"
-                                    placeholder="{{ translate('messages.Ex:') }} Jhon Doe" value="{{ old('f_name') }}"
+                                    placeholder="{{ translate('messages.Ex:') }} Sakeef Ameer" value="{{ old('f_name') }}"
                                     required>
                             </div>
                             <div class="form-group">
@@ -50,7 +50,7 @@
                                 <label class="input-label text-capitalize"
                                     for="phone">{{ translate('messages.phone') }}</label>
                                 <input type="tel" name="phone" value="{{ old('phone') }}" class="form-control"
-                                    id="phone" placeholder="{{ translate('messages.Ex:') }} +1********" required>
+                                    id="phone" placeholder="{{ translate('messages.Ex:') }} +88017********" required>
                             </div>
                             <div class="form-group mb-0">
                                 <label class="input-label text-capitalize"
@@ -82,7 +82,7 @@
                                         <div class="custom-file">
                                             <input type="file" name="image" id="customFileUpload"
                                                 class="custom-file-input read-url"
-                                                accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*"
+                                                accept=".webp, .jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*"
                                                 value="{{ old('image') }}" required>
                                             <label class="custom-file-label"
                                                 for="customFileUpload">{{ translate('messages.choose_file') }}</label>
@@ -119,7 +119,7 @@
                                                     aria-label="8+ characters required" required
                                                     data-msg="Your password is invalid. Please try again."
                                                     data-hs-toggle-password-options='{
-                                                    "target": [".js-toggle-password-target-1", ".js-toggle-password-target-2"],
+                                                    "target": [".js-toggle-password-target-1"],
                                                     "defaultClass": "tio-hidden-outlined",
                                                     "showClass": "tio-visible-outlined",
                                                     "classChangeTarget": ".js-toggle-passowrd-show-icon-1"
@@ -141,7 +141,7 @@
                                                 aria-label="8+ characters required" required
                                                         data-msg="Password does not match the confirm password."
                                                         data-hs-toggle-password-options='{
-                                                        "target": [".js-toggle-password-target-1", ".js-toggle-password-target-2"],
+                                                        "target": [".js-toggle-password-target-2"],
                                                         "defaultClass": "tio-hidden-outlined",
                                                         "showClass": "tio-visible-outlined",
                                                         "classChangeTarget": ".js-toggle-passowrd-show-icon-2"

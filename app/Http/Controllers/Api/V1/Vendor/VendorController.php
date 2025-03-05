@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api\V1\Vendor;
 
-use App\Mail\WithdrawRequestMail;
 use App\Models\Item;
 use App\Models\Admin;
 use App\Models\Order;
@@ -25,6 +24,7 @@ use App\Models\UserNotification;
 use App\Models\WithdrawalMethod;
 use App\CentralLogics\OrderLogic;
 use App\CentralLogics\StoreLogic;
+use App\Mail\WithdrawRequestMail;
 use App\Models\StoreSubscription;
 use App\CentralLogics\CouponLogic;
 use App\Models\AccountTransaction;
@@ -38,10 +38,6 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
 use App\Models\SubscriptionBillingAndRefundHistory;
-use App\Models\DeliveryCompany;
-use App\Models\OfflinePaymentMethod;
-use App\Models\OfflinePayments;
-use Illuminate\Support\Facades\Response;
 use Modules\Rental\Emails\ProviderWithdrawRequestMail;
 
 class VendorController extends Controller
@@ -56,7 +52,6 @@ class VendorController extends Controller
         $store['discount']=$discount;
         $store['schedules']=$store->schedules()->get();
         $store['module']=$store->module;
-
         $vendor['order_count'] =$vendor->orders->where('order_type','!=','pos')->whereNotIn('order_status',['canceled','failed'])->count();
         $vendor['todays_order_count'] =$vendor->todaysorders->where('order_type','!=','pos')->whereIn('order_status', ['refunded', 'delivered'])->count();
         $vendor['this_week_order_count'] =$vendor->this_week_orders->where('order_type','!=','pos')->whereIn('order_status', ['refunded', 'delivered'])->count();
@@ -156,7 +151,6 @@ class VendorController extends Controller
                         $max_product_uploads= -1;
                     }
                     else{
-//                        $max_product_uploads= $vendor['subscription']->max_product - $st?->items?->count() > 0?  $vendor['subscription']->max_product - $st?->items?->count() : 0 ;
                         if($st?->module_type == 'rental'){
                             $max_product_uploads = $vendor['subscription']->max_product - $st?->vehicles()->count() > 0?  $vendor['subscription']->max_product - $st?->vehicles()->count() : 0 ;
                         } else{
@@ -285,7 +279,7 @@ class VendorController extends Controller
         $validator = Validator::make($request->all(), [
             'limit' => 'required',
             'offset' => 'required',
-            'status' => 'required|in:all,refunded,delivered,refund_requested',
+            'status' => 'required|in:all,refunded,delivered',
         ]);
 
         if ($validator->fails()) {
@@ -420,16 +414,13 @@ class VendorController extends Controller
                 ]
             ], 403);
         }
-        if(Config::get('order_delivery_verification')==1 && $request['status']=='handover')
+        if(Config::get('order_delivery_verification')==1 && $request['status']=='delivered' && $order->otp != $request['otp'])
         {
-            if ($order->dm_otp != $request['otp'])
-            {
-                return response()->json([
-                    'errors' => [
-                        ['code' => 'otp', 'message' => 'Otp Does not matched']
-                    ]
-                ], 403);
-            }
+            return response()->json([
+                'errors' => [
+                    ['code' => 'otp', 'message' => 'Not matched']
+                ]
+            ], 403);
         }
 
         if ($request->status == 'delivered' && $order->transaction == null) {
@@ -562,7 +553,7 @@ class VendorController extends Controller
         if(!$order){
             return response()->json(['errors'=>[['code'=>'order_id', 'message'=>trans('messages.order_data_not_found')]]],404);
         }
-        return response()->json(json_decode(Helpers::order_data_formatting($order,false, true)),200);   // v2.8.1
+        return response()->json(Helpers::order_data_formatting($order),200);
     }
 
     public function get_all_orders(Request $request)
@@ -849,11 +840,6 @@ class VendorController extends Controller
                 DB::table('withdraw_requests')->insert($data);
                 $w?->increment('pending_withdraw', $request['amount']);
                 $mail_status = Helpers::get_mail_status('withdraw_request_mail_status_admin');
-//                if(config('mail.status') && $mail_status == '1'  &&  Helpers::getNotificationStatusData('admin','withdraw_request','mail_status' )) {
-//                    $wallet_transaction = WithdrawRequest::where('vendor_id',$w->vendor_id)->latest()->first();
-//                    $admin= \App\Models\Admin::where('role_id', 1)->first();
-//                    Mail::to($admin->email)->send(new \App\Mail\WithdrawRequestMail('admin_mail',$wallet_transaction));
-//                }
                 $admin= \App\Models\Admin::where('role_id', 1)->first();
                 $wallet_transaction = WithdrawRequest::where('vendor_id',$w->vendor_id)->latest()->first();
                 if($request['vendor']?->stores[0]?->module?->module_type !== 'rental' &&  config('mail.status') && $mail_status == '1'  &&  Helpers::getNotificationStatusData('admin','withdraw_request','mail_status' )) {
@@ -1262,64 +1248,6 @@ class VendorController extends Controller
         return response()->json(['message' => translate('messages.store_wallet_adjustment_successfull')], 200);
     }
 
-    // v2.8.1 full function
-    public function make_payment_offline(Request $request){
-        $validator = Validator::make($request->all(), [
-            'amount' => 'required|numeric|min:.001',
-            'method_id' => 'required',
-        ]);
-
-        $vendor = $request['vendor'];
-        $store=  $vendor->stores[0];
-
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => Helpers::error_processor($validator)], 403);
-        }
-        $offline_payment_info = [];
-        $method = OfflinePaymentMethod::where(['id'=>$request->method_id,'status'=>1])->first();
-        try{
-            if(isset($method))
-            {
-                $fields = array_column($method->method_informations, 'customer_input');
-                $values = $request->all();
-
-                $offline_payment_info['method_id'] = $request->method_id;
-                $offline_payment_info['method_name'] = $method->method_name;
-                foreach ($fields as $field) {
-                    if(key_exists($field, $values)) {
-                        $offline_payment_info[$field] = $values[$field];
-                    }
-                }
-            }
-
-            $OfflinePayments= new OfflinePayments();
-
-            $OfflinePayments->payment_info =json_encode($offline_payment_info);
-            $OfflinePayments->method_fields = json_encode($method?->method_fields);
-            $OfflinePayments->store_id = $store->id;
-            $OfflinePayments->amount = $request->amount;
-            $OfflinePayments->type = 'store';
-            DB::beginTransaction();
-            $OfflinePayments->save();
-            DB::commit();
-
-        } catch (\Exception $e) {
-            info($e->getMessage());
-            DB::rollBack();
-            return response()->json([ 'payment' => $e->getMessage()], 403);
-        }
-        return response()->json(['message' => translate('messages.offline_payment_added_successfully')], 200);
-    }
-    // v2.8.1 full function
-    public function offline_payment_list(Request $request)
-    {
-        $vendor = $request['vendor'];
-        $store=  $vendor->stores[0];
-        $offline_payments = OfflinePayments::where('store_id', $store->id)->where('type', 'store')->latest()->get();
-        return response()->json($offline_payments, 200);
-    }
-
     public function wallet_payment_list(Request $request)
     {
         $limit= $request['limit'] ?? 25;
@@ -1360,45 +1288,5 @@ class VendorController extends Controller
         ];
 
         return response()->json($data, 200);
-    }
-    // v2.8.1 full function
-    public function third_party_company(Request $request){
-        $validator = Validator::make($request->all(), [
-            "order_id"=>"required",
-            "company_name"=>"required",
-            "tracking_url"=>"required|url",
-            "serial_number"=>"required",
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => Helpers::error_processor($validator)], 403);
-        }
-        $order=Order::find($request->order_id);
-        if(!$order){
-            return response()->json([
-                'errors' => [
-                    ['code' => 'status', 'message' => translate('messages.order_not_found')]
-                ]
-            ], 403);
-        }
-
-        $delivery_company = DeliveryCompany::updateOrCreate(
-            ['order_id' => $request->order_id],
-            [
-                'company_name' => $request->company_name,
-                'tracking_url' => $request->tracking_url,
-                'serial_number' => $request->serial_number
-            ]
-        );
-        $order->third_party=1;
-        $order->company_id=$delivery_company->id;
-        $order->save();
-        if ($delivery_company->wasRecentlyCreated) {
-            return response()->json(['message' => translate('messages.Assigned_third_party_company_successfully')], 200);
-        }
-        else
-        {
-            return response()->json(['message' => translate('messages.third_party_company_updated_successfully')], 200);
-        }
     }
 }
