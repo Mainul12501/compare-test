@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin\System;
 
 use App\Models\Module;
+use App\Traits\AddonHelper;
 use Illuminate\Http\Request;
 use App\CentralLogics\Helpers;
 use Illuminate\Http\JsonResponse;
